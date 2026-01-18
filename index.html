@@ -173,9 +173,12 @@
 
       // ✅ 修改：不要用 <br>（避免被當純文字顯示）
       setMsg(msg, `✅ ${res.message}（手機：${res.phone}）\n你可以使用「手機＋身分證末5碼」登入補件。`, "ok");
-    }catch(err){
-      setMsg(msg, `❌ ${err.message}`, "err");
-    }
+}catch(err){
+  // ✅ 顯示完整錯誤（包含 upstream_status / upstream_head）
+  setMsg(msg, `❌ ${String(err?.message || err)}`, "err");
+  console.error(err);
+}
+
   });
 </script>
 
