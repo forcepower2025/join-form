@@ -187,3 +187,7 @@ function clearSession() {
   localStorage.removeItem("join_phone");
   localStorage.removeItem("join_password");
 }
+
+function loadSession() {
+  return getSession();
+}
