@@ -7,11 +7,23 @@ async function apiCall(body) {
     body: JSON.stringify(body),
   });
 
-  // Worker 只允許 POST；若 Worker 或 GAS 回傳非 JSON，這裡會拋錯
-  const json = await resp.json();
+  const text = await resp.text(); // 先拿純文字
+  let json;
+
+  try {
+    json = JSON.parse(text);
+  } catch (e) {
+    // 這裡就是你現在的問題：回來的是 HTML
+    throw new Error(
+      "API 回傳不是 JSON（可能是 HTML）。前 200 字：\n" +
+      text.slice(0, 200)
+    );
+  }
+
   if (!json.ok) throw new Error(json.error || "API error");
   return json.result;
 }
+
 
 function qs(id){ return document.getElementById(id); }
 
