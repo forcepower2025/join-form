@@ -131,47 +131,53 @@
   </div>
 
   <script src="./app.js"></script>
-  <script>
-    const msg = qs("msg");
-    const sig = setupSignatureCanvas(qs("signCanvas"));
+<script>
+  const msg = qs("msg");
+  const sig = setupSignatureCanvas(qs("signCanvas"));
 
-    qs("btnClearSign").addEventListener("click", ()=> sig.clear());
+  qs("btnClearSign").addEventListener("click", ()=> sig.clear());
 
-    qs("btnSubmit").addEventListener("click", async ()=>{
-      try{
-        setMsg(msg, "送出中…", "ok");
+  qs("btnSubmit").addEventListener("click", async ()=>{
+    try{
+      setMsg(msg, "送出中…", "ok");
 
-        const payload = {
-          "姓名": qs("name").value.trim(),
-          "手機號碼": qs("phone").value.trim(),
-          "身分證字號": qs("idno").value.trim().toUpperCase(),
-          "出生日期": qs("dob").value,
-          "銀行分行": qs("bankBranch").value.trim(),
-          "銀行帳戶": qs("bankAccount").value.trim(),
-          "銀行戶名": qs("bankName").value.trim(),
-          "通訊地址（縣市）": qs("addrCity").value.trim(),
-          "通訊地址（區）": qs("addrDist").value.trim(),
-          "通訊地址（詳細地址）": qs("addrDetail").value.trim(),
-          "推薦人姓名": qs("refName").value.trim(),
-          "推薦人手機號碼": qs("refPhone").value.trim(),
-          consentChecked: qs("consent").checked,
-          signatureDataUrl: sig.toDataUrl(),
-          idFrontDataUrl: await fileToDataUrl(qs("idFront").files[0]),
-          idBackDataUrl: await fileToDataUrl(qs("idBack").files[0]),
-          bankbookDataUrl: await fileToDataUrl(qs("bankbook").files[0]),
-        };
+      // ✅ 新增：簽名必填（空白不可送出）
+      if (sig.isBlank()) throw new Error("必須簽名才能送出申請");
 
-        // 前端最基本檢核（後端也會再檢核）
-        if(!payload["姓名"] || !payload["手機號碼"] || !payload["身分證字號"] || !payload["出生日期"]) throw new Error("姓名/手機/身分證/出生日期為必填");
-        if(!payload["通訊地址（縣市）"] || !payload["通訊地址（區）"] || !payload["通訊地址（詳細地址）"]) throw new Error("通訊地址需填完整");
-        if(!payload.consentChecked) throw new Error("請先勾選同意聲明");
+      const payload = {
+        "姓名": qs("name").value.trim(),
+        "手機號碼": qs("phone").value.trim(),
+        "身分證字號": qs("idno").value.trim().toUpperCase(),
+        "出生日期": qs("dob").value,
+        "銀行分行": qs("bankBranch").value.trim(),
+        "銀行帳戶": qs("bankAccount").value.trim(),
+        "銀行戶名": qs("bankName").value.trim(),
+        "通訊地址（縣市）": qs("addrCity").value.trim(),
+        "通訊地址（區）": qs("addrDist").value.trim(),
+        "通訊地址（詳細地址）": qs("addrDetail").value.trim(),
+        "推薦人姓名": qs("refName").value.trim(),
+        "推薦人手機號碼": qs("refPhone").value.trim(),
+        consentChecked: qs("consent").checked,
+        signatureDataUrl: sig.toDataUrl(),
+        idFrontDataUrl: await fileToDataUrl(qs("idFront").files[0]),
+        idBackDataUrl: await fileToDataUrl(qs("idBack").files[0]),
+        bankbookDataUrl: await fileToDataUrl(qs("bankbook").files[0]),
+      };
 
-        const res = await apiCall({ action:"submitApplication", payload });
-        setMsg(msg, `✅ ${res.message}（手機：${res.phone}）<br>你可以使用「手機＋身分證末5碼」登入補件。`, "ok");
-      }catch(err){
-        setMsg(msg, `❌ ${err.message}`, "err");
-      }
-    });
-  </script>
+      // 前端最基本檢核（後端也會再檢核）
+      if(!payload["姓名"] || !payload["手機號碼"] || !payload["身分證字號"] || !payload["出生日期"]) throw new Error("姓名/手機/身分證/出生日期為必填");
+      if(!payload["通訊地址（縣市）"] || !payload["通訊地址（區）"] || !payload["通訊地址（詳細地址）"]) throw new Error("通訊地址需填完整");
+      if(!payload.consentChecked) throw new Error("請先勾選同意聲明");
+
+      const res = await apiCall({ action:"submitApplication", payload });
+
+      // ✅ 修改：不要用 <br>（避免被當純文字顯示）
+      setMsg(msg, `✅ ${res.message}（手機：${res.phone}）\n你可以使用「手機＋身分證末5碼」登入補件。`, "ok");
+    }catch(err){
+      setMsg(msg, `❌ ${err.message}`, "err");
+    }
+  });
+</script>
+
 </body>
 </html>
