@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>登入補件</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <div class="title">登入補件</div>
+        <div class="muted">請輸入手機號碼與預設密碼（身分證末5碼）。</div>
+      </div>
+      <div class="nav">
+        <a href="./index.html">回申請表</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="grid grid-2">
+        <div>
+          <label>手機號碼</label>
+          <input id="phone" inputmode="numeric" placeholder="例：0912345678" />
+        </div>
+        <div>
+          <label>密碼（身分證末5碼）</label>
+          <input id="pwd" type="password" inputmode="numeric" placeholder="例：67890" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnLogin" class="btn-primary" type="button">登入</button>
+      </div>
+
+      <div id="msg" class="msg"></div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script>
+    const msg = qs("msg");
+
+    qs("btnLogin").addEventListener("click", async ()=>{
+      try{
+        setMsg(msg, "登入中…", "ok");
+        const phone = qs("phone").value.trim();
+        const password = qs("pwd").value.trim();
+        if(!phone || !password) throw new Error("請輸入手機與密碼");
+
+        await apiCall({ action:"login", phone, password });
+        saveSession(phone, password);
+        location.href = "./portal.html";
+      }catch(err){
+        setMsg(msg, `❌ ${err.message}`, "err");
+      }
+    });
+  </script>
+</body>
+</html>
