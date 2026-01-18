@@ -1,13 +1,177 @@
 <!doctype html>
-<html>
+<html lang="zh-Hant">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url=https://script.google.com/macros/s/AKfycbwC_JadtJdb5Wf_Af4lVkzFbu38-Fgq5Sef5rY0WKytsTPqk0kaKmpZMqFp-eUctETH2Q/exec">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>加盟商申請表</title>
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-  <p>正在前往申請表…</p>
-  <p><a href="https://script.google.com/macros/s/AKfycbwC_JadtJdb5Wf_Af4lVkzFbu38-Fgq5Sef5rY0WKytsTPqk0kaKmpZMqFp-eUctETH2Q/exec">若未跳轉請點此</a></p>
+  <div class="container">
+    <div class="header">
+      <div>
+        <div class="title">加盟商申請表</div>
+        <div class="muted">資料將寫入 Google Sheet，文件與簽名存入 Google Drive。</div>
+      </div>
+      <div class="nav">
+        <a href="./login.html">登入補件</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="grid grid-2">
+        <div>
+          <label>姓名</label>
+          <input id="name" placeholder="請輸入姓名" />
+        </div>
+        <div>
+          <label>手機號碼</label>
+          <input id="phone" inputmode="numeric" placeholder="例：0912345678" />
+        </div>
+
+        <div>
+          <label>身分證字號</label>
+          <input id="idno" placeholder="例：A123456789" />
+          <div class="muted">登入預設密碼為「身分證字號末5碼」</div>
+        </div>
+        <div>
+          <label>出生日期</label>
+          <input id="dob" type="date" />
+        </div>
+
+        <div>
+          <label>銀行分行</label>
+          <input id="bankBranch" placeholder="例：XX銀行XX分行" />
+        </div>
+        <div>
+          <label>銀行帳戶</label>
+          <input id="bankAccount" placeholder="請輸入帳號" />
+        </div>
+
+        <div>
+          <label>銀行戶名</label>
+          <input id="bankName" placeholder="請輸入戶名" />
+        </div>
+        <div>
+          <label>推薦人姓名</label>
+          <input id="refName" placeholder="（可選）" />
+        </div>
+
+        <div>
+          <label>推薦人手機號碼</label>
+          <input id="refPhone" inputmode="numeric" placeholder="（可選）" />
+        </div>
+        <div></div>
+
+        <div>
+          <label>通訊地址（縣市）</label>
+          <input id="addrCity" placeholder="例：桃園市" />
+        </div>
+        <div>
+          <label>通訊地址（區）</label>
+          <input id="addrDist" placeholder="例：八德區" />
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label>通訊地址（詳細地址）</label>
+          <input id="addrDetail" placeholder="例：銀和街1號18樓" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <span class="badge">可選上傳</span>
+        <span class="muted">若一開始未上傳，登入後仍可補件。</span>
+      </div>
+      <div class="grid grid-2" style="margin-top:10px;">
+        <div>
+          <label>身份證正面</label>
+          <input id="idFront" type="file" accept="image/*" />
+        </div>
+        <div>
+          <label>身份證反面</label>
+          <input id="idBack" type="file" accept="image/*" />
+        </div>
+        <div style="grid-column:1/-1;">
+          <label>存摺封面</label>
+          <input id="bankbook" type="file" accept="image/*" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <span class="badge">同意聲明</span>
+      </div>
+      <div style="margin-top:10px;">
+        <label style="display:flex; gap:10px; align-items:center; color: var(--txt);">
+          <input id="consent" type="checkbox" style="width:auto; transform: scale(1.1);" />
+          我已閱讀並同意以上合約書內容
+        </label>
+        <div class="muted">送出即表示同意並以簽名為憑。</div>
+      </div>
+
+      <hr />
+
+      <div class="row">
+        <span class="badge">手寫簽名</span>
+        <button id="btnClearSign" class="btn-ghost" type="button">清除簽名</button>
+      </div>
+      <div style="margin-top:10px;">
+        <canvas id="signCanvas"></canvas>
+        <div class="muted">手機可直接手寫；電腦用滑鼠簽名。</div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnSubmit" class="btn-primary" type="button">送出申請</button>
+      </div>
+
+      <div id="msg" class="msg"></div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script>
+    const msg = qs("msg");
+    const sig = setupSignatureCanvas(qs("signCanvas"));
+
+    qs("btnClearSign").addEventListener("click", ()=> sig.clear());
+
+    qs("btnSubmit").addEventListener("click", async ()=>{
+      try{
+        setMsg(msg, "送出中…", "ok");
+
+        const payload = {
+          "姓名": qs("name").value.trim(),
+          "手機號碼": qs("phone").value.trim(),
+          "身分證字號": qs("idno").value.trim().toUpperCase(),
+          "出生日期": qs("dob").value,
+          "銀行分行": qs("bankBranch").value.trim(),
+          "銀行帳戶": qs("bankAccount").value.trim(),
+          "銀行戶名": qs("bankName").value.trim(),
+          "通訊地址（縣市）": qs("addrCity").value.trim(),
+          "通訊地址（區）": qs("addrDist").value.trim(),
+          "通訊地址（詳細地址）": qs("addrDetail").value.trim(),
+          "推薦人姓名": qs("refName").value.trim(),
+          "推薦人手機號碼": qs("refPhone").value.trim(),
+          consentChecked: qs("consent").checked,
+          signatureDataUrl: sig.toDataUrl(),
+          idFrontDataUrl: await fileToDataUrl(qs("idFront").files[0]),
+          idBackDataUrl: await fileToDataUrl(qs("idBack").files[0]),
+          bankbookDataUrl: await fileToDataUrl(qs("bankbook").files[0]),
+        };
+
+        // 前端最基本檢核（後端也會再檢核）
+        if(!payload["姓名"] || !payload["手機號碼"] || !payload["身分證字號"] || !payload["出生日期"]) throw new Error("姓名/手機/身分證/出生日期為必填");
+        if(!payload["通訊地址（縣市）"] || !payload["通訊地址（區）"] || !payload["通訊地址（詳細地址）"]) throw new Error("通訊地址需填完整");
+        if(!payload.consentChecked) throw new Error("請先勾選同意聲明");
+
+        const res = await apiCall({ action:"submitApplication", payload });
+        setMsg(msg, `✅ ${res.message}（手機：${res.phone}）<br>你可以使用「手機＋身分證末5碼」登入補件。`, "ok");
+      }catch(err){
+        setMsg(msg, `❌ ${err.message}`, "err");
+      }
+    });
+  </script>
 </body>
 </html>
