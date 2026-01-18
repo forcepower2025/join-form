@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>會員資料與補件</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <div class="title">會員資料與補件</div>
+        <div class="muted">你可以查詢個人資料並補上傳文件與重新簽名。</div>
+      </div>
+      <div class="nav">
+        <a href="./index.html">申請表</a>
+        <a href="./login.html" id="logout">登出</a>
+      </div>
+    </div>
+
+    <div class="card" id="profileCard">
+      <div class="row">
+        <span class="badge">個人資料</span>
+      </div>
+      <div id="profile" class="muted" style="margin-top:10px;">載入中…</div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <span class="badge">補件上傳</span>
+        <span class="muted">可補上傳身份證/存摺；也可重新簽名。</span>
+      </div>
+
+      <div class="grid grid-2" style="margin-top:10px;">
+        <div>
+          <label>身份證正面（補件）</label>
+          <input id="idFront" type="file" accept="image/*" />
+        </div>
+        <div>
+          <label>身份證反面（補件）</label>
+          <input id="idBack" type="file" accept="image/*" />
+        </div>
+        <div style="grid-column:1/-1;">
+          <label>存摺封面（補件）</label>
+          <input id="bankbook" type="file" accept="image/*" />
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <label>文件說明（可選）</label>
+        <input id="desc" placeholder="例：補上存摺封面、重新上傳新版身份證" />
+      </div>
+
+      <hr />
+
+      <div class="row">
+        <span class="badge">重新簽名（可選）</span>
+        <button id="btnClearSign" class="btn-ghost" type="button">清除簽名</button>
+      </div>
+      <div style="margin-top:10px;">
+        <canvas id="signCanvas"></canvas>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button id="btnUpload" class="btn-primary" type="button">送出補件/簽名更新</button>
+      </div>
+
+      <div id="msg" class="msg"></div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+  <script>
+    const msg = qs("msg");
+    const sig = setupSignatureCanvas(qs("signCanvas"));
+
+    qs("btnClearSign").addEventListener("click", ()=> sig.clear());
+    qs("logout").addEventListener("click", (e)=>{ e.preventDefault(); clearSession(); location.href="./login.html"; });
+
+    function renderProfile(obj){
+      const order = [
+        "申請時間戳記","申請狀態","備註","姓名","手機號碼","身分證字號","出生日期",
+        "銀行分行","銀行帳戶","銀行戶名",
+        "通訊地址（縣市）","通訊地址（區）","通訊地址（詳細地址）",
+        "推薦人姓名","推薦人手機號碼",
+        "身份證正面檔案ID","身份證反面檔案ID","存摺封面檔案ID","申請簽名檔案ID"
+      ];
+      let html = `<table class="table">`;
+      order.forEach(k=>{
+        if (obj[k] === undefined) return;
+        html += `<tr><td>${k}</td><td>${String(obj[k] ?? "")}</td></tr>`;
+      });
+      html += `</table>`;
+      qs("profile").innerHTML = html;
+    }
+
+    async function loadProfile(){
+      const { phone, password } = loadSession();
+      if(!phone || !password){
+        location.href="./login.html";
+        return;
+      }
+      const res = await apiCall({ action:"getProfile", phone, password });
+      renderProfile(res.data || {});
+    }
+
+    qs("btnUpload").addEventListener("click", async ()=>{
+      try{
+        setMsg(msg, "送出中…", "ok");
+        const { phone, password } = loadSession();
+        if(!phone || !password) throw new Error("未登入");
+
+        const payload = {
+          desc: qs("desc").value.trim(),
+          idFrontDataUrl: await fileToDataUrl(qs("idFront").files[0]),
+          idBackDataUrl: await fileToDataUrl(qs("idBack").files[0]),
+          bankbookDataUrl: await fileToDataUrl(qs("bankbook").files[0]),
+          // 如果簽名區空白就不送
+          signatureDataUrl: sig.isBlank() ? "" : sig.toDataUrl(),
+        };
+
+        if(!payload.idFrontDataUrl && !payload.idBackDataUrl && !payload.bankbookDataUrl && !payload.signatureDataUrl){
+          throw new Error("沒有選擇任何補件檔案或簽名");
+        }
+
+        const res = await apiCall({ action:"uploadAfterLogin", phone, password, payload });
+        setMsg(msg, `✅ ${res.message}`, "ok");
+
+        // 重新載入資料
+        await loadProfile();
+      }catch(err){
+        setMsg(msg, `❌ ${err.message}`, "err");
+      }
+    });
+
+    loadProfile().catch(err=>{
+      qs("profile").innerHTML = `❌ 載入失敗：${err.message}`;
+    });
+  </script>
+</body>
+</html>
