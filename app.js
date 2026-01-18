@@ -167,3 +167,23 @@ async function apiGetProfile(phone, password) {
 async function apiUploadAfterLogin(phone, password, payload) {
   return apiCall({ action: "uploadAfterLogin", phone, password, payload });
 }
+
+
+// -------------------- Session helpers --------------------
+// 用 localStorage 保存登入狀態（手機/密碼）供 portal.html 使用
+function saveSession(phone, password) {
+  localStorage.setItem("join_phone", String(phone || ""));
+  localStorage.setItem("join_password", String(password || ""));
+}
+
+function getSession() {
+  return {
+    phone: localStorage.getItem("join_phone") || "",
+    password: localStorage.getItem("join_password") || "",
+  };
+}
+
+function clearSession() {
+  localStorage.removeItem("join_phone");
+  localStorage.removeItem("join_password");
+}
