@@ -11,8 +11,97 @@
     <div class="header">
       <div>
         <div class="title">動元力國際加盟商申請表</div>
+        <div class="muted"> ............. 
+        </div>
+      </div>
+      <div class="nav">
+        <a href="./login.html">登入補件</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="grid grid-2">
+        <div>
+          <label>姓名</label>
+          <input id="name" placeholder="請輸入姓名" />
+        </div>
+        <div>
+          <label>手機號碼</label>
+          <input id="phone" inputmode="numeric" placeholder="例：0912345678" />
+        </div>
+
+        <div>
+          <label>身分證字號</label>
+          <input id="idno" placeholder="例：A123456789" />
+          <div class="muted">登入預設密碼為「身分證字號末5碼」</div>
+        </div>
+        <div>
+          <label>出生日期</label>
+          <input id="dob" type="date" />
+        </div>
+
+        <div>
+          <label>銀行分行</label>
+          <input id="bankBranch" placeholder="例：XX銀行XX分行" />
+        </div>
+        <div>
+          <label>銀行帳戶</label>
+          <input id="bankAccount" placeholder="請輸入帳號" />
+        </div>
+
+        <div>
+          <label>銀行戶名</label>
+          <input id="bankName" placeholder="請輸入戶名" />
+        </div>
+        <div>
+          <label>推薦人姓名</label>
+          <input id="refName" placeholder="（可選）" />
+        </div>
+
+        <div>
+          <label>推薦人手機號碼</label>
+          <input id="refPhone" inputmode="numeric" placeholder="（可選）" />
+        </div>
+        <div></div>
+
+        <div>
+          <label>通訊地址（縣市）</label>
+          <input id="addrCity" placeholder="例：桃園市" />
+        </div>
+        <div>
+          <label>通訊地址（區）</label>
+          <input id="addrDist" placeholder="例：八德區" />
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label>通訊地址（詳細地址）</label>
+          <input id="addrDetail" placeholder="例：銀和街1號18樓" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <span class="badge">可選上傳</span>
+        <span class="muted">若一開始未上傳，登入後仍可補件。</span>
+      </div>
+      <div class="grid grid-2" style="margin-top:10px;">
+        <div>
+          <label>身份證正面</label>
+          <input id="idFront" type="file" accept="image/*" />
+        </div>
+        <div>
+          <label>身份證反面</label>
+          <input id="idBack" type="file" accept="image/*" />
+        </div>
+        <div style="grid-column:1/-1;">
+          <label>存摺封面</label>
+          <input id="bankbook" type="file" accept="image/*" />
+        </div>
+      </div>
+    </div>
+        <div class="title">《動元力國際微股東加入合約書》</div>
         <div class="muted">
-          甲方：動元力國際股份有限公司
+甲方：動元力國際股份有限公司 <br>
 代表人：黃光啟執行長
 乙方：微股東加入人（投資人）
 甲乙雙方本於誠信原則，就乙方參與甲方「微股東募集專案」之權利義務，達成合意，訂立本合約如下：
@@ -102,95 +191,7 @@ ________________________________________
 本合約為電子合約，由乙方填寫完個人資料、勾選同意並於電子簽名板上親筆簽名送出後生效。
 ________________________________________
 
-        </div>
-      </div>
-      <div class="nav">
-        <a href="./login.html">登入補件</a>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="grid grid-2">
-        <div>
-          <label>姓名</label>
-          <input id="name" placeholder="請輸入姓名" />
-        </div>
-        <div>
-          <label>手機號碼</label>
-          <input id="phone" inputmode="numeric" placeholder="例：0912345678" />
-        </div>
-
-        <div>
-          <label>身分證字號</label>
-          <input id="idno" placeholder="例：A123456789" />
-          <div class="muted">登入預設密碼為「身分證字號末5碼」</div>
-        </div>
-        <div>
-          <label>出生日期</label>
-          <input id="dob" type="date" />
-        </div>
-
-        <div>
-          <label>銀行分行</label>
-          <input id="bankBranch" placeholder="例：XX銀行XX分行" />
-        </div>
-        <div>
-          <label>銀行帳戶</label>
-          <input id="bankAccount" placeholder="請輸入帳號" />
-        </div>
-
-        <div>
-          <label>銀行戶名</label>
-          <input id="bankName" placeholder="請輸入戶名" />
-        </div>
-        <div>
-          <label>推薦人姓名</label>
-          <input id="refName" placeholder="（可選）" />
-        </div>
-
-        <div>
-          <label>推薦人手機號碼</label>
-          <input id="refPhone" inputmode="numeric" placeholder="（可選）" />
-        </div>
-        <div></div>
-
-        <div>
-          <label>通訊地址（縣市）</label>
-          <input id="addrCity" placeholder="例：桃園市" />
-        </div>
-        <div>
-          <label>通訊地址（區）</label>
-          <input id="addrDist" placeholder="例：八德區" />
-        </div>
-        <div style="grid-column: 1 / -1;">
-          <label>通訊地址（詳細地址）</label>
-          <input id="addrDetail" placeholder="例：銀和街1號18樓" />
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="row">
-        <span class="badge">可選上傳</span>
-        <span class="muted">若一開始未上傳，登入後仍可補件。</span>
-      </div>
-      <div class="grid grid-2" style="margin-top:10px;">
-        <div>
-          <label>身份證正面</label>
-          <input id="idFront" type="file" accept="image/*" />
-        </div>
-        <div>
-          <label>身份證反面</label>
-          <input id="idBack" type="file" accept="image/*" />
-        </div>
-        <div style="grid-column:1/-1;">
-          <label>存摺封面</label>
-          <input id="bankbook" type="file" accept="image/*" />
-        </div>
-      </div>
-    </div>
-        <div class="title">《動元力國際微股東加入合約書》</div>
-        <div class="muted">合約書內容</div>
+          </div>
     <div class="card">
       <div class="row">
         <span class="badge">同意聲明</span>
