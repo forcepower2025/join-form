@@ -1,97 +1,124 @@
+// app.js
+// 目的：
+// 1) 統一呼叫 Cloudflare Worker（解 CORS）
+// 2) 任何錯誤都「完整顯示」(包含 upstream_status / upstream_head)
+// 3) 提供：檔案轉 base64、簽名板、訊息顯示等共用工具
+
+// ✅ 請確認這條是你的 Cloudflare Worker URL
 const API_BASE = "https://join-form.2025-forcepower.workers.dev";
 
+// -------------------- API --------------------
 async function apiCall(body) {
-  let resp;
-  try {
-    resp = await fetch(API_BASE, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-  } catch (e) {
-    throw new Error("fetch 失敗（可能網路或被擋）：" + String(e));
-  }
+  const resp = await fetch(API_BASE, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
 
-  const text = await resp.text(); // 先拿純文字
+  const text = await resp.text();
 
-  // ✅ 新增：空回應也要報告
-  if (!text) {
-    throw new Error(
-      "API 回應是空的。\n" +
-      "Status: " + resp.status + "\n" +
-      "URL: " + API_BASE + "\n"
-    );
-  }
-
+  // Worker 理論上永遠回 JSON；這段是保險
   let json;
   try {
-    json = JSON.parse(text);
+    json = JSON.parse(text || "{}");
   } catch (e) {
     throw new Error(
-      "API 回傳不是 JSON（可能是 HTML/純文字）。\n" +
+      "API 回應無法解析為 JSON\n" +
       "Status: " + resp.status + "\n" +
-      "前 200 字：\n" + text.slice(0, 200)
+      "Head:\n" + (text || "").slice(0, 300)
     );
   }
 
-  if (!json.ok) throw new Error(json.error || "API error");
+  // ✅ 任何錯誤都把整包 JSON 顯示出來（含 upstream_*）
+  if (!json.ok) {
+    throw new Error(JSON.stringify(json, null, 2));
+  }
+
   return json.result;
 }
 
+// -------------------- DOM helpers --------------------
+function qs(id) { return document.getElementById(id); }
 
+function setMsg(el, html, kind) {
+  if (!el) return;
+  if (kind === "err") {
+    el.innerHTML = `<pre class="err" style="white-space:pre-wrap; margin:0;">${escapeHtml(String(html))}</pre>`;
+  } else if (kind === "ok") {
+    el.innerHTML = `<div class="ok">${escapeHtml(String(html))}</div>`;
+  } else {
+    el.innerHTML = `<div>${escapeHtml(String(html))}</div>`;
+  }
+}
 
-function qs(id){ return document.getElementById(id); }
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
-function fileToDataUrl(file){
-  return new Promise((resolve, reject)=>{
+// -------------------- File to DataURL (base64) --------------------
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
     if (!file) return resolve("");
     const r = new FileReader();
-    r.onload = ()=> resolve(r.result);
+    r.onload = () => resolve(r.result);
     r.onerror = reject;
     r.readAsDataURL(file);
   });
 }
 
-function setupSignatureCanvas(canvas){
+// -------------------- Signature Canvas --------------------
+function setupSignatureCanvas(canvas) {
   const ctx = canvas.getContext("2d");
 
-  function resize(){
+  function resize() {
     const rect = canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
+
+    // 設定內部像素、再用 transform 對齊視覺座標
     canvas.width = Math.floor(rect.width * dpr);
     canvas.height = Math.floor(rect.height * dpr);
-    ctx.setTransform(dpr,0,0,dpr,0,0);
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.lineWidth = 2;
     ctx.lineCap = "round";
     ctx.strokeStyle = "#111";
   }
+
   resize();
   window.addEventListener("resize", resize);
 
   let drawing = false;
   let last = null;
 
-  function pos(e){
+  function getPoint(e) {
     const r = canvas.getBoundingClientRect();
     const t = (e.touches && e.touches[0]) ? e.touches[0] : e;
     return { x: t.clientX - r.left, y: t.clientY - r.top };
   }
 
-  function start(e){
+  function start(e) {
     drawing = true;
-    last = pos(e);
+    last = getPoint(e);
   }
-  function move(e){
+
+  function move(e) {
     if (!drawing) return;
     e.preventDefault();
-    const p = pos(e);
+
+    const p = getPoint(e);
     ctx.beginPath();
     ctx.moveTo(last.x, last.y);
     ctx.lineTo(p.x, p.y);
     ctx.stroke();
     last = p;
   }
-  function end(){
+
+  function end() {
     drawing = false;
     last = null;
   }
@@ -100,36 +127,35 @@ function setupSignatureCanvas(canvas){
   canvas.addEventListener("mousemove", move);
   window.addEventListener("mouseup", end);
 
-  canvas.addEventListener("touchstart", start, {passive:false});
-  canvas.addEventListener("touchmove", move, {passive:false});
+  canvas.addEventListener("touchstart", start, { passive: false });
+  canvas.addEventListener("touchmove", move, { passive: false });
   canvas.addEventListener("touchend", end);
 
   return {
-    clear(){ ctx.clearRect(0,0,canvas.width,canvas.height); },
-    toDataUrl(){ return canvas.toDataURL("image/png"); },
-    isBlank(){
+    clear() { ctx.clearRect(0, 0, canvas.width, canvas.height); },
+    toDataUrl() { return canvas.toDataURL("image/png"); },
+    isBlank() {
       const c = document.createElement("canvas");
-      c.width = canvas.width; c.height = canvas.height;
+      c.width = canvas.width;
+      c.height = canvas.height;
       return canvas.toDataURL() === c.toDataURL();
     }
   };
 }
 
-function setMsg(el, text, kind){
-  el.innerHTML = `<div class="${kind}">${text}</div>`;
+// -------------------- Convenience wrappers (optional) --------------------
+async function apiSubmitApplication(payload) {
+  return apiCall({ action: "submitApplication", payload });
 }
 
-function saveSession(phone, password){
-  sessionStorage.setItem("phone", phone);
-  sessionStorage.setItem("password", password);
+async function apiLogin(phone, password) {
+  return apiCall({ action: "login", phone, password });
 }
-function loadSession(){
-  return {
-    phone: sessionStorage.getItem("phone") || "",
-    password: sessionStorage.getItem("password") || "",
-  };
+
+async function apiGetProfile(phone, password) {
+  return apiCall({ action: "getProfile", phone, password });
 }
-function clearSession(){
-  sessionStorage.removeItem("phone");
-  sessionStorage.removeItem("password");
+
+async function apiUploadAfterLogin(phone, password, payload) {
+  return apiCall({ action: "uploadAfterLogin", phone, password, payload });
 }
