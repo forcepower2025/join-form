@@ -72,8 +72,15 @@ function fileToDataUrl(file) {
 }
 
 // -------------------- Signature Canvas --------------------
+// ✅ 只修改這一段：修正「空白簽名也能送出」的判定（避免空白畫布 toDataURL 仍有值）
 function setupSignatureCanvas(canvas) {
   const ctx = canvas.getContext("2d");
+
+  let drawing = false;
+  let last = null;
+
+  // ✅ 用布林值追蹤「是否真的畫過」
+  let hasInk = false;
 
   function resize() {
     const rect = canvas.getBoundingClientRect();
@@ -91,9 +98,6 @@ function setupSignatureCanvas(canvas) {
 
   resize();
   window.addEventListener("resize", resize);
-
-  let drawing = false;
-  let last = null;
 
   function getPoint(e) {
     const r = canvas.getBoundingClientRect();
@@ -115,6 +119,10 @@ function setupSignatureCanvas(canvas) {
     ctx.moveTo(last.x, last.y);
     ctx.lineTo(p.x, p.y);
     ctx.stroke();
+
+    // ✅ 只要有畫線就視為已簽名
+    hasInk = true;
+
     last = p;
   }
 
@@ -132,14 +140,14 @@ function setupSignatureCanvas(canvas) {
   canvas.addEventListener("touchend", end);
 
   return {
-    clear() { ctx.clearRect(0, 0, canvas.width, canvas.height); },
+    clear() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hasInk = false; // ✅ 清除後視為未簽名
+    },
     toDataUrl() { return canvas.toDataURL("image/png"); },
-    isBlank() {
-      const c = document.createElement("canvas");
-      c.width = canvas.width;
-      c.height = canvas.height;
-      return canvas.toDataURL() === c.toDataURL();
-    }
+
+    // ✅ 改成用 hasInk 判定，避免「空白畫布也有 dataURL」導致誤判
+    isBlank() { return !hasInk; },
   };
 }
 
