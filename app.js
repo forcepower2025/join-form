@@ -1,28 +1,43 @@
 const API_BASE = "https://join-form.2025-forcepower.workers.dev";
 
 async function apiCall(body) {
-  const resp = await fetch(API_BASE, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  let resp;
+  try {
+    resp = await fetch(API_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  } catch (e) {
+    throw new Error("fetch 失敗（可能網路或被擋）：" + String(e));
+  }
 
   const text = await resp.text(); // 先拿純文字
-  let json;
 
+  // ✅ 新增：空回應也要報告
+  if (!text) {
+    throw new Error(
+      "API 回應是空的。\n" +
+      "Status: " + resp.status + "\n" +
+      "URL: " + API_BASE + "\n"
+    );
+  }
+
+  let json;
   try {
     json = JSON.parse(text);
   } catch (e) {
-    // 這裡就是你現在的問題：回來的是 HTML
     throw new Error(
-      "API 回傳不是 JSON（可能是 HTML）。前 200 字：\n" +
-      text.slice(0, 200)
+      "API 回傳不是 JSON（可能是 HTML/純文字）。\n" +
+      "Status: " + resp.status + "\n" +
+      "前 200 字：\n" + text.slice(0, 200)
     );
   }
 
   if (!json.ok) throw new Error(json.error || "API error");
   return json.result;
 }
+
 
 
 function qs(id){ return document.getElementById(id); }
