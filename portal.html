@@ -19,6 +19,16 @@
       </div>
     </div>
 
+    <!-- ✅ 合約PDF下載（最上方） -->
+    <div class="card" id="contractCard" style="display:none;">
+      <div class="row">
+        <span class="badge">合約PDF</span>
+      </div>
+      <div class="row" style="margin-top:12px;">
+        <a id="contractBtn" class="btn-primary" href="#" target="_blank" rel="noopener">下載合約PDF</a>
+      </div>
+    </div>
+
     <div class="card" id="profileCard">
       <div class="row">
         <span class="badge">個人資料</span>
@@ -101,7 +111,20 @@
         location.href="./login.html";
         return;
       }
+
       const res = await apiCall({ action:"getProfile", phone, password });
+
+      // ✅ 合約PDF下載按鈕（最上方卡片）
+      const contractUrl = (res && res.contractPdfUrl) ? String(res.contractPdfUrl) : "";
+      const cc = qs("contractCard");
+      const btn = qs("contractBtn");
+      if (contractUrl) {
+        btn.href = contractUrl;
+        cc.style.display = "";
+      } else {
+        cc.style.display = "none";
+      }
+
       renderProfile(res.data || {});
     }
 
@@ -127,7 +150,7 @@
         const res = await apiCall({ action:"uploadAfterLogin", phone, password, payload });
         setMsg(msg, `✅ ${res.message}`, "ok");
 
-        // 重新載入資料
+        // 重新載入資料（包含合約連結）
         await loadProfile();
       }catch(err){
         setMsg(msg, `❌ ${err.message}`, "err");
