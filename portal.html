@@ -103,29 +103,21 @@
       qs("profile").innerHTML = html;
     }
 
-    // ✅ 把 Drive「view連結」轉為可直接顯示圖片的連結
-    function toDriveImageUrl(u){
-      u = String(u || "").trim();
-      if(!u) return "";
-      // 1) 已經是 direct link
-      if (u.includes("googleusercontent.com")) return u;
-
-      // 2) 從 view 連結抓 fileId
-      const m = u.match(/\/file\/d\/([^\/]+)\//);
-      if (m && m[1]) {
-        const id = m[1];
-        // 這個格式可以直接當 <img src>
-        return `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`;
-      }
-
-      // 3) fallback
-      return u;
+    // ✅ 由 Drive File ID 組出：
+    // - openUrl：給「開新視窗」
+    // - imgUrl：給 <img src> 直接顯示
+    function driveUrlsById(fileId){
+      const id = String(fileId || "").trim();
+      if(!id) return { openUrl:"", imgUrl:"" };
+      return {
+        openUrl: `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`,
+        imgUrl:  `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`
+      };
     }
 
-    function imgBlock(title, url){
-      if(!url) return "";
-      const openUrl = String(url);
-      const imgUrl = toDriveImageUrl(openUrl);
+    function imgBlock(title, fileId){
+      const { openUrl, imgUrl } = driveUrlsById(fileId);
+      if(!openUrl || !imgUrl) return "";
 
       return `
         <div style="margin-bottom:14px;">
@@ -147,17 +139,22 @@
       }
 
       const res = await apiCall({ action:"getProfile", phone, password });
+      const data = (res && res.data) ? res.data : {};
 
-      // ✅ 顯示證件/存摺/簽名圖片（依 api.gs 回傳 res.links）
-      const links = (res && res.links) ? res.links : {};
+      // ✅ 直接用主表的檔案ID顯示（不依賴 res.links）
+      const idFrontId = data["身份證正面檔案ID"] || "";
+      const idBackId  = data["身份證反面檔案ID"] || "";
+      const bankbookId = data["存摺封面檔案ID"] || "";
+      const signId = data["申請簽名檔案ID"] || "";
+
       const card = qs("filesCard");
       const wrap = qs("filesWrap");
 
       const html =
-        imgBlock("身份證正面", links.idFrontUrl) +
-        imgBlock("身份證反面", links.idBackUrl) +
-        imgBlock("存摺封面", links.bankbookUrl) +
-        imgBlock("親筆簽名", links.signUrl);
+        imgBlock("身份證正面", idFrontId) +
+        imgBlock("身份證反面", idBackId) +
+        imgBlock("存摺封面", bankbookId) +
+        imgBlock("親筆簽名", signId);
 
       if (html) {
         wrap.innerHTML = html;
@@ -167,7 +164,7 @@
         card.style.display = "";
       }
 
-      renderProfile(res.data || {});
+      renderProfile(data);
     }
 
     qs("btnUpload").addEventListener("click", async ()=>{
