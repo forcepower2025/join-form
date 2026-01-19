@@ -19,14 +19,12 @@
       </div>
     </div>
 
-    <!-- ✅ 合約PDF下載（最上方） -->
-    <div class="card" id="contractCard" style="display:none;">
+    <!-- ✅ 證件/簽名預覽（最上方） -->
+    <div class="card" id="filesCard" style="display:none;">
       <div class="row">
-        <span class="badge">合約PDF</span>
+        <span class="badge">證件與簽名</span>
       </div>
-      <div class="row" style="margin-top:12px;">
-        <a id="contractBtn" class="btn-primary" href="#" target="_blank" rel="noopener">下載合約PDF</a>
-      </div>
+      <div id="filesWrap" style="margin-top:12px;"></div>
     </div>
 
     <div class="card" id="profileCard">
@@ -99,10 +97,25 @@
       let html = `<table class="table">`;
       order.forEach(k=>{
         if (obj[k] === undefined) return;
-        html += `<tr><td>${k}</td><td>${String(obj[k] ?? "")}</td></tr>`;
+        html += `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(String(obj[k] ?? ""))}</td></tr>`;
       });
       html += `</table>`;
       qs("profile").innerHTML = html;
+    }
+
+    function imgBlock(title, url){
+      if(!url) return "";
+      const u = String(url);
+      return `
+        <div style="margin-bottom:14px;">
+          <div class="muted" style="margin-bottom:6px;">${escapeHtml(title)}</div>
+          <a class="btn-ghost" href="${escapeHtml(u)}" target="_blank" rel="noopener">開新視窗</a>
+          <div style="margin-top:8px;">
+            <img src="${escapeHtml(u)}" alt="${escapeHtml(title)}"
+                 style="max-width:100%; border-radius:12px; border:1px solid #eee;" />
+          </div>
+        </div>
+      `;
     }
 
     async function loadProfile(){
@@ -114,15 +127,23 @@
 
       const res = await apiCall({ action:"getProfile", phone, password });
 
-      // ✅ 合約PDF下載按鈕（最上方卡片）
-      const contractUrl = (res && res.contractPdfUrl) ? String(res.contractPdfUrl) : "";
-      const cc = qs("contractCard");
-      const btn = qs("contractBtn");
-      if (contractUrl) {
-        btn.href = contractUrl;
-        cc.style.display = "";
+      // ✅ 顯示證件/存摺/簽名圖片（依 api.gs 回傳 res.links）
+      const links = (res && res.links) ? res.links : {};
+      const card = qs("filesCard");
+      const wrap = qs("filesWrap");
+
+      const html =
+        imgBlock("身份證正面", links.idFrontUrl) +
+        imgBlock("身份證反面", links.idBackUrl) +
+        imgBlock("存摺封面", links.bankbookUrl) +
+        imgBlock("親筆簽名", links.signUrl);
+
+      if (html) {
+        wrap.innerHTML = html;
+        card.style.display = "";
       } else {
-        cc.style.display = "none";
+        wrap.innerHTML = `<div class="muted">尚未上傳任何文件。</div>`;
+        card.style.display = "";
       }
 
       renderProfile(res.data || {});
@@ -150,7 +171,7 @@
         const res = await apiCall({ action:"uploadAfterLogin", phone, password, payload });
         setMsg(msg, `✅ ${res.message}`, "ok");
 
-        // 重新載入資料（包含合約連結）
+        // 重新載入資料（包含預覽）
         await loadProfile();
       }catch(err){
         setMsg(msg, `❌ ${err.message}`, "err");
@@ -158,7 +179,7 @@
     });
 
     loadProfile().catch(err=>{
-      qs("profile").innerHTML = `❌ 載入失敗：${err.message}`;
+      qs("profile").innerHTML = `❌ 載入失敗：${escapeHtml(err.message)}`;
     });
   </script>
 </body>
