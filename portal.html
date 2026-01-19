@@ -115,21 +115,42 @@
       };
     }
 
-    function imgBlock(title, fileId){
-      const { openUrl, imgUrl } = driveUrlsById(fileId);
-      if(!openUrl || !imgUrl) return "";
+function driveViewToDirect(url){
+  const u = String(url || "").trim();
+  if(!u) return "";
 
-      return `
-        <div style="margin-bottom:14px;">
-          <div class="muted" style="margin-bottom:6px;">${escapeHtml(title)}</div>
-          <a class="btn-ghost" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">開新視窗</a>
-          <div style="margin-top:8px;">
-            <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}"
-                 style="max-width:100%; border-radius:12px; border:1px solid #eee;" />
-          </div>
-        </div>
-      `;
-    }
+  // 如果已經是 uc 直連，就直接回傳
+  if (u.includes("drive.google.com/uc?")) return u;
+
+  // https://drive.google.com/file/d/<ID>/view?...
+  let m = u.match(/drive\.google\.com\/file\/d\/([^\/\?]+)/);
+  if (m && m[1]) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+
+  // https://drive.google.com/open?id=<ID>
+  m = u.match(/[?&]id=([^&]+)/);
+  if (m && m[1]) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+
+  // 其他情況：就回原本
+  return u;
+}
+
+function imgBlock(title, url){
+  if(!url) return "";
+  const viewUrl = String(url);
+  const directUrl = driveViewToDirect(viewUrl);
+
+  return `
+    <div style="margin-bottom:14px;">
+      <div class="muted" style="margin-bottom:6px;">${escapeHtml(title)}</div>
+      <a class="btn-ghost" href="${escapeHtml(viewUrl)}" target="_blank" rel="noopener">開新視窗</a>
+      <div style="margin-top:8px;">
+        <img src="${escapeHtml(directUrl)}" alt="${escapeHtml(title)}"
+             style="max-width:100%; border-radius:12px; border:1px solid #eee;" />
+      </div>
+    </div>
+  `;
+}
+
 
     async function loadProfile(){
       const { phone, password } = loadSession();
