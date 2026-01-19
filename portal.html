@@ -115,42 +115,41 @@
       };
     }
 
-function driveViewToDirect(url){
-  const u = String(url || "").trim();
-  if(!u) return "";
+function driveToImgSrc(x){
+  const s = String(x || "").trim();
+  if(!s) return "";
 
-  // 如果已經是 uc 直連，就直接回傳
-  if (u.includes("drive.google.com/uc?")) return u;
+  // 1) 如果是純 Drive 檔案ID（你現在就是這種）
+  if (/^[a-zA-Z0-9_-]{20,}$/.test(s) && !s.startsWith("http")) {
+    return `https://drive.google.com/thumbnail?id=${s}&sz=w1600`;
+  }
 
-  // https://drive.google.com/file/d/<ID>/view?...
-  let m = u.match(/drive\.google\.com\/file\/d\/([^\/\?]+)/);
-  if (m && m[1]) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+  // 2) 如果是 Drive 分享連結，抽出 id
+  const m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/) || s.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (m && m[1]) {
+    return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1600`;
+  }
 
-  // https://drive.google.com/open?id=<ID>
-  m = u.match(/[?&]id=([^&]+)/);
-  if (m && m[1]) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
-
-  // 其他情況：就回原本
-  return u;
+  // 3) 其他網址：原樣回傳（但通常不會走到這）
+  return s;
 }
 
-function imgBlock(title, url){
-  if(!url) return "";
-  const viewUrl = String(url);
-  const directUrl = driveViewToDirect(viewUrl);
+function imgBlock(title, urlOrId){
+  const imgSrc = driveToImgSrc(urlOrId);
+  if(!imgSrc) return "";
 
+  // 開新視窗：用同一個 imgSrc 就好（會直接顯示）
   return `
     <div style="margin-bottom:14px;">
       <div class="muted" style="margin-bottom:6px;">${escapeHtml(title)}</div>
-      <a class="btn-ghost" href="${escapeHtml(viewUrl)}" target="_blank" rel="noopener">開新視窗</a>
+      <a class="btn-ghost" href="${escapeHtml(imgSrc)}" target="_blank" rel="noopener">開新視窗</a>
       <div style="margin-top:8px;">
-        <img src="${escapeHtml(directUrl)}" alt="${escapeHtml(title)}"
+        <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(title)}"
              style="max-width:100%; border-radius:12px; border:1px solid #eee;" />
       </div>
     </div>
   `;
 }
-
 
     async function loadProfile(){
       const { phone, password } = loadSession();
