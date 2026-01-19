@@ -103,15 +103,36 @@
       qs("profile").innerHTML = html;
     }
 
+    // ✅ 把 Drive「view連結」轉為可直接顯示圖片的連結
+    function toDriveImageUrl(u){
+      u = String(u || "").trim();
+      if(!u) return "";
+      // 1) 已經是 direct link
+      if (u.includes("googleusercontent.com")) return u;
+
+      // 2) 從 view 連結抓 fileId
+      const m = u.match(/\/file\/d\/([^\/]+)\//);
+      if (m && m[1]) {
+        const id = m[1];
+        // 這個格式可以直接當 <img src>
+        return `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`;
+      }
+
+      // 3) fallback
+      return u;
+    }
+
     function imgBlock(title, url){
       if(!url) return "";
-      const u = String(url);
+      const openUrl = String(url);
+      const imgUrl = toDriveImageUrl(openUrl);
+
       return `
         <div style="margin-bottom:14px;">
           <div class="muted" style="margin-bottom:6px;">${escapeHtml(title)}</div>
-          <a class="btn-ghost" href="${escapeHtml(u)}" target="_blank" rel="noopener">開新視窗</a>
+          <a class="btn-ghost" href="${escapeHtml(openUrl)}" target="_blank" rel="noopener">開新視窗</a>
           <div style="margin-top:8px;">
-            <img src="${escapeHtml(u)}" alt="${escapeHtml(title)}"
+            <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(title)}"
                  style="max-width:100%; border-radius:12px; border:1px solid #eee;" />
           </div>
         </div>
@@ -160,7 +181,6 @@
           idFrontDataUrl: await fileToDataUrl(qs("idFront").files[0]),
           idBackDataUrl: await fileToDataUrl(qs("idBack").files[0]),
           bankbookDataUrl: await fileToDataUrl(qs("bankbook").files[0]),
-          // 如果簽名區空白就不送
           signatureDataUrl: sig.isBlank() ? "" : sig.toDataUrl(),
         };
 
@@ -171,7 +191,6 @@
         const res = await apiCall({ action:"uploadAfterLogin", phone, password, payload });
         setMsg(msg, `✅ ${res.message}`, "ok");
 
-        // 重新載入資料（包含預覽）
         await loadProfile();
       }catch(err){
         setMsg(msg, `❌ ${err.message}`, "err");
