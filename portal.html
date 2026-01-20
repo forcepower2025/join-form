@@ -323,20 +323,20 @@ ________________________________________<br>
           }
         }
 
-        const payload = {
-          desc: qs("desc").value.trim(),
-          idFrontDataUrl: await fileToDataUrl(qs("idFront").files[0]),
-          idBackDataUrl: await fileToDataUrl(qs("idBack").files[0]),
-          bankbookDataUrl: await fileToDataUrl(bankbookFile),
+const payload = {
+  desc: qs("desc").value.trim(),
+  idFrontDataUrl: await fileToDataUrl(qs("idFront").files[0]),
+  idBackDataUrl: await fileToDataUrl(qs("idBack").files[0]),
+  bankbookDataUrl: await fileToDataUrl(bankbookFile),
 
-          // ✅ 必送簽名（補件送出必簽）
-          signatureDataUrl: sig.toDataUrl(),
+  // ✅ 必送簽名（補件送出必簽）
+  signatureDataUrl: sig.toDataUrl(),
 
-          // ✅ 存摺三欄（只有上傳存摺時才送）
-          bankBranchCode: hasBankbook ? bankBranchCode : "",
-          bankAccount: hasBankbook ? bankAccount : "",
-          bankName: hasBankbook ? bankName : "",
-        };
+  // ✅ 這三個一定要用「Google Sheet 欄位名稱」當 key，api.gs 才讀得到
+  '銀行分行': hasBankbook ? bankBranchCode : "",
+  '銀行帳戶': hasBankbook ? bankAccount : "",
+  '銀行戶名': hasBankbook ? bankName : "",
+};
 
         // ✅ 仍保留：至少要有補件檔案之一或簽名（簽名必送，所以這裡等於檔案可全空也會送）
         // 你要求「送出補件一定要重新簽名」，因此允許只簽名不選檔案也可送出
