@@ -82,7 +82,7 @@ ________________________________________<br><br>
 合約五年期滿後，乙方之「微股東福利」即行取消，包括但不限於：<br>
 •	領取餐包60盒<br>
 •	共享全國分紅2%之資格<br>
-•	五日海外豪華旅遊乙次<br>
+•	海外豪華旅遊乙次<br>
 •	介紹獎金制度<br>
 ________________________________________<br><br>
 第十一條｜提前終止／退約處理<br>
@@ -147,6 +147,24 @@ ________________________________________<br>
         </div>
       </div>
 
+      <!-- ✅ 新增：若有上傳存摺，必填三欄（回存到 Google Sheet 的「會員申請資料」） -->
+      <div id="bankFields" style="display:none; margin-top:10px;">
+        <div class="grid grid-2">
+          <div>
+            <label>銀行代碼與分行代碼(共7碼)</label>
+            <input id="bankBranchCode" placeholder="例：0123456" inputmode="numeric" />
+          </div>
+          <div>
+            <label>銀行帳號</label>
+            <input id="bankAccount" placeholder="請輸入銀行帳號" inputmode="numeric" />
+          </div>
+          <div style="grid-column:1/-1;">
+            <label>銀行戶名</label>
+            <input id="bankName" placeholder="請輸入銀行戶名" />
+          </div>
+        </div>
+      </div>
+
       <div style="margin-top:10px;">
         <label>文件說明（可選）</label>
         <input id="desc" placeholder="例：補上存摺封面、重新上傳新版身份證" />
@@ -155,7 +173,7 @@ ________________________________________<br>
       <hr />
 
       <div class="row">
-        <span class="badge">重新簽名（可選）</span>
+        <span class="badge">重新簽名（必填）</span>
         <button id="btnClearSign" class="btn-ghost" type="button">清除簽名</button>
       </div>
       <div style="margin-top:10px;">
@@ -178,6 +196,12 @@ ________________________________________<br>
     qs("btnClearSign").addEventListener("click", ()=> sig.clear());
     qs("logout").addEventListener("click", (e)=>{ e.preventDefault(); clearSession(); location.href="./login.html"; });
 
+    // ✅ 若有選擇存摺檔案 -> 顯示三個必填欄位
+    qs("bankbook").addEventListener("change", ()=>{
+      const hasBankbook = qs("bankbook").files && qs("bankbook").files.length > 0;
+      qs("bankFields").style.display = hasBankbook ? "" : "none";
+    });
+
     function renderProfile(obj){
       const order = [
         "申請時間戳記","申請狀態","備註","姓名","手機號碼","身分證字號","出生日期",
@@ -195,53 +219,40 @@ ________________________________________<br>
       qs("profile").innerHTML = html;
     }
 
-    // ✅ 由 Drive File ID 組出：
-    // - openUrl：給「開新視窗」
-    // - imgUrl：給 <img src> 直接顯示
-    function driveUrlsById(fileId){
-      const id = String(fileId || "").trim();
-      if(!id) return { openUrl:"", imgUrl:"" };
-      return {
-        openUrl: `https://drive.google.com/file/d/${encodeURIComponent(id)}/view`,
-        imgUrl:  `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`
-      };
+    function driveToImgSrc(x){
+      const s = String(x || "").trim();
+      if(!s) return "";
+
+      // 1) 如果是純 Drive 檔案ID（你現在就是這種）
+      if (/^[a-zA-Z0-9_-]{20,}$/.test(s) && !s.startsWith("http")) {
+        return `https://drive.google.com/thumbnail?id=${s}&sz=w1600`;
+      }
+
+      // 2) 如果是 Drive 分享連結，抽出 id
+      const m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/) || s.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (m && m[1]) {
+        return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1600`;
+      }
+
+      // 3) 其他網址：原樣回傳
+      return s;
     }
 
-function driveToImgSrc(x){
-  const s = String(x || "").trim();
-  if(!s) return "";
+    function imgBlock(title, urlOrId){
+      const imgSrc = driveToImgSrc(urlOrId);
+      if(!imgSrc) return "";
 
-  // 1) 如果是純 Drive 檔案ID（你現在就是這種）
-  if (/^[a-zA-Z0-9_-]{20,}$/.test(s) && !s.startsWith("http")) {
-    return `https://drive.google.com/thumbnail?id=${s}&sz=w1600`;
-  }
-
-  // 2) 如果是 Drive 分享連結，抽出 id
-  const m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/) || s.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (m && m[1]) {
-    return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1600`;
-  }
-
-  // 3) 其他網址：原樣回傳（但通常不會走到這）
-  return s;
-}
-
-function imgBlock(title, urlOrId){
-  const imgSrc = driveToImgSrc(urlOrId);
-  if(!imgSrc) return "";
-
-  // 開新視窗：用同一個 imgSrc 就好（會直接顯示）
-  return `
-    <div style="margin-bottom:14px;">
-      <div class="muted" style="margin-bottom:6px;">${escapeHtml(title)}</div>
-      <a class="btn-ghost" href="${escapeHtml(imgSrc)}" target="_blank" rel="noopener">開新視窗</a>
-      <div style="margin-top:8px;">
-        <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(title)}"
-             style="max-width:100%; border-radius:12px; border:1px solid #eee;" />
-      </div>
-    </div>
-  `;
-}
+      return `
+        <div>
+          <div class="muted" style="margin-bottom:6px;">${escapeHtml(title)}</div>
+          <a class="btn-ghost" href="${escapeHtml(imgSrc)}" target="_blank" rel="noopener">開新視窗</a>
+          <div style="margin-top:8px;">
+            <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(title)}"
+                 style="max-width:100%; border-radius:12px; border:1px solid #eee;" />
+          </div>
+        </div>
+      `;
+    }
 
     async function loadProfile(){
       const { phone, password } = loadSession();
@@ -253,7 +264,7 @@ function imgBlock(title, urlOrId){
       const res = await apiCall({ action:"getProfile", phone, password });
       const data = (res && res.data) ? res.data : {};
 
-      // ✅ 直接用主表的檔案ID顯示（不依賴 res.links）
+      // ✅ 直接用主表的檔案ID顯示
       const idFrontId = data["身份證正面檔案ID"] || "";
       const idBackId  = data["身份證反面檔案ID"] || "";
       const bankbookId = data["存摺封面檔案ID"] || "";
@@ -262,13 +273,18 @@ function imgBlock(title, urlOrId){
       const card = qs("filesCard");
       const wrap = qs("filesWrap");
 
+      // ✅ 改成 2x2 並排顯示：
+      // 第一排：身分證正面、身分證反面
+      // 第二排：存摺、簽名
       const html =
-        imgBlock("身份證正面", idFrontId) +
-        imgBlock("身份證反面", idBackId) +
-        imgBlock("存摺封面", bankbookId) +
-        imgBlock("親筆簽名", signId);
+        `<div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">` +
+          imgBlock("身份證正面", idFrontId) +
+          imgBlock("身份證反面", idBackId) +
+          imgBlock("存摺封面", bankbookId) +
+          imgBlock("親筆簽名", signId) +
+        `</div>`;
 
-      if (html) {
+      if (idFrontId || idBackId || bankbookId || signId) {
         wrap.innerHTML = html;
         card.style.display = "";
       } else {
@@ -285,20 +301,56 @@ function imgBlock(title, urlOrId){
         const { phone, password } = loadSession();
         if(!phone || !password) throw new Error("未登入");
 
+        // ✅ 1) 如果要送出補件：一定要重新簽名
+        if (sig.isBlank()) {
+          throw new Error("送出補件必須重新簽名（簽名不可空白）");
+        }
+
+        const bankbookFile = qs("bankbook").files[0];
+        const hasBankbook = !!bankbookFile;
+
+        // ✅ 2) 如果有上傳存摺：三欄必填
+        const bankBranchCode = qs("bankBranchCode").value.trim();
+        const bankAccount = qs("bankAccount").value.trim();
+        const bankName = qs("bankName").value.trim();
+
+        if (hasBankbook) {
+          if (!bankBranchCode || !bankAccount || !bankName) {
+            throw new Error("上傳存摺時，「銀行代碼與分行代碼(共7碼) / 銀行帳號 / 銀行戶名」三欄必須全部輸入");
+          }
+          if (!/^\d{7}$/.test(bankBranchCode)) {
+            throw new Error("銀行代碼與分行代碼必須為7碼數字");
+          }
+        }
+
         const payload = {
           desc: qs("desc").value.trim(),
           idFrontDataUrl: await fileToDataUrl(qs("idFront").files[0]),
           idBackDataUrl: await fileToDataUrl(qs("idBack").files[0]),
-          bankbookDataUrl: await fileToDataUrl(qs("bankbook").files[0]),
-          signatureDataUrl: sig.isBlank() ? "" : sig.toDataUrl(),
+          bankbookDataUrl: await fileToDataUrl(bankbookFile),
+
+          // ✅ 必送簽名（補件送出必簽）
+          signatureDataUrl: sig.toDataUrl(),
+
+          // ✅ 存摺三欄（只有上傳存摺時才送）
+          bankBranchCode: hasBankbook ? bankBranchCode : "",
+          bankAccount: hasBankbook ? bankAccount : "",
+          bankName: hasBankbook ? bankName : "",
         };
 
-        if(!payload.idFrontDataUrl && !payload.idBackDataUrl && !payload.bankbookDataUrl && !payload.signatureDataUrl){
-          throw new Error("沒有選擇任何補件檔案或簽名");
-        }
+        // ✅ 仍保留：至少要有補件檔案之一或簽名（簽名必送，所以這裡等於檔案可全空也會送）
+        // 你要求「送出補件一定要重新簽名」，因此允許只簽名不選檔案也可送出
+        // 若你想「必須至少選一個檔案」再告訴我，我再照你規則改。
 
         const res = await apiCall({ action:"uploadAfterLogin", phone, password, payload });
         setMsg(msg, `✅ ${res.message}`, "ok");
+
+        // 送出後：清空存摺欄位區（不改原本UI結構）
+        qs("bankbook").value = "";
+        qs("bankFields").style.display = "none";
+        qs("bankBranchCode").value = "";
+        qs("bankAccount").value = "";
+        qs("bankName").value = "";
 
         await loadProfile();
       }catch(err){
@@ -311,8 +363,5 @@ function imgBlock(title, urlOrId){
     });
 
  </script>
-
-
-  
 </body>
 </html>
