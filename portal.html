@@ -136,6 +136,15 @@ ________________________________________<br>
       <div id="profile" class="muted" style="margin-top:10px;">載入中…</div>
     </div>
 
+  <div class="card" id="bonusCard" style="display:none;">
+  <div class="row">
+    <span class="badge">介紹獎金</span>
+    <span class="muted">（每位 NT$5,000；匯款日＝加入隔月20日）</span>
+  </div>
+  <div id="bonusWrap" style="margin-top:10px;"></div>
+</div>
+
+
 </div>
   
     <div class="card">
@@ -312,6 +321,8 @@ ________________________________________<br>
       }
 
       renderProfile(data);
+      await loadReferralBonus();
+
     }
 
     qs("btnUpload").addEventListener("click", async ()=>{
@@ -380,6 +391,45 @@ const payload = {
     loadProfile().catch(err=>{
       qs("profile").innerHTML = `❌ 載入失敗：${escapeHtml(err.message)}`;
     });
+
+function renderReferralBonus(rows){
+  if (!rows || !rows.length) {
+    qs("bonusWrap").innerHTML = `<div class="muted">目前尚無推薦加入紀錄。</div>`;
+    return;
+  }
+
+  let html = `<table class="table">`;
+  html += `<tr>
+    <th>加入日期</th>
+    <th>姓名</th>
+    <th>獎金</th>
+    <th>匯款日期</th>
+  </tr>`;
+
+  rows.forEach(r=>{
+    html += `<tr>
+      <td>${escapeHtml(String(r.joinDate || ""))}</td>
+      <td>${escapeHtml(String(r.name || ""))}</td>
+      <td>${escapeHtml(String(r.bonus || 5000))}</td>
+      <td>${escapeHtml(String(r.remitDate || ""))}</td>
+    </tr>`;
+  });
+
+  html += `</table>`;
+  qs("bonusWrap").innerHTML = html;
+}
+
+async function loadReferralBonus(){
+  const { phone, password } = loadSession();
+  if(!phone || !password) return;
+
+  const res = await apiCall({ action:"getReferralBonus", phone, password });
+  const rows = (res && res.rows) ? res.rows : [];
+
+  qs("bonusCard").style.display = "";
+  renderReferralBonus(rows);
+}
+
 
  </script>
 </body>
