@@ -9,7 +9,7 @@
 @media print {
   body * { visibility: hidden !important; }
   #printArea, #printArea * { visibility: visible !important; }
-  #printArea { position: absolute; left: 0; top: 0; width: 100%;  transform: scale(0.85); }
+  #printArea { position: absolute; left: 0; top: 0; width: 100%;  }
 }
 </style>
 
@@ -261,7 +261,7 @@ ________________________________________<br>
       return `
         <div>
           <div class="muted" style="margin-bottom:6px;">${escapeHtml(title)}</div>
-          <a class="btn-ghost" href="${escapeHtml(imgSrc)}" target="_blank" rel="noopener">開新視窗</a>
+     //     <a class="btn-ghost" href="${escapeHtml(imgSrc)}" target="_blank" rel="noopener">開新視窗</a>
           <div style="margin-top:8px;">
             <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(title)}"
                  style="max-width:100%; border-radius:12px; border:1px solid #eee;" />
