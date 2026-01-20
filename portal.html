@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>動元力國際會員資料</title>
   <link rel="stylesheet" href="./style.css" />
+  <style>
+@media print {
+  body * { visibility: hidden !important; }
+  #printArea, #printArea * { visibility: visible !important; }
+  #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+}
+</style>
+
 </head>
 <body>
   <div class="container">
@@ -14,11 +22,13 @@
         <div class="muted">你可以查詢合約書內容、個人資料、並補上傳文件及重新簽名。</div>
       </div>
       <div class="nav">
+        <a href="#" id="printPage" style="display:none;">列印本頁</a>
         <a href="./index.html">申請表</a>
         <a href="./login.html" id="logout">登出</a>
       </div>
     </div>
-
+    
+<div id="printArea">
             <div class="title">《動元力國際微股東加入合約書》</div>
         <div class="muted">  <br>
 甲方：動元力國際股份有限公司 <br>
@@ -126,6 +136,8 @@ ________________________________________<br>
       <div id="profile" class="muted" style="margin-top:10px;">載入中…</div>
     </div>
 
+</div>
+  
     <div class="card">
       <div class="row">
         <span class="badge">補件上傳</span>
@@ -195,6 +207,10 @@ ________________________________________<br>
 
     qs("btnClearSign").addEventListener("click", ()=> sig.clear());
     qs("logout").addEventListener("click", (e)=>{ e.preventDefault(); clearSession(); location.href="./login.html"; });
+    qs("printPage").addEventListener("click", (e)=>{
+      e.preventDefault();
+      window.print();
+      });
 
     // ✅ 若有選擇存摺檔案 -> 顯示三個必填欄位
     qs("bankbook").addEventListener("change", ()=>{
@@ -263,6 +279,9 @@ ________________________________________<br>
 
       const res = await apiCall({ action:"getProfile", phone, password });
       const data = (res && res.data) ? res.data : {};
+      const status = String(data["申請狀態"] || "").trim();
+      qs("printPage").style.display = (status === "審核通過") ? "" : "none";
+
 
       // ✅ 直接用主表的檔案ID顯示
       const idFrontId = data["身份證正面檔案ID"] || "";
