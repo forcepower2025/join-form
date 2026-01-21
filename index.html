@@ -40,14 +40,28 @@
           <input id="dob" type="date" />
         </div>
 
-        <div>
-          <label>銀行代碼與分行代碼(共7碼，郵局為7000021)</label>
-          <input id="bankBranch" placeholder="例：8220342" />
-        </div>
-        <div>
-          <label>銀行帳戶</label>
-          <input id="bankAccount" placeholder="請輸入帳號" />
-        </div>
+<div>
+  <label>銀行名稱</label>
+  <input id="bankNameInput" placeholder="輸入銀行名稱搜尋" autocomplete="off" />
+  <div id="bankSuggest" class="suggest"></div>
+</div>
+
+<div>
+  <label>分行名稱</label>
+  <input id="branchNameInput" placeholder="請先選擇銀行" autocomplete="off" disabled />
+  <div id="branchSuggest" class="suggest"></div>
+</div>
+
+<div>
+  <label>銀行代碼與分行代碼(共7碼)</label>
+  <input id="bankBranch" placeholder="系統自動帶入" readonly />
+</div>
+
+<div>
+  <label>銀行帳戶</label>
+  <input id="bankAccount" placeholder="請輸入帳號" />
+</div>
+
 
         <div>
           <label>銀行戶名</label>
@@ -228,6 +242,80 @@ ________________________________________<br>
 
   qs("btnClearSign").addEventListener("click", ()=> sig.clear());
 
+  // ===== 銀行 / 分行搜尋（與 portal 同邏輯）=====
+let selectedBankCode = "";
+let selectedBranchCode = "";
+
+// 銀行搜尋
+qs("bankNameInput").addEventListener("input", async (e) => {
+  const kw = e.target.value.trim();
+  selectedBankCode = "";
+  selectedBranchCode = "";
+  qs("bankBranch").value = "";
+  qs("branchNameInput").value = "";
+  qs("branchNameInput").disabled = true;
+
+  if (!kw) {
+    qs("bankSuggest").innerHTML = "";
+    return;
+  }
+
+  const res = await apiCall({
+    action: "searchBanks",
+    keyword: kw,
+  });
+
+  qs("bankSuggest").innerHTML = (res.banks || []).map(b =>
+    `<div class="opt" data-code="${b.code}">${b.name}</div>`
+  ).join("");
+});
+
+// 點選銀行
+qs("bankSuggest").addEventListener("click", (e) => {
+  const opt = e.target.closest(".opt");
+  if (!opt) return;
+
+  selectedBankCode = opt.dataset.code;
+  qs("bankNameInput").value = opt.textContent;
+  qs("bankSuggest").innerHTML = "";
+
+  qs("branchNameInput").disabled = false;
+  qs("branchNameInput").placeholder = "輸入分行名稱搜尋";
+});
+
+// 分行搜尋
+qs("branchNameInput").addEventListener("input", async (e) => {
+  if (!selectedBankCode) {
+    alert("請先選擇銀行");
+    return;
+  }
+
+  const kw = e.target.value.trim();
+  const res = await apiCall({
+    action: "searchBranches",
+    bankCode: selectedBankCode,
+    keyword: kw,
+  });
+
+  qs("branchSuggest").innerHTML = (res.branches || []).map(br =>
+    `<div class="opt" data-code="${br.code}">${br.name}</div>`
+  ).join("");
+});
+
+// 點選分行
+qs("branchSuggest").addEventListener("click", (e) => {
+  const opt = e.target.closest(".opt");
+  if (!opt) return;
+
+  selectedBranchCode = opt.dataset.code;
+  qs("branchNameInput").value = opt.textContent;
+  qs("branchSuggest").innerHTML = "";
+
+  // ✅ 自動組 7 碼
+  qs("bankBranch").value = selectedBankCode + selectedBranchCode;
+});
+
+  
   qs("btnSubmit").addEventListener("click", async ()=>{
     try{
       setMsg(msg, "送出中…", "ok");
@@ -240,6 +328,8 @@ ________________________________________<br>
         "手機號碼": qs("phone").value.trim(),
         "身分證字號": qs("idno").value.trim().toUpperCase(),
         "出生日期": qs("dob").value,
+        "銀行名稱": qs("bankNameInput").value.trim(),
+        "分行名稱": qs("branchNameInput").value.trim(),
         "銀行分行": qs("bankBranch").value.trim(),
         "銀行帳戶": qs("bankAccount").value.trim(),
         "銀行戶名": qs("bankName").value.trim(),
