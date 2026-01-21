@@ -267,6 +267,12 @@ function debounce(fn, ms=250){
   };
 }
 
+  // 分行先鎖住
+  qs("branchNameInput").value = "";
+  qs("branchNameInput").disabled = true;
+  qs("branchNameInput").placeholder = "請先選擇銀行";
+  qs("branchList").innerHTML = "";
+
 // 銀行名稱：輸入1字就查
 const onBankInput = debounce(async ()=>{
   const kw = qs("bankNameInput").value.trim();
@@ -275,12 +281,11 @@ const onBankInput = debounce(async ()=>{
   selectedBranchCode = "";
   selectedBranchName = "";
 
-  // 分行先鎖住
-  qs("branchNameInput").value = "";
-  qs("branchNameInput").disabled = true;
-  qs("branchNameInput").placeholder = "請先選擇銀行";
-  qs("branchList").innerHTML = "";
-  qs("bankBranchCode").value = ""; // ✅ 新增：切換銀行時清 7碼
+qs("branchNameInput").disabled = true;
+
+
+ // ✅ 新增：切換銀行時清 7碼
+  qs("bankBranchCode").value = "";
 
   if (kw.length < 1) {
     qs("bankList").innerHTML = "";
