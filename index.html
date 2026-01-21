@@ -1,4 +1,3 @@
-@@ -1,18 +1,17 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -14,52 +13,46 @@
         <div class="title">動元力國際微股東申請表</div>
         <div class="muted"> 請確實填寫個人資料 
         </div>
-        <div class="muted">請確實填寫個人資料</div>
       </div>
       <div class="nav">
         <a href="./login.html">登入</a>
-@@ -40,33 +39,40 @@
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="grid grid-2">
+        <div>
+          <label>姓名</label>
+          <input id="name" placeholder="請輸入姓名" />
+        </div>
+        <div>
+          <label>手機號碼</label>
+          <input id="phone" inputmode="numeric" placeholder="例：0912345678" />
+        </div>
+
+        <div>
+          <label>身分證字號</label>
+          <input id="idno" placeholder="例：A123456789" />
+          <div class="muted">登入預設密碼為「身分證字號末5碼」</div>
+        </div>
+        <div>
+          <label>出生日期</label>
           <input id="dob" type="date" />
         </div>
 
-<div>
-  <label>銀行名稱</label>
-  <input id="bankNameInput" placeholder="輸入銀行名稱搜尋" autocomplete="off" />
-  <div id="bankSuggest" class="suggest"></div>
-</div>
-
-<div>
-  <label>分行名稱</label>
-  <input id="branchNameInput" placeholder="請先選擇銀行" autocomplete="off" disabled />
-  <div id="branchSuggest" class="suggest"></div>
-</div>
-        <!-- ✅ 銀行名稱（datalist，與 portal 同款） -->
+        <!-- ✅ 只改這一段：銀行/分行下拉選單樣式改成 portal 的 datalist 方式 -->
         <div>
           <label>銀行名稱</label>
-          <input id="bankNameInput"
-                 placeholder="輸入銀行名稱搜尋"
-                 list="bankList" />
+          <input id="bankNameInput" placeholder="輸入 1 個字開始搜尋" list="bankList" autocomplete="off" />
           <datalist id="bankList"></datalist>
         </div>
 
-<div>
-  <label>銀行代碼與分行代碼(共7碼)</label>
-  <input id="bankBranch" placeholder="系統自動帶入" readonly />
-</div>
-        <!-- ✅ 分行名稱（需先選銀行） -->
         <div>
           <label>分行名稱</label>
-          <input id="branchNameInput"
-                 placeholder="請先選擇銀行"
-                 list="branchList"
-                 disabled />
+          <input id="branchNameInput" placeholder="請先選擇銀行" list="branchList" autocomplete="off" disabled />
           <datalist id="branchList"></datalist>
         </div>
 
-<div>
-  <label>銀行帳戶</label>
-  <input id="bankAccount" placeholder="請輸入帳號" />
-</div>
         <div>
           <label>銀行代碼與分行代碼(共7碼)</label>
           <input id="bankBranch" placeholder="系統自動帶入" readonly />
@@ -74,19 +67,29 @@
           <label>銀行戶名</label>
           <input id="bankName" placeholder="請輸入戶名" />
         </div>
-
         <div>
           <label>推薦人姓名</label>
           <input id="refName" placeholder="（可選填）" />
-@@ -76,6 +82,7 @@
+        </div>
+
+        <div>
           <label>推薦人手機號碼</label>
           <input id="refPhone" inputmode="numeric" placeholder="（可選填）" />
         </div>
-
         <div></div>
 
         <div>
-@@ -93,276 +100,104 @@
+          <label>通訊地址（縣市）</label>
+          <input id="addrCity" placeholder="例：台北市" />
+        </div>
+        <div>
+          <label>通訊地址（區）</label>
+          <input id="addrDist" placeholder="例：中正區" />
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label>通訊地址（詳細地址）</label>
+          <input id="addrDetail" placeholder="例：中山北路一段2號" />
+        </div>
       </div>
     </div>
 
@@ -110,8 +113,9 @@
         </div>
       </div>
     </div>
-        <div class="title">《動元力國際微股東加入合約書》</div>
-        <div class="muted">  <br>
+
+    <div class="title">《動元力國際微股東加入合約書》</div>
+    <div class="muted">  <br>
 甲方：動元力國際股份有限公司 <br>
 代表人：黃光啟執行長<br><br>
 乙方：微股東加入人（投資人）<br><br>
@@ -200,7 +204,8 @@ ________________________________________<br><br>
 本合約為電子合約，由乙方填寫完個人資料、勾選同意並於電子簽名板上親筆簽名送出後生效。<br>
 ________________________________________<br>
 
-          </div>
+    </div>
+
     <div class="card">
       <div class="row">
         <span class="badge">同意聲明</span>
@@ -223,10 +228,7 @@ ________________________________________<br>
         <canvas id="signCanvas"></canvas>
         <div class="muted">手機可直接手寫；電腦用滑鼠簽名。</div>
       </div>
-    <!-- 其餘內容完全未動 -->
-    <!-- （上傳區、合約內容、同意聲明、簽名、送出按鈕全部保留） -->
 
-    <div class="card">
       <div class="row" style="margin-top:12px;">
         <button id="btnSubmit" class="btn-primary" type="button">送出申請</button>
       </div>
@@ -236,181 +238,214 @@ ________________________________________<br>
   </div>
 
   <script src="./app.js"></script>
-<script>
-  const msg = qs("msg");
-  const sig = setupSignatureCanvas(qs("signCanvas"));
 
-  qs("btnClearSign").addEventListener("click", ()=> sig.clear());
-<script>
-/* ===== 銀行 / 分行（datalist，與 portal 完全同邏輯）===== */
+  <script>
+    const msg = qs("msg");
+    const sig = setupSignatureCanvas(qs("signCanvas"));
 
-  // ===== 銀行 / 分行搜尋（與 portal 同邏輯）=====
-let selectedBankCode = "";
-let selectedBranchCode = "";
+    qs("btnClearSign").addEventListener("click", ()=> sig.clear());
 
-// 銀行搜尋
-qs("bankNameInput").addEventListener("input", async (e) => {
-  const kw = e.target.value.trim();
-qs("bankNameInput").addEventListener("input", async () => {
-  const kw = qs("bankNameInput").value.trim();
+    // ===== ✅ 銀行 / 分行搜尋（改成 portal 的 datalist 方式；其餘不動）=====
+    let selectedBankCode = "";    // 3碼
+    let selectedBranchCode = "";  // 4碼
 
-  selectedBankCode = "";
-  selectedBranchCode = "";
-  qs("bankBranch").value = "";
-  qs("branchNameInput").value = "";
-  qs("branchNameInput").disabled = true;
-  qs("branchList").innerHTML = "";
-
-  if (!kw) {
-    qs("bankSuggest").innerHTML = "";
-    qs("bankList").innerHTML = "";
-    return;
-  }
-
-const res = await apiCall({
-  action: "searchBanksPublic",
-  keyword: kw,
-});
-
-  const res = await apiCall({
-    action: "searchBanksPublic",
-    keyword: kw,
-  });
-
-  qs("bankSuggest").innerHTML = (res.banks || []).map(b =>
-    `<div class="opt" data-code="${b.code}">${b.name}</div>`
-  qs("bankList").innerHTML = (res.banks || []).map(b =>
-    `<option value="${b.name}" data-code="${b.code}"></option>`
-  ).join("");
-});
-
-// 點選銀行
-qs("bankSuggest").addEventListener("click", (e) => {
-  const opt = e.target.closest(".opt");
-  if (!opt) return;
-// 銀行選定
-qs("bankNameInput").addEventListener("change", () => {
-  const val = qs("bankNameInput").value.trim();
-  const opts = qs("bankList").querySelectorAll("option");
-
-  let foundCode = "";
-  opts.forEach(op => {
-    if (op.value === val) foundCode = op.dataset.code;
-  });
-
-  selectedBankCode = opt.dataset.code;
-  qs("bankNameInput").value = opt.textContent;
-  qs("bankSuggest").innerHTML = "";
-  if (!foundCode) {
-    selectedBankCode = "";
-    qs("branchNameInput").disabled = true;
-    return;
-  }
-
-  selectedBankCode = foundCode;
-  qs("branchNameInput").disabled = false;
-  qs("branchNameInput").placeholder = "輸入分行名稱搜尋";
-});
-
-// 分行搜尋
-qs("branchNameInput").addEventListener("input", async (e) => {
-  if (!selectedBankCode) {
-    alert("請先選擇銀行");
-    return;
-  }
-qs("branchNameInput").addEventListener("input", async () => {
-  if (!selectedBankCode) return;
-
-  const kw = e.target.value.trim();
-const res = await apiCall({
-  action: "searchBranchesPublic",
-  bankCode: selectedBankCode,
-  keyword: kw,
-});
-  const kw = qs("branchNameInput").value.trim();
-
-  const res = await apiCall({
-    action: "searchBranchesPublic",
-    bankCode: selectedBankCode,
-    keyword: kw,
-  });
-
-  qs("branchSuggest").innerHTML = (res.branches || []).map(br =>
-    `<div class="opt" data-code="${br.code}">${br.name}</div>`
-  qs("branchList").innerHTML = (res.branches || []).map(br =>
-    `<option value="${br.name}" data-code="${br.code}"></option>`
-  ).join("");
-});
-
-// 點選分行
-qs("branchSuggest").addEventListener("click", (e) => {
-  const opt = e.target.closest(".opt");
-  if (!opt) return;
-// 分行選定 → 自動組 7 碼
-qs("branchNameInput").addEventListener("change", () => {
-  const val = qs("branchNameInput").value.trim();
-  const opts = qs("branchList").querySelectorAll("option");
-
-  let foundCode = "";
-  opts.forEach(op => {
-    if (op.value === val) foundCode = op.dataset.code;
-  });
-
-  selectedBranchCode = opt.dataset.code;
-  qs("branchNameInput").value = opt.textContent;
-  qs("branchSuggest").innerHTML = "";
-  if (!foundCode) return;
-
-  // ✅ 自動組 7 碼
-  selectedBranchCode = foundCode;
-  qs("bankBranch").value = selectedBankCode + selectedBranchCode;
-});
-
-  
-  qs("btnSubmit").addEventListener("click", async ()=>{
-    try{
-      setMsg(msg, "送出中…", "ok");
-
-      // ✅ 新增：簽名必填（空白不可送出）
-      if (sig.isBlank()) throw new Error("必須簽名才能送出申請");
-
-      const payload = {
-        "姓名": qs("name").value.trim(),
-        "手機號碼": qs("phone").value.trim(),
-        "身分證字號": qs("idno").value.trim().toUpperCase(),
-        "出生日期": qs("dob").value,
-        "銀行名稱": qs("bankNameInput").value.trim(),
-        "分行名稱": qs("branchNameInput").value.trim(),
-        "銀行分行": qs("bankBranch").value.trim(),
-        "銀行帳戶": qs("bankAccount").value.trim(),
-        "銀行戶名": qs("bankName").value.trim(),
-        "通訊地址（縣市）": qs("addrCity").value.trim(),
-        "通訊地址（區）": qs("addrDist").value.trim(),
-        "通訊地址（詳細地址）": qs("addrDetail").value.trim(),
-        "推薦人姓名": qs("refName").value.trim(),
-        "推薦人手機號碼": qs("refPhone").value.trim(),
-        consentChecked: qs("consent").checked,
-        signatureDataUrl: sig.toDataUrl(),
-        idFrontDataUrl: await fileToDataUrl(qs("idFront").files[0]),
-        idBackDataUrl: await fileToDataUrl(qs("idBack").files[0]),
-        bankbookDataUrl: await fileToDataUrl(qs("bankbook").files[0]),
+    function debounce(fn, ms=250){
+      let t=null;
+      return (...args)=>{
+        clearTimeout(t);
+        t=setTimeout(()=>fn(...args), ms);
       };
+    }
 
-      // 前端最基本檢核（後端也會再檢核）
-      if(!payload["姓名"] || !payload["手機號碼"] || !payload["身分證字號"] || !payload["出生日期"]) throw new Error("姓名/手機/身分證/出生日期為必填");
-      if(!payload["通訊地址（縣市）"] || !payload["通訊地址（區）"] || !payload["通訊地址（詳細地址）"]) throw new Error("通訊地址需填完整");
-      if(!payload.consentChecked) throw new Error("請先勾選同意聲明");
+    function pickCodeFromDatalist(listId, inputValue){
+      const val = String(inputValue || "").trim();
+      if (!val) return "";
+      const listEl = qs(listId);
+      if (!listEl) return "";
+      const opts = listEl.querySelectorAll("option");
+      let found = "";
+      opts.forEach(op=>{
+        if (op.value === val && op.dataset && op.dataset.code) found = op.dataset.code;
+      });
+      return found;
+    }
 
-      const res = await apiCall({ action:"submitApplication", payload });
+    // 初始化分行鎖住
+    qs("branchNameInput").value = "";
+    qs("branchNameInput").disabled = true;
+    qs("branchNameInput").placeholder = "請先選擇銀行";
+    qs("branchList").innerHTML = "";
+    qs("bankList").innerHTML = "";
 
-      // ✅ 修改：不要用 <br>（避免被當純文字顯示）
-      setMsg(msg, `✅ ${res.message}（手機：${res.phone}）\n你可以使用「手機＋身分證末5碼」登入補件。`, "ok");
-}catch(err){
-  // ✅ 顯示完整錯誤（包含 upstream_status / upstream_head）
-  setMsg(msg, `❌ ${String(err?.message || err)}`, "err");
-  console.error(err);
-}
+    // 銀行名稱：輸入 1 字就查（public）
+    const onBankInput = debounce(async ()=>{
+      const kw = qs("bankNameInput").value.trim();
 
-  });
-</script>
+      // 每次銀行輸入：分行狀態重置
+      selectedBranchCode = "";
+      qs("branchNameInput").value = "";
+      qs("branchNameInput").disabled = true;
+      qs("branchNameInput").placeholder = "請先選擇銀行";
+      qs("branchList").innerHTML = "";
+      qs("bankBranch").value = ""; // 清 7碼
 
+      if (kw.length < 1) {
+        qs("bankList").innerHTML = "";
+        selectedBankCode = "";
+        return;
+      }
+
+      const res = await apiCall({ action:"searchBanksPublic", keyword: kw });
+      const banks = (res && res.banks) ? res.banks : [];
+
+      qs("bankList").innerHTML = banks.map(b =>
+        `<option value="${escapeHtml(b.name)}" data-code="${escapeHtml(b.code)}"></option>`
+      ).join("");
+
+      // 若目前輸入值剛好等於清單內某一個銀行名稱 -> 視為已選定並解鎖分行
+      const foundCode = pickCodeFromDatalist("bankList", kw);
+      if (foundCode) {
+        selectedBankCode = foundCode;
+        qs("branchNameInput").disabled = false;
+        qs("branchNameInput").placeholder = "輸入分行名稱開始搜尋";
+      } else {
+        selectedBankCode = "";
+      }
+    }, 250);
+
+    qs("bankNameInput").addEventListener("input", onBankInput);
+
+    // 銀行 change：必須是 datalist 內選到才算選定
+    qs("bankNameInput").addEventListener("change", ()=>{
+      const val = qs("bankNameInput").value.trim();
+      if (!val) return;
+
+      const foundCode = pickCodeFromDatalist("bankList", val);
+
+      if (!foundCode) {
+        // 沒從下拉選到（用手打的）-> 視為未選定，分行鎖回去
+        selectedBankCode = "";
+        selectedBranchCode = "";
+        qs("branchNameInput").value = "";
+        qs("branchNameInput").disabled = true;
+        qs("branchNameInput").placeholder = "請先選擇銀行";
+        qs("branchList").innerHTML = "";
+        qs("bankBranch").value = "";
+        return;
+      }
+
+      // 已選定銀行
+      selectedBankCode = foundCode;
+
+      // 切換銀行時：清掉分行/7碼
+      selectedBranchCode = "";
+      qs("branchNameInput").value = "";
+      qs("branchList").innerHTML = "";
+      qs("bankBranch").value = "";
+
+      // 解鎖分行
+      qs("branchNameInput").disabled = false;
+      qs("branchNameInput").placeholder = "輸入分行名稱開始搜尋";
+      qs("branchNameInput").focus();
+    });
+
+    // 分行名稱：必須先選銀行（public）
+    const onBranchInput = debounce(async ()=>{
+      if (!selectedBankCode) {
+        qs("branchNameInput").value = "";
+        alert("請先選擇銀行");
+        return;
+      }
+
+      const kw = qs("branchNameInput").value.trim();
+      selectedBranchCode = "";
+
+      if (kw.length < 1) {
+        qs("branchList").innerHTML = "";
+        return;
+      }
+
+      const res = await apiCall({ action:"searchBranchesPublic", bankCode: selectedBankCode, keyword: kw });
+      const branches = (res && res.branches) ? res.branches : [];
+
+      qs("branchList").innerHTML = branches.map(br =>
+        `<option value="${escapeHtml(br.name)}" data-code="${escapeHtml(br.code)}"></option>`
+      ).join("");
+    }, 250);
+
+    qs("branchNameInput").addEventListener("input", onBranchInput);
+
+    // 分行 change：選定後回填 7碼
+    qs("branchNameInput").addEventListener("change", ()=>{
+      const val = qs("branchNameInput").value.trim();
+      if (!val || !selectedBankCode) return;
+
+      const foundCode = pickCodeFromDatalist("branchList", val);
+      if (!foundCode) return;
+
+      selectedBranchCode = foundCode;
+
+      // ✅ 自動組 7 碼：bankCode(3) + branchCode(4)
+      qs("bankBranch").value = `${selectedBankCode}${selectedBranchCode}`;
+    });
+
+    qs("btnSubmit").addEventListener("click", async ()=>{
+      try{
+        setMsg(msg, "送出中…", "ok");
+
+        // ✅ 新增：簽名必填（空白不可送出）
+        if (sig.isBlank()) throw new Error("必須簽名才能送出申請");
+
+        // ✅ 送出當下補強：若 change 沒觸發，從 datalist 反查一次 code
+        if (!selectedBankCode) {
+          selectedBankCode = pickCodeFromDatalist("bankList", qs("bankNameInput").value.trim());
+        }
+        if (!selectedBranchCode) {
+          selectedBranchCode = pickCodeFromDatalist("branchList", qs("branchNameInput").value.trim());
+        }
+        // 若兩者都有，確保 7碼一致
+        if (selectedBankCode && selectedBranchCode) {
+          qs("bankBranch").value = `${selectedBankCode}${selectedBranchCode}`;
+        }
+
+        const payload = {
+          "姓名": qs("name").value.trim(),
+          "手機號碼": qs("phone").value.trim(),
+          "身分證字號": qs("idno").value.trim().toUpperCase(),
+          "出生日期": qs("dob").value,
+          "銀行名稱": qs("bankNameInput").value.trim(),
+          "分行名稱": qs("branchNameInput").value.trim(),
+          "銀行分行": qs("bankBranch").value.trim(),
+          "銀行帳戶": qs("bankAccount").value.trim(),
+          "銀行戶名": qs("bankName").value.trim(),
+          "通訊地址（縣市）": qs("addrCity").value.trim(),
+          "通訊地址（區）": qs("addrDist").value.trim(),
+          "通訊地址（詳細地址）": qs("addrDetail").value.trim(),
+          "推薦人姓名": qs("refName").value.trim(),
+          "推薦人手機號碼": qs("refPhone").value.trim(),
+          consentChecked: qs("consent").checked,
+          signatureDataUrl: sig.toDataUrl(),
+          idFrontDataUrl: await fileToDataUrl(qs("idFront").files[0]),
+          idBackDataUrl: await fileToDataUrl(qs("idBack").files[0]),
+          bankbookDataUrl: await fileToDataUrl(qs("bankbook").files[0]),
+        };
+
+        // 前端最基本檢核（後端也會再檢核）
+        if(!payload["姓名"] || !payload["手機號碼"] || !payload["身分證字號"] || !payload["出生日期"]) throw new Error("姓名/手機/身分證/出生日期為必填");
+        if(!payload["通訊地址（縣市）"] || !payload["通訊地址（區）"] || !payload["通訊地址（詳細地址）"]) throw new Error("通訊地址需填完整");
+        if(!payload.consentChecked) throw new Error("請先勾選同意聲明");
+
+        const res = await apiCall({ action:"submitApplication", payload });
+
+        // ✅ 修改：不要用 <br>（避免被當純文字顯示）
+        setMsg(msg, `✅ ${res.message}（手機：${res.phone}）\n你可以使用「手機＋身分證末5碼」登入補件。`, "ok");
+      }catch(err){
+        // ✅ 顯示完整錯誤（包含 upstream_status / upstream_head）
+        setMsg(msg, `❌ ${String(err?.message || err)}`, "err");
+        console.error(err);
+      }
+    });
+  </script>
+
+</body>
+</html>
