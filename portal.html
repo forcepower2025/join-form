@@ -177,20 +177,38 @@ ________________________________________<br>
 
       <!-- ✅ 新增：若有上傳存摺，必填三欄（回存到 Google Sheet 的「會員申請資料」） -->
       <div id="bankFields" style="display:none; margin-top:10px;">
-        <div class="grid grid-2">
-          <div>
-            <label>銀行代碼與分行代碼(共7碼，郵局為7000021)</label>
-            <input id="bankBranchCode" placeholder="例：0123456" inputmode="numeric" />
-          </div>
-          <div>
-            <label>銀行帳號</label>
-            <input id="bankAccount" placeholder="請輸入銀行帳號" inputmode="numeric" />
-          </div>
-          <div style="grid-column:1/-1;">
-            <label>銀行戶名</label>
-            <input id="bankName" placeholder="請輸入銀行戶名" />
-          </div>
-        </div>
+<div class="grid grid-2">
+  <!-- ✅ 新增：銀行名稱（輸入 1 字就查） -->
+  <div>
+    <label>銀行名稱</label>
+    <input id="bankNameInput" placeholder="輸入 1 個字開始搜尋" list="bankList" />
+    <datalist id="bankList"></datalist>
+  </div>
+
+  <!-- ✅ 新增：分行名稱（需先選銀行） -->
+  <div>
+    <label>分行名稱</label>
+    <input id="branchNameInput" placeholder="請先選擇銀行" list="branchList" disabled />
+    <datalist id="branchList"></datalist>
+  </div>
+
+  <!-- 原本既有：7碼 -->
+  <div>
+    <label>銀行代碼與分行代碼(共7碼，郵局為7000021)</label>
+    <input id="bankBranchCode" placeholder="例：0123456" inputmode="numeric" />
+  </div>
+
+  <div>
+    <label>銀行帳號</label>
+    <input id="bankAccount" placeholder="請輸入銀行帳號" inputmode="numeric" />
+  </div>
+
+  <div style="grid-column:1/-1;">
+    <label>銀行戶名</label>
+    <input id="bankName" placeholder="請輸入銀行戶名" />
+  </div>
+</div>
+
       </div>
 
       <div style="margin-top:10px;">
@@ -234,6 +252,135 @@ ________________________________________<br>
       qs("bankFields").style.display = hasBankbook ? "" : "none";
     });
 
+    // =============== 銀行/分行 搜尋選取 ===============
+let selectedBankCode = "";    // 3碼
+let selectedBankName = "";
+let selectedBranchCode = "";  // 4碼
+let selectedBranchName = "";
+qs("bankBranchCode").value = ""; // 避免分行輸入中殘留舊 7碼
+
+function debounce(fn, ms=250){
+  let t=null;
+  return (...args)=>{
+    clearTimeout(t);
+    t=setTimeout(()=>fn(...args), ms);
+  };
+}
+
+// 銀行名稱：輸入1字就查
+const onBankInput = debounce(async ()=>{
+  const kw = qs("bankNameInput").value.trim();
+  selectedBankCode = "";
+  selectedBankName = "";
+  selectedBranchCode = "";
+  selectedBranchName = "";
+
+  // 分行先鎖住
+  qs("branchNameInput").value = "";
+  qs("branchNameInput").disabled = true;
+  qs("branchNameInput").placeholder = "請先選擇銀行";
+  qs("branchList").innerHTML = "";
+  qs("bankBranchCode").value = ""; // ✅ 新增：切換銀行時清 7碼
+
+  if (kw.length < 1) {
+    qs("bankList").innerHTML = "";
+    return;
+  }
+
+  const { phone, password } = loadSession();
+  const res = await apiCall({ action:"searchBanks", phone, password, keyword: kw });
+  const banks = (res && res.banks) ? res.banks : [];
+
+  // datalist options：顯示「銀行名稱」，value 也用銀行名稱
+  qs("bankList").innerHTML = banks.map(b =>
+    `<option value="${escapeHtml(b.name)}" data-code="${escapeHtml(b.code)}"></option>`
+  ).join("");
+
+}, 250);
+
+qs("bankNameInput").addEventListener("input", onBankInput);
+
+// 當銀行名稱確定（change）時，抓出 bankCode
+qs("bankNameInput").addEventListener("change", ()=>{
+  const val = qs("bankNameInput").value.trim();
+  if (!val) return;
+
+  // 從 datalist 找對應 code（用 option.value 比對）
+  const opts = qs("bankList").querySelectorAll("option");
+  let foundCode = "";
+  opts.forEach(op=>{
+    if (op.value === val && op.dataset && op.dataset.code) foundCode = op.dataset.code;
+  });
+
+  if (!foundCode) {
+    // 沒選到建議清單，就當作未選定
+    selectedBankCode = "";
+    selectedBankName = "";
+    qs("branchNameInput").disabled = true;
+    qs("branchNameInput").placeholder = "請先選擇銀行";
+    return;
+  }
+
+  selectedBankCode = foundCode;
+  selectedBankName = val;
+
+  // 開放分行輸入
+  qs("branchNameInput").disabled = false;
+  qs("branchNameInput").placeholder = "輸入分行名稱開始搜尋";
+  qs("branchNameInput").focus();
+});
+
+// 分行名稱：必須先選銀行
+const onBranchInput = debounce(async ()=>{
+  if (!selectedBankCode) {
+    qs("branchNameInput").value = "";
+    alert("請先選擇銀行");
+    return;
+  }
+
+  const kw = qs("branchNameInput").value.trim();
+  selectedBranchCode = "";
+  selectedBranchName = "";
+
+  if (kw.length < 1) {
+    qs("branchList").innerHTML = "";
+    return;
+  }
+
+  const { phone, password } = loadSession();
+  const res = await apiCall({ action:"searchBranches", phone, password, bankCode: selectedBankCode, keyword: kw });
+  const branches = (res && res.branches) ? res.branches : [];
+
+  // datalist：value 顯示「桃園分行」這種文字
+  qs("branchList").innerHTML = branches.map(b =>
+    `<option value="${escapeHtml(b.name)}" data-code="${escapeHtml(b.code)}"></option>`
+  ).join("");
+
+}, 250);
+
+qs("branchNameInput").addEventListener("input", onBranchInput);
+
+// 分行 change：選定後回填 7碼
+qs("branchNameInput").addEventListener("change", ()=>{
+  const val = qs("branchNameInput").value.trim();
+  if (!val || !selectedBankCode) return;
+
+  const opts = qs("branchList").querySelectorAll("option");
+  let foundCode = "";
+  opts.forEach(op=>{
+    if (op.value === val && op.dataset && op.dataset.code) foundCode = op.dataset.code;
+  });
+
+  if (!foundCode) return;
+
+  selectedBranchCode = foundCode;
+  selectedBranchName = val;
+
+  // ✅ 自動寫入 7碼：bankCode(3) + branchCode(4)
+  qs("bankBranchCode").value = `${selectedBankCode}${selectedBranchCode}`;
+});
+
+
     function renderProfile(obj){
       const order = [
         "申請時間戳記","申請狀態","備註","姓名","手機號碼","身分證字號","出生日期",
@@ -245,7 +392,17 @@ ________________________________________<br>
       let html = `<table class="table">`;
       order.forEach(k=>{
         if (obj[k] === undefined) return;
-        html += `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(String(obj[k] ?? ""))}</td></tr>`;
+let v = obj[k];
+
+// ✅ 銀行分行顯示：銀行名稱 分行名稱 bankBranchCode(7碼)
+if (k === "銀行分行") {
+  const bn = String(obj["銀行名稱"] || "").trim();
+  const brn = String(obj["分行名稱"] || "").trim();
+  const code7 = String(obj["銀行分行"] || "").trim();
+  v = [bn, brn, code7].filter(Boolean).join(" ");
+}
+
+html += `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(String(v ?? ""))}</td></tr>`;
       });
       html += `</table>`;
       qs("profile").innerHTML = html;
@@ -351,14 +508,21 @@ ________________________________________<br>
         const bankAccount = qs("bankAccount").value.trim();
         const bankName = qs("bankName").value.trim();
 
-        if (hasBankbook) {
-          if (!bankBranchCode || !bankAccount || !bankName) {
-            throw new Error("上傳存摺時，「銀行代碼與分行代碼(共7碼) / 銀行帳號 / 銀行戶名」三欄必須全部輸入");
-          }
-          if (!/^\d{7}$/.test(bankBranchCode)) {
-            throw new Error("銀行代碼與分行代碼必須為7碼數字");
-          }
-        }
+if (hasBankbook) {
+  if (!selectedBankCode) throw new Error("請從下拉選單選擇銀行"); 
+  if (!selectedBranchCode) throw new Error("請從下拉選單選擇分行");
+  
+  const bankNameText = qs("bankNameInput").value.trim();
+  const branchNameText = qs("branchNameInput").value.trim();
+
+  if (!bankNameText || !branchNameText || !bankBranchCode || !bankAccount || !bankName) {
+    throw new Error("上傳存摺時，「銀行名稱 / 分行名稱 / 銀行代碼與分行代碼(7碼) / 銀行帳號 / 銀行戶名」必須全部輸入");
+  }
+  if (!/^\d{7}$/.test(bankBranchCode)) {
+    throw new Error("銀行代碼與分行代碼必須為7碼數字");
+  }
+}
+
 
 const payload = {
   desc: qs("desc").value.trim(),
@@ -366,14 +530,15 @@ const payload = {
   idBackDataUrl: await fileToDataUrl(qs("idBack").files[0]),
   bankbookDataUrl: await fileToDataUrl(bankbookFile),
 
-  // ✅ 必送簽名（補件送出必簽）
   signatureDataUrl: sig.toDataUrl(),
 
-  // ✅ 這三個一定要用「Google Sheet 欄位名稱」當 key，api.gs 才讀得到
   '銀行分行': hasBankbook ? bankBranchCode : "",
+  '銀行名稱': hasBankbook ? qs("bankNameInput").value.trim() : "",
+  '分行名稱': hasBankbook ? qs("branchNameInput").value.trim() : "",
   '銀行帳戶': hasBankbook ? bankAccount : "",
   '銀行戶名': hasBankbook ? bankName : "",
 };
+
 
         // ✅ 仍保留：至少要有補件檔案之一或簽名（簽名必送，所以這裡等於檔案可全空也會送）
         // 你要求「送出補件一定要重新簽名」，因此允許只簽名不選檔案也可送出
@@ -388,6 +553,17 @@ const payload = {
         qs("bankBranchCode").value = "";
         qs("bankAccount").value = "";
         qs("bankName").value = "";
+        qs("bankNameInput").value = "";
+        qs("branchNameInput").value = "";
+        selectedBankCode = "";
+        selectedBranchCode = "";
+        qs("branchNameInput").disabled = true;
+        qs("branchNameInput").placeholder = "請先選擇銀行";
+        qs("bankList").innerHTML = "";
+        qs("branchList").innerHTML = "";
+        qs("bankBranchCode").value = "";
+
+
 
         await loadProfile();
       }catch(err){
