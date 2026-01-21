@@ -260,10 +260,11 @@ qs("bankNameInput").addEventListener("input", async (e) => {
     return;
   }
 
-  const res = await apiCall({
-    action: "searchBanks",
-    keyword: kw,
-  });
+const res = await apiCall({
+  action: "searchBanksPublic",
+  keyword: kw,
+});
+
 
   qs("bankSuggest").innerHTML = (res.banks || []).map(b =>
     `<div class="opt" data-code="${b.code}">${b.name}</div>`
@@ -291,11 +292,12 @@ qs("branchNameInput").addEventListener("input", async (e) => {
   }
 
   const kw = e.target.value.trim();
-  const res = await apiCall({
-    action: "searchBranches",
-    bankCode: selectedBankCode,
-    keyword: kw,
-  });
+const res = await apiCall({
+  action: "searchBranchesPublic",
+  bankCode: selectedBankCode,
+  keyword: kw,
+});
+
 
   qs("branchSuggest").innerHTML = (res.branches || []).map(br =>
     `<div class="opt" data-code="${br.code}">${br.name}</div>`
