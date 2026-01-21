@@ -267,6 +267,19 @@ function debounce(fn, ms=250){
   };
 }
 
+function pickCodeFromDatalist(listId, inputValue){
+  const val = String(inputValue || "").trim();
+  if (!val) return "";
+
+  const opts = qs(listId).querySelectorAll("option");
+  let found = "";
+  opts.forEach(op=>{
+    if (op.value === val && op.dataset && op.dataset.code) found = op.dataset.code;
+  });
+  return found;
+}
+
+
   // 分行先鎖住
   qs("branchNameInput").value = "";
   qs("branchNameInput").disabled = true;
@@ -582,9 +595,25 @@ html += `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(String(v ?? ""))}</td></t
         const bankName = qs("bankName").value.trim();
 
 if (hasBankbook) {
-  if (!selectedBankCode) throw new Error("請從下拉選單選擇銀行"); 
+
+  // ✅ 送出當下再反查一次，避免 change 沒觸發導致 selectedXXX 為空
+  if (!selectedBankCode) {
+    const bankVal = qs("bankNameInput").value.trim();
+    selectedBankCode = pickCodeFromDatalist("bankList", bankVal);
+  }
+
+  // 分行的 datalist 是你在 onBranchInput 查詢後才填入的，所以也用同樣方式反查
+  if (!selectedBranchCode) {
+    const branchVal = qs("branchNameInput").value.trim();
+    selectedBranchCode = pickCodeFromDatalist("branchList", branchVal);
+  }
+
+  if (!selectedBankCode) throw new Error("請從下拉選單選擇銀行");
   if (!selectedBranchCode) throw new Error("請從下拉選單選擇分行");
-  
+
+  const bankBranchCode = qs("bankBranchCode").value.trim();
+  const bankAccount = qs("bankAccount").value.trim();
+  const bankName = qs("bankName").value.trim();
   const bankNameText = qs("bankNameInput").value.trim();
   const branchNameText = qs("branchNameInput").value.trim();
 
@@ -595,6 +624,7 @@ if (hasBankbook) {
     throw new Error("銀行代碼與分行代碼必須為7碼數字");
   }
 }
+
 
 
 const payload = {
