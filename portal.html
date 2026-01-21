@@ -302,6 +302,27 @@ qs("bankNameInput").addEventListener("input", onBankInput);
 
 // 當銀行名稱確定（change）時，抓出 bankCode
 qs("bankNameInput").addEventListener("change", ()=>{
+  // ✅ 新增：datalist點選時，常見是觸發 input 而不是 change
+qs("bankNameInput").addEventListener("input", ()=>{
+  const val = qs("bankNameInput").value.trim();
+  if (!val) return;
+
+  const opts = qs("bankList").querySelectorAll("option");
+  let foundCode = "";
+  opts.forEach(op=>{
+    if (op.value === val && op.dataset && op.dataset.code) foundCode = op.dataset.code;
+  });
+
+  if (!foundCode) return; // 還沒選到清單內的項目就先不解鎖
+
+  // ✅ 一旦確認是清單內項目，就等同選定銀行
+  selectedBankCode = foundCode;
+  selectedBankName = val;
+
+  qs("branchNameInput").disabled = false;
+  qs("branchNameInput").placeholder = "輸入分行名稱開始搜尋";
+});
+
   const val = qs("bankNameInput").value.trim();
   if (!val) return;
 
