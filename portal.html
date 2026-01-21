@@ -276,19 +276,22 @@ function debounce(fn, ms=250){
 // 銀行名稱：輸入1字就查
 const onBankInput = debounce(async ()=>{
   const kw = qs("bankNameInput").value.trim();
-  selectedBankCode = "";
-  selectedBankName = "";
+
+  // 每次銀行輸入：分行狀態先重置（分行一定要跟著銀行走）
   selectedBranchCode = "";
   selectedBranchName = "";
+  qs("branchNameInput").value = "";
+  qs("branchNameInput").disabled = true;
+  qs("branchNameInput").placeholder = "請先選擇銀行";
+  qs("branchList").innerHTML = "";
+  qs("bankBranchCode").value = ""; // 清 7碼
 
-qs("branchNameInput").disabled = false;
-
-
- // ✅ 新增：切換銀行時清 7碼
-  qs("bankBranchCode").value = "";
+  // ✅ 不要在這裡清 selectedBankCode，避免 datalist 點選造成 input 時把 code 洗掉
 
   if (kw.length < 1) {
     qs("bankList").innerHTML = "";
+    selectedBankCode = "";
+    selectedBankName = "";
     return;
   }
 
@@ -296,37 +299,81 @@ qs("branchNameInput").disabled = false;
   const res = await apiCall({ action:"searchBanks", phone, password, keyword: kw });
   const banks = (res && res.banks) ? res.banks : [];
 
-  // datalist options：顯示「銀行名稱」，value 也用銀行名稱
   qs("bankList").innerHTML = banks.map(b =>
     `<option value="${escapeHtml(b.name)}" data-code="${escapeHtml(b.code)}"></option>`
   ).join("");
 
+  // ✅ 如果目前輸入值「剛好等於清單內某一個 bank name」，就當作已選定銀行並解鎖分行
+  const opts = qs("bankList").querySelectorAll("option");
+  let foundCode = "";
+  opts.forEach(op=>{
+    if (op.value === kw && op.dataset && op.dataset.code) foundCode = op.dataset.code;
+  });
+
+  if (foundCode) {
+    selectedBankCode = foundCode;
+    selectedBankName = kw;
+
+    qs("branchNameInput").disabled = false;
+    qs("branchNameInput").placeholder = "輸入分行名稱開始搜尋";
+  } else {
+    selectedBankCode = "";
+    selectedBankName = "";
+  }
+
 }, 250);
 
-qs("bankNameInput").addEventListener("input", onBankInput);
 
-// 當銀行名稱確定（change）時，抓出 bankCode
+qs("bankNameInput").addEventListener("input", onBankInput);
+// ✅ 改3：銀行確定選定（change）後，正式解鎖分行 + 清掉舊分行/7碼
 qs("bankNameInput").addEventListener("change", ()=>{
-  // ✅ 新增：datalist點選時，常見是觸發 input 而不是 change
-qs("bankNameInput").addEventListener("input", ()=>{
   const val = qs("bankNameInput").value.trim();
   if (!val) return;
 
+  // 從 datalist 找對應 code（用 option.value 比對）
   const opts = qs("bankList").querySelectorAll("option");
   let foundCode = "";
   opts.forEach(op=>{
     if (op.value === val && op.dataset && op.dataset.code) foundCode = op.dataset.code;
   });
 
-  if (!foundCode) return; // 還沒選到清單內的項目就先不解鎖
+  // 沒有從下拉選到（用手打的）就視為未選定
+  if (!foundCode) {
+    selectedBankCode = "";
+    selectedBankName = "";
 
-  // ✅ 一旦確認是清單內項目，就等同選定銀行
+    // 分行鎖回去 + 清掉分行/7碼
+    selectedBranchCode = "";
+    selectedBranchName = "";
+    qs("branchNameInput").value = "";
+    qs("branchNameInput").disabled = true;
+    qs("branchNameInput").placeholder = "請先選擇銀行";
+    qs("branchList").innerHTML = "";
+    qs("bankBranchCode").value = "";
+    return;
+  }
+
+  // ✅ 已確定選到下拉選單內的銀行
   selectedBankCode = foundCode;
   selectedBankName = val;
 
+  // ✅ 切換銀行時：清掉分行/7碼，避免殘留舊資料
+  selectedBranchCode = "";
+  selectedBranchName = "";
+  qs("branchNameInput").value = "";
+  qs("branchList").innerHTML = "";
+  qs("bankBranchCode").value = "";
+
+  // ✅ 解鎖分行
   qs("branchNameInput").disabled = false;
   qs("branchNameInput").placeholder = "輸入分行名稱開始搜尋";
+  qs("branchNameInput").focus();
 });
+
+// 當銀行名稱確定（change）時，抓出 bankCode
+qs("bankNameInput").addEventListener("change", ()=>{
+  // ✅ 新增：datalist點選時，常見是觸發 input 而不是 change
+
 
   const val = qs("bankNameInput").value.trim();
   if (!val) return;
