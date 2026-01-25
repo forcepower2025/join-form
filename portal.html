@@ -10,6 +10,38 @@
   body * { visibility: hidden !important; }
   #printArea, #printArea * { visibility: visible !important; }
   #printArea { position: absolute; left: 0; top: 0;  }
+    /* ✅ 新增：分三頁列印 */
+  #printArea { width: 210mm; }
+
+  .print-page{
+    width: 210mm;
+    min-height: 297mm;
+    padding: 12mm;
+    box-sizing: border-box;
+    page-break-after: always;
+    break-after: page;
+  }
+  .print-page:last-child{
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  /* ✅ 新增：避免區塊被拆頁 */
+  .print-block, .contract, #profileCardPrint{
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* ✅ 新增：列印圖縮放 */
+  #printArea img{
+    width: 100%;
+    height: auto;
+    max-height: 120mm;
+    object-fit: contain;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+  }
+
 }
     /* ✅ 介紹獎金：表格置中對齊 */
   #bonusCard .table th,
@@ -35,8 +67,12 @@
     </div>
     
 <div id="printArea">
-            <div class="title">《動元力國際微股東加入合約書》</div>
-        <div class="muted">  <br>
+
+  <!-- ==================== 第1頁：合約（到第九條結束） ==================== -->
+  <section class="print-page">
+    <div class="title">《動元力國際微股東加入合約書》</div>
+    <div class="muted contract"><br>
+	
 甲方：動元力國際股份有限公司 <br>
 代表人：黃光啟執行長<br><br>
 乙方：微股東加入人（投資人）<br><br>
@@ -94,7 +130,16 @@ ________________________________________<br><br>
 •	乙方於期滿後一個月內提出申請。<br>
 •	甲方於收到申請後10個工作日內完成買回款項支付。<br>
 4.	若乙方未於期限內提出申請，視同放棄權益。<br>
-________________________________________<br><br>
+________________________________________
+
+    </div>
+  </section>
+
+  <!-- ==================== 第2頁：合約（第十條起）+ 身分證 ==================== -->
+  <section class="print-page">
+    <div class="muted contract"><br>
+
+
 第十條｜期滿後資格取消<br>
 合約五年期滿後，乙方之「微股東福利」即行取消，包括但不限於：<br>
 •	領取餐包60盒<br>
@@ -129,6 +174,7 @@ ________________________________________<br>
           </div>
 
     <!-- ✅ 證件/簽名預覽（最上方） -->
+	
     <div class="card" id="filesCard" style="display:none;">
       <div class="row">
         <span class="badge">證件與簽名</span>
