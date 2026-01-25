@@ -42,6 +42,25 @@
     border-radius: 10px;
   }
 
+
+  /* ✅ 1. 強制縮小上邊界（這一行最重要） */
+  @page {
+    size: A4;
+    margin: 6mm 12mm 12mm 12mm; /* 上 右 下 左 */
+  }
+
+  /* ✅ 2. 把標題上方多餘空白砍掉 */
+  #printArea .title {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  /* ✅ 3. 合約內文第一段不要自己再撐高度 */
+  #printArea .contract {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
 }
     /* ✅ 介紹獎金：表格置中對齊 */
   #bonusCard .table th,
