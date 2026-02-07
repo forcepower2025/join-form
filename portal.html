@@ -504,27 +504,43 @@ html += `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(String(v ?? ""))}</td></t
     }
 
     // ✅ 新增：把模板合約拆成第1頁/第2頁，塞到既有容器，不動其他版面
-    async function renderContractFromTemplate_(plan, name){
-      if (!plan) return;
+// ✅ 修改：用「第八條｜」做切點，確保第1～7條一定進第1頁
+async function renderContractFromTemplate_(plan, name){
+  if (!plan) return;
 
-      const res = await apiCall({ action:"getContractTemplate", plan });
-      let tpl = String(res && res.html ? res.html : "");
+  const res = await apiCall({ action:"getContractTemplate", plan });
+  let tpl = String(res && res.html ? res.html : "");
 
-      // 只代入姓名
-      tpl = tpl.replaceAll("{{姓名}}", name || "");
+  // 只代入姓名
+  tpl = tpl.replaceAll("{{姓名}}", name || "");
 
-      // 從模板 HTML 抽出「前2個 .muted.contract」當作第1/第2頁合約內容
-      const doc = new DOMParser().parseFromString(tpl, "text/html");
-      const blocks = doc.querySelectorAll(".muted.contract");
-      const p1 = blocks[0] ? blocks[0].innerHTML : "";
-      const p2 = blocks[1] ? blocks[1].innerHTML : "";
+  // ✅ 把模板轉成純文字HTML（取 body 內容）
+  const doc = new DOMParser().parseFromString(tpl, "text/html");
+  const bodyHtml = (doc.body ? doc.body.innerHTML : tpl);
 
-      // 只更新合約兩頁，不覆蓋 printArea
-      const el1 = qs("contractPage1");
-      const el2 = qs("contractPage2");
-      if (el1) el1.innerHTML = p1;
-      if (el2) el2.innerHTML = p2;
-    }
+  // ✅ 以「第八條｜」為切點分頁
+  const cutKey = "第八條｜";
+  const idx = bodyHtml.indexOf(cutKey);
+
+  let p1 = "";
+  let p2 = "";
+
+  if (idx >= 0) {
+    p1 = bodyHtml.slice(0, idx);
+    p2 = bodyHtml.slice(idx);
+  } else {
+    // 找不到切點就全部放第1頁，避免空白
+    p1 = bodyHtml;
+    p2 = "";
+  }
+
+  // ✅ 塞回兩頁容器
+  const el1 = qs("contractPage1");
+  const el2 = qs("contractPage2");
+  if (el1) el1.innerHTML = p1;
+  if (el2) el2.innerHTML = p2;
+}
+
 
     async function loadProfile(){
       const { phone, password } = loadSession();
