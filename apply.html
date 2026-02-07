@@ -19,6 +19,19 @@
       </div>
     </div>
 
+<!-- ✅ 選擇加入方案 -->
+<div>
+  <label>加入方案</label>
+  <select id="plan">
+    <option value="">請選擇</option>
+    <option value="方案A - 隔月返還股金">方案A</option>
+    <option value="方案B - 三年返還股金">方案B</option>
+  </select>
+</div>
+
+<div id="contractPreview" class="card" style="display:none; margin-top:10px;"></div>
+
+
     <div class="card">
       <div class="grid grid-2">
         <div>
@@ -221,6 +234,19 @@ ________________________________________<br>
     const msg = qs("msg");
     const sig = setupSignatureCanvas(qs("signCanvas"));
 
+  qs("plan").addEventListener("change", async ()=>{
+  const plan = qs("plan").value;
+  if(!plan){
+    qs("contractPreview").style.display="none";
+    return;
+  }
+
+  const res = await apiCall({ action:"getContractTemplate", plan });
+  qs("contractPreview").innerHTML = res.html;  // 不代入資料
+  qs("contractPreview").style.display="";
+});
+
+
     qs("btnClearSign").addEventListener("click", ()=> sig.clear());
 
     // ===== ✅ 銀行 / 分行搜尋（改成 portal 的 datalist 方式；其餘不動）=====
@@ -388,6 +414,7 @@ ________________________________________<br>
 
         const payload = {
           "姓名": qs("name").value.trim(),
+          "加入方案": qs("plan").value,
           "手機號碼": qs("phone").value.trim(),
           "身分證字號": qs("idno").value.trim().toUpperCase(),
           "出生日期": qs("dob").value,
