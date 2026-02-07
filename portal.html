@@ -582,6 +582,21 @@ html += `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(String(v ?? ""))}</td></t
 
       const res = await apiCall({ action:"getProfile", phone, password });
       const data = (res && res.data) ? res.data : {};
+
+      // ✅ 新增：依加入方案載入合約模板（只代入姓名）
+      const plan = String(data["加入方案"] || "").trim();
+      const name = String(data["姓名"] || "").trim();
+
+      if (plan) {
+        const c = await apiCall({ action: "getContractTemplate", plan });
+        let html = String(c && c.html ? c.html : "");
+        if (name) html = html.replaceAll("{{姓名}}", name);
+
+        // ✅ 把合約放進 printArea（列印時會印這一塊）
+        qs("printArea").innerHTML = html;
+      }
+
+		
       const status = String(data["申請狀態"] || "").trim();
       qs("printPage").style.display = (status === "審核通過") ? "" : "none";
 
