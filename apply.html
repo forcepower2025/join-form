@@ -166,17 +166,25 @@
     const msg = qs("msg");
     const sig = setupSignatureCanvas(qs("signCanvas"));
 
-  qs("plan").addEventListener("change", async ()=>{
+// ===== ✅ 設定切換方案時，顯示對應的合約 =====
+qs("plan").addEventListener("change", async ()=>{
   const plan = qs("plan").value;
   if(!plan){
     qs("contractPreview").style.display="none";
+    qs("contractPreview").innerHTML = "";
     return;
   }
 
-  const res = await apiCall({ action:"getContractTemplate", plan });
-  qs("contractPreview").innerHTML = res.html;  // 不代入資料
-  qs("contractPreview").style.display="";
+  try{
+    const res = await apiCall({ action:"getContractTemplate", plan });
+    qs("contractPreview").innerHTML = res.html || "";
+    qs("contractPreview").style.display = "";
+  }catch(err){
+    qs("contractPreview").style.display = "";
+    qs("contractPreview").innerHTML = `❌ ${escapeHtml(String(err?.message || err))}`;
+  }
 });
+
 
 
     qs("btnClearSign").addEventListener("click", ()=> sig.clear());
