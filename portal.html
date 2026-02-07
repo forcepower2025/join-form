@@ -517,11 +517,14 @@ qs("branchNameInput").addEventListener("change", ()=>{
         "通訊地址（縣市）","通訊地址（區）","通訊地址（詳細地址）",
         "推薦人姓名","推薦人手機號碼",
         "身份證正面檔案ID","身份證反面檔案ID","存摺封面檔案ID","申請簽名檔案ID","備註"
-      ];
-      let html = `<table class="table">`;
-      order.forEach(k=>{
-        if (obj[k] === undefined) return;
-let v = obj[k];
+        let html = `<table class="table">`;
+  order.forEach(k=>{
+    // ✅ 修改：這三欄就算 Sheet 沒值，也要顯示一列（先預留）
+    const mustShowEvenIfMissing = (k === "完款日期" || k === "加入資格" || k === "總監職等");
+
+    if (obj[k] === undefined && !mustShowEvenIfMissing) return;
+
+    let v = obj[k];;
 
 // ✅ 銀行分行顯示：銀行名稱 分行名稱 bankBranchCode(7碼)
 if (k === "銀行分行") {
