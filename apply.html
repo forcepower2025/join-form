@@ -404,7 +404,7 @@ qs("plan").addEventListener("change", async ()=>{
 
     qs("btnSubmit").addEventListener("click", async ()=>{
       try{
-        setMsg(msg, "送出中…", "ok");
+        setMsg(msg, "送出中…請稍等資料上傳中…請勿關閉視窗", "ok");
 
         // ✅ 新增：簽名必填（空白不可送出）
         if (sig.isBlank()) throw new Error("必須簽名才能送出申請");
