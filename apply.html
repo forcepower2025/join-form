@@ -166,6 +166,53 @@
     const msg = qs("msg");
     const sig = setupSignatureCanvas(qs("signCanvas"));
 
+//====== ✅ 身分證加浮文印 ========
+    async function fileToDataUrlWithWatermark(file, text){
+  if (!file) return "";
+
+  const srcDataUrl = await fileToDataUrl(file);
+
+  const img = await new Promise((resolve, reject)=>{
+    const im = new Image();
+    im.onload = ()=> resolve(im);
+    im.onerror = reject;
+    im.src = srcDataUrl;
+  });
+
+  const canvas = document.createElement("canvas");
+  canvas.width = img.naturalWidth || img.width;
+  canvas.height = img.naturalHeight || img.height;
+  const ctx = canvas.getContext("2d");
+
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  const wm = String(text || "").trim();
+  if (wm){
+    const base = Math.min(canvas.width, canvas.height);
+    const fontSize = Math.max(28, Math.floor(base * 0.06));
+
+    ctx.save();
+    ctx.globalAlpha = 0.18;
+    ctx.fillStyle = "#000";
+    ctx.strokeStyle = "rgba(0,0,0,0.35)";
+    ctx.lineWidth = Math.max(2, Math.floor(fontSize * 0.08));
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = `700 ${fontSize}px sans-serif`;
+
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(-18 * Math.PI / 180);
+
+    ctx.strokeText(wm, 0, 0);
+    ctx.fillText(wm, 0, 0);
+
+    ctx.restore();
+  }
+
+  return canvas.toDataURL("image/jpeg", 0.92);
+}
+
+
 // ===== ✅ 設定切換方案時，顯示對應的合約 =====
 qs("plan").addEventListener("change", async ()=>{
   const plan = qs("plan").value;
@@ -370,9 +417,11 @@ qs("plan").addEventListener("change", async ()=>{
           "推薦人手機號碼": qs("refPhone").value.trim(),
           consentChecked: qs("consent").checked,
           signatureDataUrl: sig.toDataUrl(),
-          idFrontDataUrl: await fileToDataUrl(qs("idFront").files[0]),
-          idBackDataUrl: await fileToDataUrl(qs("idBack").files[0]),
+          const wmText = "僅限加入動元力國際";
+          idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText),
+          idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText),
           bankbookDataUrl: await fileToDataUrl(qs("bankbook").files[0]),
+,
         };
 
         // 前端最基本檢核（後端也會再檢核）
