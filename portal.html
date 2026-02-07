@@ -513,11 +513,11 @@ qs("branchNameInput").addEventListener("change", ()=>{
     function renderProfile(obj){
       const order = [
         "申請時間戳記","申請狀態","姓名","手機號碼","身分證字號","出生日期",
-        "完款日期","加入資格","總監職級","銀行分行","銀行帳戶","銀行戶名",
+        "加入資格","總監職級","完款日期","銀行分行","銀行帳戶","銀行戶名",
         "通訊地址（縣市）","通訊地址（區）","通訊地址（詳細地址）",
         "推薦人姓名","推薦人手機號碼",
         "身份證正面檔案ID","身份證反面檔案ID","存摺封面檔案ID","申請簽名檔案ID","備註"
-		  
+	  ];  
       let html = `<table class="table">`;
       order.forEach(k=>{
       if (obj[k] === undefined) return;
