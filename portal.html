@@ -663,7 +663,7 @@ async function renderContractFromTemplate_(plan, name){
 
     qs("btnUpload").addEventListener("click", async ()=>{
       try{
-        setMsg(msg, "送出中…", "ok");
+        setMsg(msg, "送出中…請稍等資料上傳中…請勿關閉視窗", "ok");
         const { phone, password } = loadSession();
         if(!phone || !password) throw new Error("未登入");
 
