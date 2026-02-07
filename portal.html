@@ -689,12 +689,10 @@ if (hasBankbook) {
   }
 }
 
-
+const wmText = "僅限加入動元力國際";
 
 const payload = {
   desc: qs("desc").value.trim(),
-  const wmText = "僅限加入動元力國際";
-
   idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText),
   idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText),
   bankbookDataUrl: await fileToDataUrl(bankbookFile),
