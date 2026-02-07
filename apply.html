@@ -399,6 +399,8 @@ qs("plan").addEventListener("change", async ()=>{
           qs("bankBranch").value = `${selectedBankCode}${selectedBranchCode}`;
         }
 
+        const wmText = "僅限加入動元力國際";
+
         const payload = {
           "姓名": qs("name").value.trim(),
           "加入方案": qs("plan").value,
@@ -415,14 +417,15 @@ qs("plan").addEventListener("change", async ()=>{
           "通訊地址（詳細地址）": qs("addrDetail").value.trim(),
           "推薦人姓名": qs("refName").value.trim(),
           "推薦人手機號碼": qs("refPhone").value.trim(),
+
           consentChecked: qs("consent").checked,
           signatureDataUrl: sig.toDataUrl(),
-          const wmText = "僅限加入動元力國際";
+
           idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText),
           idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText),
           bankbookDataUrl: await fileToDataUrl(qs("bankbook").files[0]),
-,
         };
+
 
         // 前端最基本檢核（後端也會再檢核）
         if(!payload["姓名"] || !payload["手機號碼"] || !payload["身分證字號"] || !payload["出生日期"]) throw new Error("姓名/手機/身分證/出生日期為必填");
