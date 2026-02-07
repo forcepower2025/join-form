@@ -247,13 +247,35 @@
     ctx.textBaseline = "middle";
     ctx.font = `700 ${fontSize}px sans-serif`;
 
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate(-18 * Math.PI / 180);
+const angle = -18 * Math.PI / 180;
 
-    ctx.strokeText(wm, 0, 0);
-    ctx.fillText(wm, 0, 0);
+// ✅ 五個位置：左上、右上、左下、右下、中間（都同角度）
+const W = canvas.width;
+const H = canvas.height;
 
-    ctx.restore();
+// 距離邊緣留白（避免太貼邊被裁切）
+const padX = Math.max(60, Math.floor(W * 0.18));
+const padY = Math.max(60, Math.floor(H * 0.18));
+
+const positions = [
+  { x: padX,     y: padY     }, // 左上
+  { x: W - padX, y: padY     }, // 右上
+  { x: padX,     y: H - padY }, // 左下
+  { x: W - padX, y: H - padY }, // 右下
+  { x: W / 2,    y: H / 2    }, // 中間
+];
+
+positions.forEach(p => {
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  ctx.rotate(angle);
+  ctx.strokeText(wm, 0, 0);
+  ctx.fillText(wm, 0, 0);
+  ctx.restore();
+});
+
+ctx.restore();
+
   }
 
   return canvas.toDataURL("image/jpeg", 0.92);
