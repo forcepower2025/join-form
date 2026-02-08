@@ -167,7 +167,7 @@
     const sig = setupSignatureCanvas(qs("signCanvas"));
 
 //====== ✅ 身分證加浮文印 ========
-    async function fileToDataUrlWithWatermark(file, text){
+async function fileToDataUrlWithWatermark(file, text, targetWidth){
   if (!file) return "";
 
   const srcDataUrl = await fileToDataUrl(file);
@@ -179,12 +179,20 @@
     im.src = srcDataUrl;
   });
 
-  const canvas = document.createElement("canvas");
-  canvas.width = img.naturalWidth || img.width;
-  canvas.height = img.naturalHeight || img.height;
-  const ctx = canvas.getContext("2d");
+  // ✅ 先算等比尺寸（只縮放寬度，height 等比）
+  const ow = img.naturalWidth || img.width;
+  const oh = img.naturalHeight || img.height;
 
-  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const tw = Math.max(1, Number(targetWidth) || ow);  // 沒給就用原寬
+  const scale = tw / ow;
+  const th = Math.max(1, Math.round(oh * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = tw;
+  canvas.height = th;
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0, tw, th);
 
   const wm = String(text || "").trim();
   if (wm){
@@ -201,37 +209,34 @@
     ctx.font = `700 ${fontSize}px sans-serif`;
 
     const angle = -18 * Math.PI / 180;
+    const W = canvas.width;
+    const H = canvas.height;
 
-// ✅ 五個位置：左上、右上、左下、右下、中間（都同角度）
-const W = canvas.width;
-const H = canvas.height;
+    const padX = Math.max(60, Math.floor(W * 0.18));
+    const padY = Math.max(60, Math.floor(H * 0.18));
 
-// 距離邊緣留白（避免太貼邊被裁切）
-const padX = Math.max(60, Math.floor(W * 0.18));
-const padY = Math.max(60, Math.floor(H * 0.18));
+    const positions = [
+      { x: padX,     y: padY     },
+      { x: W - padX, y: padY     },
+      { x: padX,     y: H - padY },
+      { x: W - padX, y: H - padY },
+      { x: W / 2,    y: H / 2    },
+    ];
 
-const positions = [
-  { x: padX,     y: padY     }, // 左上
-  { x: W - padX, y: padY     }, // 右上
-  { x: padX,     y: H - padY }, // 左下
-  { x: W - padX, y: H - padY }, // 右下
-  { x: W / 2,    y: H / 2    }, // 中間
-];
+    positions.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(angle);
+      ctx.strokeText(wm, 0, 0);
+      ctx.fillText(wm, 0, 0);
+      ctx.restore();
+    });
 
-positions.forEach(p => {
-  ctx.save();
-  ctx.translate(p.x, p.y);
-  ctx.rotate(angle);
-  ctx.strokeText(wm, 0, 0);
-  ctx.fillText(wm, 0, 0);
-  ctx.restore();
-});
-
-ctx.restore();
-
+    ctx.restore();
   }
 
-  return canvas.toDataURL("image/jpeg", 0.92);
+  // ✅ PNG 不吃 0.92 參數，直接輸出 PNG
+  return canvas.toDataURL("image/png");
 }
 
 
@@ -443,18 +448,18 @@ qs("plan").addEventListener("change", async ()=>{
           consentChecked: qs("consent").checked,
           
   // ✅身份證（原本就有浮水印）
-  idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText),
-  idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText),
+  idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText, 600),
+  idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText, 600),
 
   // ✅ 存摺封面也加浮水印
-  bankbookDataUrl: await fileToDataUrlWithWatermark(bankbookFile, wmText),
+  bankbookDataUrl: await fileToDataUrlWithWatermark(bankbookFile, wmText, 600),
 
   // ✅ 簽名也加浮水印（要先把canvas轉成圖片再丟進浮水印函式）
   signatureDataUrl: await (async ()=>{
     if (sig.isBlank()) return "";
     const rawSign = sig.toDataUrl();
     const blob = await (await fetch(rawSign)).blob();
-    const file = new File([blob], "sign.jpg", { type:"image/jpeg" });
+    const file = new File([blob], "sign.png", { type:"image/png" });
     return await fileToDataUrlWithWatermark(file, wmText);
   })(),
 
