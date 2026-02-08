@@ -46,10 +46,6 @@
           <label>身分證字號</label>
           <input id="idno" placeholder="例：A123456789" />
           
-           qs("idno").addEventListener("input", e => {
-           e.target.value = e.target.value.toUpperCase();
-           });
-
           <div class="muted">登入預設密碼為「身分證字號末5碼」</div>
         </div>
         <div>
@@ -169,6 +165,12 @@
   <script>
     const msg = qs("msg");
     const sig = setupSignatureCanvas(qs("signCanvas"));
+
+    // 身分證英文字母自動大寫
+    qs("idno").addEventListener("input", e => {
+    e.target.value = e.target.value.toUpperCase();
+    });
+
 
     function checkTaiwanID(id) {
   const letters = "ABCDEFGHJKLMNPQRSTUVXYWZIO";
