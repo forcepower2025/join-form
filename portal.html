@@ -722,8 +722,8 @@ const payload = {
   desc: qs("desc").value.trim(),
 	
   // ✅身份證（原本就有浮水印）
-  idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText, 400),
-  idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText, 400),
+  idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText, 600),
+  idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText, 600),
 
   // ✅ 存摺封面也加浮水印
   bankbookDataUrl: await fileToDataUrlWithWatermark(bankbookFile, wmText, 600),
@@ -805,6 +805,7 @@ function renderReferralBonus(rows){
 
   html += `</table>`;
   qs("bonusWrap").innerHTML = html;
+	
 }
 
 async function loadReferralBonus(){
