@@ -441,12 +441,22 @@ qs("plan").addEventListener("change", async ()=>{
           "推薦人手機號碼": qs("refPhone").value.trim(),
 
           consentChecked: qs("consent").checked,
-          signatureDataUrl: sig.toDataUrl(),
+          
+  // ✅身份證（原本就有浮水印）
+  idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText),
+  idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText),
 
-          idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText),
-          idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText),
-          bankbookDataUrl: await fileToDataUrl(qs("bankbook").files[0]),
-        };
+  // ✅ 存摺封面也加浮水印
+  bankbookDataUrl: await fileToDataUrlWithWatermark(bankbookFile, wmText),
+
+  // ✅ 簽名也加浮水印（要先把canvas轉成圖片再丟進浮水印函式）
+  signatureDataUrl: await (async ()=>{
+    if (sig.isBlank()) return "";
+    const rawSign = sig.toDataUrl();
+    const blob = await (await fetch(rawSign)).blob();
+    const file = new File([blob], "sign.jpg", { type:"image/jpeg" });
+    return await fileToDataUrlWithWatermark(file, wmText);
+  })(),
 
 
         // 前端最基本檢核（後端也會再檢核）
