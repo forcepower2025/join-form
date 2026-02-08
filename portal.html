@@ -588,7 +588,7 @@ async function renderContractFromTemplate_(plan, name){
   const bodyHtml = (doc.body ? doc.body.innerHTML : tpl);
 
   // ✅ 以「接續上頁｜」為切點分頁
-  const cutKey = "接續上頁";
+  const cutKey = "</section>";
   const idx = bodyHtml.indexOf(cutKey);
 
   let p1 = "";
