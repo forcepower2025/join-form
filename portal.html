@@ -588,7 +588,7 @@ async function renderContractFromTemplate_(plan, name){
   const bodyHtml = (doc.body ? doc.body.innerHTML : tpl);
 
   // ✅ 以「第八條｜」為切點分頁
-  const cutKey = "第八條｜";
+  const cutKey = "<b>第八條｜";
   const idx = bodyHtml.indexOf(cutKey);
 
   let p1 = "";
