@@ -407,78 +407,77 @@ qs("plan").addEventListener("change", async ()=>{
       qs("bankBranch").value = `${selectedBankCode}${selectedBranchCode}`;
     });
 
-    qs("btnSubmit").addEventListener("click", async ()=>{
-      try{
-        setMsg(msg, "送出中…請稍等資料上傳中…請勿關閉視窗", "ok");
+qs("btnSubmit").addEventListener("click", async ()=>{
+  try{
+    setMsg(msg, "送出中…請稍等資料上傳中…請勿關閉視窗", "ok");
 
-        // ✅ 新增：簽名必填（空白不可送出）
-        if (sig.isBlank()) throw new Error("必須簽名才能送出申請");
+    // ✅ 簽名必填
+    if (sig.isBlank()) throw new Error("必須簽名才能送出申請");
 
-        // ✅ 送出當下補強：若 change 沒觸發，從 datalist 反查一次 code
-        if (!selectedBankCode) {
-          selectedBankCode = pickCodeFromDatalist("bankList", qs("bankNameInput").value.trim());
-        }
-        if (!selectedBranchCode) {
-          selectedBranchCode = pickCodeFromDatalist("branchList", qs("branchNameInput").value.trim());
-        }
-        // 若兩者都有，確保 7碼一致
-        if (selectedBankCode && selectedBranchCode) {
-          qs("bankBranch").value = `${selectedBankCode}${selectedBranchCode}`;
-        }
+    // ✅ 送出當下補強：若 change 沒觸發，從 datalist 反查一次 code
+    if (!selectedBankCode) {
+      selectedBankCode = pickCodeFromDatalist("bankList", qs("bankNameInput").value.trim());
+    }
+    if (!selectedBranchCode) {
+      selectedBranchCode = pickCodeFromDatalist("branchList", qs("branchNameInput").value.trim());
+    }
+    if (selectedBankCode && selectedBranchCode) {
+      qs("bankBranch").value = `${selectedBankCode}${selectedBranchCode}`;
+    }
 
-        const wmText = "僅限加入動元力國際";
+    const wmText = "僅限加入動元力國際";
 
-        const payload = {
-          "姓名": qs("name").value.trim(),
-          "加入方案": qs("plan").value,
-          "手機號碼": qs("phone").value.trim(),
-          "身分證字號": qs("idno").value.trim().toUpperCase(),
-          "出生日期": qs("dob").value,
-          "銀行名稱": qs("bankNameInput").value.trim(),
-          "分行名稱": qs("branchNameInput").value.trim(),
-          "銀行分行": qs("bankBranch").value.trim(),
-          "銀行帳戶": qs("bankAccount").value.trim(),
-          "銀行戶名": qs("bankName").value.trim(),
-          "通訊地址（縣市）": qs("addrCity").value.trim(),
-          "通訊地址（區）": qs("addrDist").value.trim(),
-          "通訊地址（詳細地址）": qs("addrDetail").value.trim(),
-          "推薦人姓名": qs("refName").value.trim(),
-          "推薦人手機號碼": qs("refPhone").value.trim(),
+    // ✅ 這行是你缺的：bankbookFile 定義
+    const bankbookFile = qs("bankbook").files[0];
 
-          consentChecked: qs("consent").checked,
-          
-  // ✅身份證（原本就有浮水印）
-  idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText, 600),
-  idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText, 600),
+    const payload = {
+      "姓名": qs("name").value.trim(),
+      "加入方案": qs("plan").value,
+      "手機號碼": qs("phone").value.trim(),
+      "身分證字號": qs("idno").value.trim().toUpperCase(),
+      "出生日期": qs("dob").value,
+      "銀行名稱": qs("bankNameInput").value.trim(),
+      "分行名稱": qs("branchNameInput").value.trim(),
+      "銀行分行": qs("bankBranch").value.trim(),
+      "銀行帳戶": qs("bankAccount").value.trim(),
+      "銀行戶名": qs("bankName").value.trim(),
+      "通訊地址（縣市）": qs("addrCity").value.trim(),
+      "通訊地址（區）": qs("addrDist").value.trim(),
+      "通訊地址（詳細地址）": qs("addrDetail").value.trim(),
+      "推薦人姓名": qs("refName").value.trim(),
+      "推薦人手機號碼": qs("refPhone").value.trim(),
 
-  // ✅ 存摺封面也加浮水印
-  bankbookDataUrl: await fileToDataUrlWithWatermark(bankbookFile, wmText, 600),
+      consentChecked: qs("consent").checked,
 
-  // ✅ 簽名也加浮水印（要先把canvas轉成圖片再丟進浮水印函式）
-  signatureDataUrl: await (async ()=>{
-    if (sig.isBlank()) return "";
-    const rawSign = sig.toDataUrl();
-    const blob = await (await fetch(rawSign)).blob();
-    const file = new File([blob], "sign.png", { type:"image/png" });
-    return await fileToDataUrlWithWatermark(file, wmText);
-  })(),
+      // ✅ 身分證縮 600px（等比）+ 浮水印
+      idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText, 600),
+      idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText, 600),
 
+      // ✅ 存摺縮 600px（等比）+ 浮水印（若沒選檔就空字串）
+      bankbookDataUrl: await fileToDataUrlWithWatermark(bankbookFile, wmText, 600),
 
-        // 前端最基本檢核（後端也會再檢核）
-        if(!payload["姓名"] || !payload["手機號碼"] || !payload["身分證字號"] || !payload["出生日期"]) throw new Error("姓名/手機/身分證/出生日期為必填");
-        if(!payload["通訊地址（縣市）"] || !payload["通訊地址（區）"] || !payload["通訊地址（詳細地址）"]) throw new Error("通訊地址需填完整");
-        if(!payload.consentChecked) throw new Error("請先勾選同意聲明");
+      // ✅ 簽名（你說已經OK就不要再縮；這裡維持原本：直接送簽名圖）
+      signatureDataUrl: sig.toDataUrl(),
+    };
 
-        const res = await apiCall({ action:"submitApplication", payload });
+    // 前端最基本檢核（後端也會再檢核）
+    if(!payload["姓名"] || !payload["手機號碼"] || !payload["身分證字號"] || !payload["出生日期"]) {
+      throw new Error("姓名/手機/身分證/出生日期為必填");
+    }
+    if(!payload["通訊地址（縣市）"] || !payload["通訊地址（區）"] || !payload["通訊地址（詳細地址）"]) {
+      throw new Error("通訊地址需填完整");
+    }
+    if(!payload.consentChecked) throw new Error("請先勾選同意聲明");
 
-        // ✅ 修改：不要用 <br>（避免被當純文字顯示）
-        setMsg(msg, `✅ ${res.message}（手機：${res.phone}）\n你可以使用「手機＋身分證末5碼」登入補件。`, "ok");
-      }catch(err){
-        // ✅ 顯示完整錯誤（包含 upstream_status / upstream_head）
-        setMsg(msg, `❌ ${String(err?.message || err)}`, "err");
-        console.error(err);
-      }
-    });
+    const res = await apiCall({ action:"submitApplication", payload });
+
+    setMsg(msg, `✅ ${res.message}（手機：${res.phone}）\n你可以使用「手機＋身分證末5碼」登入補件。`, "ok");
+  }catch(err){
+    setMsg(msg, `❌ ${String(err?.message || err)}`, "err");
+    console.error(err);
+  }
+});
+
   </script>
 
 </body>
