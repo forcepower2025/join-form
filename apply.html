@@ -449,6 +449,25 @@ qs("btnSubmit").addEventListener("click", async () => {
     qs("idno").value = idno;
     if (!checkTaiwanID(idno)) throw new Error("身分證字號不正確");
 
+    // ✅ 年滿 18 歲檢查
+   const dobStr = qs("dob").value;
+   if (!dobStr) throw new Error("請填寫出生日期");
+
+   const dob = new Date(dobStr);
+   const today = new Date();
+
+  // 計算實際年齡（含生日未到的情況）
+   let age = today.getFullYear() - dob.getFullYear();
+   const m = today.getMonth() - dob.getMonth();
+   if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+     age--;
+}
+
+if (age < 18) {
+  throw new Error("申請人須年滿 18 歲");
+}
+
+
     // ✅ 簽名必填
     if (sig.isBlank()) throw new Error("必須簽名才能送出申請");
 
