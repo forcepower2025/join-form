@@ -573,7 +573,7 @@ html += `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(String(v ?? ""))}</td></t
     }
 
     // ✅ 新增：把模板合約拆成第1頁/第2頁，塞到既有容器，不動其他版面
-// ✅ 修改：用「第八條｜」做切點，確保第1～7條一定進第1頁
+// ✅ 修改：用「接續上頁｜」做切點，確保第1～7條一定進第1頁
 async function renderContractFromTemplate_(plan, name){
   if (!plan) return;
 
@@ -587,8 +587,8 @@ async function renderContractFromTemplate_(plan, name){
   const doc = new DOMParser().parseFromString(tpl, "text/html");
   const bodyHtml = (doc.body ? doc.body.innerHTML : tpl);
 
-  // ✅ 以「第八條｜」為切點分頁
-  const cutKey = "<b>第八條｜";
+  // ✅ 以「接續上頁｜」為切點分頁
+  const cutKey = "接續上頁";
   const idx = bodyHtml.indexOf(cutKey);
 
   let p1 = "";
