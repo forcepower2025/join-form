@@ -762,7 +762,7 @@ if (detail) qs("addrDetail").value = detail;
 
         // ✅ 1) 如果要送出補件：一定要重新簽名
         if (sig.isBlank()) {
-          throw new Error("送出補件必須重新簽名（簽名不可空白）");
+          throw new Error("更新資料必須重新簽名（簽名不可空白）");
         }
 
         const bankbookFile = qs("bankbook").files[0];
