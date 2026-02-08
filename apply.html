@@ -29,7 +29,6 @@
   </select>
 </div>
 
-<div id="contractPreview" class="card" style="display:none; margin-top:10px;"></div>
 
 
     <div class="card">
@@ -127,7 +126,7 @@
       </div>
     </div>
 
-
+<div id="contractPreview" class="card" style="display:none; margin-top:10px;"></div>
 
     <div class="card">
       <div class="row">
@@ -431,6 +430,17 @@ qs("btnSubmit").addEventListener("click", async ()=>{
     const bankbookFile = qs("bankbook").files[0];
 
     const payload = {
+      const hasBankbook = !!bankbookFile;
+
+if (hasBankbook) {
+  if (!payload["銀行名稱"] ||
+      !payload["分行名稱"] ||
+      !payload["銀行帳戶"] ||
+      !payload["銀行戶名"]) {
+    throw new Error("上傳存摺時，銀行名稱 / 分行名稱 / 帳號 / 戶名必須填寫");
+  }
+}
+
       "姓名": qs("name").value.trim(),
       "加入方案": qs("plan").value,
       "手機號碼": qs("phone").value.trim(),
