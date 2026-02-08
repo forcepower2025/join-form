@@ -727,7 +727,7 @@ const payload = {
     if (sig.isBlank()) return "";
     const rawSign = sig.toDataUrl();
     const blob = await (await fetch(rawSign)).blob();
-    const file = new File([blob], "sign.jpg", { type:"image/jpeg" });
+    const file = new File([blob], "sign.png", { type:"image/png" });
     return await fileToDataUrlWithWatermark(file, wmText);
   })(),
 
