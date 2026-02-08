@@ -164,12 +164,16 @@
 
   <script>
     const msg = qs("msg");
-    const sig = setupSignatureCanvas(qs("signCanvas"));
+const sig = setupSignatureCanvas(qs("signCanvas"));
 
-    // 身分證英文字母自動大寫
-    qs("idno").addEventListener("input", e => {
-    e.target.value = e.target.value.toUpperCase();
-    });
+// ✅ 修改：只把第一碼英文字母轉大寫（其餘保留）
+const idEl = qs("idno");
+idEl.addEventListener("input", (e) => {
+  const v = String(e.target.value || "");
+  if (!v) return;
+  e.target.value = v[0].toUpperCase() + v.slice(1);
+});
+
 
 
     function checkTaiwanID(id) {
@@ -435,22 +439,20 @@ qs("plan").addEventListener("change", async ()=>{
       qs("bankBranch").value = `${selectedBankCode}${selectedBranchCode}`;
     });
 
-qs("btnSubmit").addEventListener("click", async ()=>{
-  const idno = qs("idno").value.trim().toUpperCase();
-
-// 身分證格式檢查
-if (!checkTaiwanID(idno)) {
-  throw new Error("身分證字號不正確");
-}
-
-
-  try{
+// ✅ 修改：整段取代 btnSubmit click
+qs("btnSubmit").addEventListener("click", async () => {
+  try {
     setMsg(msg, "送出中…請稍等資料上傳中…請勿關閉視窗", "ok");
+
+    // ✅ 身分證：大寫 + 檢查
+    const idno = qs("idno").value.trim().toUpperCase();
+    qs("idno").value = idno;
+    if (!checkTaiwanID(idno)) throw new Error("身分證字號不正確");
 
     // ✅ 簽名必填
     if (sig.isBlank()) throw new Error("必須簽名才能送出申請");
 
-    // ✅ 送出當下補強：若 change 沒觸發，從 datalist 反查一次 code
+    // ✅ datalist code 補強（避免 change 沒觸發）
     if (!selectedBankCode) {
       selectedBankCode = pickCodeFromDatalist("bankList", qs("bankNameInput").value.trim());
     }
@@ -463,25 +465,28 @@ if (!checkTaiwanID(idno)) {
 
     const wmText = "僅限加入動元力國際";
 
-    // ✅ 這行是你缺的：bankbookFile 定義
+    // ✅ 存摺檔案（先定義，下面才用得到）
     const bankbookFile = qs("bankbook").files[0];
+    const hasBankbook = !!bankbookFile;
 
+    // ✅ 如果有上傳存摺：必填四欄（這段放在 payload 之前）
+    if (hasBankbook) {
+      const bankNameText = qs("bankNameInput").value.trim();
+      const branchNameText = qs("branchNameInput").value.trim();
+      const bankAccount = qs("bankAccount").value.trim();
+      const bankName = qs("bankName").value.trim();
+
+      if (!bankNameText || !branchNameText || !bankAccount || !bankName) {
+        throw new Error("上傳存摺時，銀行名稱 / 分行名稱 / 帳號 / 戶名必須填寫");
+      }
+    }
+
+    // ✅ payload：物件裡只能放 key/value
     const payload = {
-      const hasBankbook = !!bankbookFile;
-
-if (hasBankbook) {
-  if (!payload["銀行名稱"] ||
-      !payload["分行名稱"] ||
-      !payload["銀行帳戶"] ||
-      !payload["銀行戶名"]) {
-    throw new Error("上傳存摺時，銀行名稱 / 分行名稱 / 帳號 / 戶名必須填寫");
-  }
-}
-
       "姓名": qs("name").value.trim(),
       "加入方案": qs("plan").value,
       "手機號碼": qs("phone").value.trim(),
-      "身分證字號": qs("idno").value.trim().toUpperCase(),
+      "身分證字號": idno,
       "出生日期": qs("dob").value,
       "銀行名稱": qs("bankNameInput").value.trim(),
       "分行名稱": qs("branchNameInput").value.trim(),
@@ -496,34 +501,34 @@ if (hasBankbook) {
 
       consentChecked: qs("consent").checked,
 
-      // ✅ 身分證縮 600px（等比）+ 浮水印
+      // ✅ 身分證 600px 等比 + 浮水印
       idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText, 600),
       idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText, 600),
 
-      // ✅ 存摺縮 600px（等比）+ 浮水印（若沒選檔就空字串）
+      // ✅ 存摺 600px 等比 + 浮水印（沒選檔就空）
       bankbookDataUrl: await fileToDataUrlWithWatermark(bankbookFile, wmText, 600),
 
-      // ✅ 簽名（你說已經OK就不要再縮；這裡維持原本：直接送簽名圖）
+      // ✅ 簽名：不縮不改（你說已 OK）
       signatureDataUrl: sig.toDataUrl(),
     };
 
-    // 前端最基本檢核（後端也會再檢核）
-    if(!payload["姓名"] || !payload["手機號碼"] || !payload["身分證字號"] || !payload["出生日期"]) {
+    // ✅ 基本必填檢核
+    if (!payload["姓名"] || !payload["手機號碼"] || !payload["身分證字號"] || !payload["出生日期"]) {
       throw new Error("姓名/手機/身分證/出生日期為必填");
     }
-    if(!payload["通訊地址（縣市）"] || !payload["通訊地址（區）"] || !payload["通訊地址（詳細地址）"]) {
+    if (!payload["通訊地址（縣市）"] || !payload["通訊地址（區）"] || !payload["通訊地址（詳細地址）"]) {
       throw new Error("通訊地址需填完整");
     }
-    if(!payload.consentChecked) throw new Error("請先勾選同意聲明");
+    if (!payload.consentChecked) throw new Error("請先勾選同意聲明");
 
-    const res = await apiCall({ action:"submitApplication", payload });
-
+    const res = await apiCall({ action: "submitApplication", payload });
     setMsg(msg, `✅ ${res.message}（手機：${res.phone}）\n你可以使用「手機＋身分證末5碼」登入補件。`, "ok");
-  }catch(err){
+  } catch (err) {
     setMsg(msg, `❌ ${String(err?.message || err)}`, "err");
     console.error(err);
   }
 });
+
 
   </script>
 
