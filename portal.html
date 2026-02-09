@@ -1,916 +1,916 @@
-<!doctype html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>動元力國際會員資料</title>
-  <link rel="stylesheet" href="./style.css" />
-  <style>
-@media print {
-  body * { visibility: hidden !important; }
-  #printArea, #printArea * { visibility: visible !important; }
-  #printArea { position: absolute; left: 0; top: 0;  }
-    /* ✅ 新增：分三頁列印 */
-  #printArea { width: 210mm; }
-
-  .print-page{
-    width: 210mm;
-    min-height: 297mm;
-    padding: 6mm;
-    box-sizing: border-box;
-    page-break-after: always;
-    break-after: page;
-  }
-  .print-page:last-child{
-    page-break-after: auto;
-    break-after: auto;
-  }
-
-  /* ✅ 新增：避免區塊被拆頁 */
-  .print-block, .contract, #profileCardPrint{
-    page-break-inside: avoid;
-    break-inside: avoid;
-  }
-
-  /* ✅ 新增：列印圖縮放 */
-  #printArea img{
-    width: 100%;
-    height: auto;
-    max-height: 120mm;
-    object-fit: contain;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-  }
-
-
-  /* ✅ 1. 強制縮小上邊界（這一行最重要） */
-  @page {
-    size: A4;
-    margin: 6mm 12mm 12mm 12mm; /* 上 右 下 左 */
-  }
-
-  /* ✅ 2. 把標題上方多餘空白砍掉 */
-  #printArea .title {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-  }
-
-  /* ✅ 3. 合約內文第一段不要自己再撐高度 */
-  #printArea .contract {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-  }
-
-}
-    /* ✅ 介紹獎金：表格置中對齊 */
-  #bonusCard .table th,
-  #bonusCard .table td{
-    text-align: center;
-    vertical-align: middle;
-  }
-</style>
-
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div>
-        <div class="title">動元力國際會員資料</div>
-        <div class="muted">你可以查詢合約書內容、個人資料、並補上傳文件及重新簽名。</div>
-      </div>
-      <div class="nav">
-        <a href="#" id="printPage" style="display:none;">列印合約</a>
-        <a href="./login.html" id="logout">登出</a>
-      </div>
-    </div>
-    
-<div id="printArea">
-
-  <!-- ==================== 第1頁：合約（到第九條結束） ==================== -->
-  <section class="print-page">
-    <!-- ✅ 修改：改成容器，合約第1頁內容由模板塞進來（其他不動） -->
-    <div class="muted contract" style="font-size:16px; line-height:1.3;" id="contractPage1"></div>
-  </section>
-
-  <!-- ==================== 第2頁：合約（第十條起）+ 身分證 ==================== -->
-  <section class="print-page">
-    <!-- ✅ 修改：改成容器，合約第2頁內容由模板塞進來（其他不動） -->
-    <div class="muted contract" style="font-size:16px; line-height:1.3;" id="contractPage2"></div>
-
-    <!-- ✅ 證件/簽名預覽（最上方） -->
-    <div class="card" id="filesCard" style="display:none;">
-      <div class="row">
-        <span class="badge">證件與簽名</span>
-      </div>
-      <div id="filesWrap" style="margin-top:12px;"></div>
-    </div>
-  </section>	
-	
-  <section class="print-page">
-    <div class="card" id="profileCard">
-      <div class="row">
-        <span class="badge">個人資料</span>
-      </div>
-      <div id="profile" class="muted" style="margin-top:10px;">載入中…</div>
-    </div>
-
-</section>	  
-</div>
- <!-- ✅ 列印範圍的結尾 -->
-
-
-  <div class="card" id="bonusCard" style="display:none;">
-  <div class="row">
-    <span class="badge">介紹獎金</span>
-    <span class="muted">（每位 NT$10,000；匯款日＝加入隔月20日）</span>
-  </div>
-  <div id="bonusWrap" style="margin-top:10px;"></div>
-</div>
-
-    <div class="card">
-      <div class="row">
-        <span class="badge">更新證件</span>
-        <span class="muted">可上傳身份證/存摺；也可重新簽名。</span>
-      </div>
-
-      <div class="grid grid-2" style="margin-top:10px;">
-        <div>
-          <label>身份證正面</label>
-          <input id="idFront" type="file" accept="image/*" />
-        </div>
-        <div>
-          <label>身份證反面</label>
-          <input id="idBack" type="file" accept="image/*" />
-        </div>
-        <div style="grid-column:1/-1;">
-          <label>存摺封面</label>
-          <input id="bankbook" type="file" accept="image/*" />
-        </div>
-      </div>
-
-      <!-- ✅ 新增：若有上傳存摺，必填三欄（回存到 Google Sheet 的「會員申請資料」） -->
-      <div id="bankFields" style="display:none; margin-top:10px;">
-<div class="grid grid-2">
-  <!-- ✅ 新增：銀行名稱（輸入 1 字就查） -->
-  <div>
-    <label>銀行名稱</label>
-    <input id="bankNameInput" placeholder="輸入 1 個字開始搜尋" list="bankList" />
-    <datalist id="bankList"></datalist>
-  </div>
-
-  <!-- ✅ 新增：分行名稱（需先選銀行） -->
-  <div>
-    <label>分行名稱</label>
-    <input id="branchNameInput" placeholder="請先選擇銀行" list="branchList" disabled />
-    <datalist id="branchList"></datalist>
-  </div>
-
-  <!-- 原本既有：7碼 -->
-  <div>
-    <label>銀行代碼與分行代碼(共7碼，郵局為7000021)</label>
-<input id="bankBranchCode" placeholder="例：0123456" inputmode="numeric" readonly />
-  </div>
-
-  <div>
-    <label>銀行帳號</label>
-    <input id="bankAccount" placeholder="請輸入銀行帳號" inputmode="numeric" />
-  </div>
-
-  <div style="grid-column:1/-1;">
-    <label>銀行戶名</label>
-    <input id="bankName" placeholder="請輸入銀行戶名" />
-  </div>
-</div>
-
-      </div>
-
-	<hr />
-
-<div class="row" style="margin-top:10px;">
-  <span class="badge">更新通訊地址</span>
-  <span class="muted">請填寫可以收到產品的地址</span>
-</div>
-
-<div class="grid grid-2" style="margin-top:10px;">
-  <div>
-    <label>縣市</label>
-    <select id="addrCity">
-      <option value="">請選擇縣市</option>
-    </select>
-  </div>
-
-  <div>
-    <label>鄉鎮市區</label>
-    <select id="addrDist" disabled>
-      <option value="">請先選擇縣市</option>
-    </select>
-  </div>
-
-  <div style="grid-column:1/-1;">
-    <label>詳細地址</label>
-    <input id="addrDetail" placeholder="例：中山北路2號5樓" />
-  </div>
-</div>
-
-
-      <hr />
-
-      <div class="row">
-        <span class="badge">重新簽名（必填）</span>
-        <button id="btnClearSign" class="btn-ghost" type="button">清除簽名</button>
-      </div>
-      <div style="margin-top:10px;">
-        <canvas id="signCanvas"></canvas>
-      </div>
-
-      <div class="row" style="margin-top:12px;">
-        <button id="btnUpload" class="btn-primary" type="button">送出</button>
-      </div>
-
-      <div id="msg" class="msg"></div>
-    </div>
-  </div>
-
-  <script src="./app.js"></script>
-  <script>
-    const msg = qs("msg");
-    const sig = setupSignatureCanvas(qs("signCanvas"));
-
-	// ===== 台灣縣市/行政區（下拉）=====
-const TW_CITY_DIST = {
-  "台北市": ["中正區","大同區","中山區","松山區","大安區","萬華區","信義區","士林區","北投區","內湖區","南港區","文山區"],
-  "新北市": ["板橋區","三重區","中和區","永和區","新莊區","新店區","土城區","蘆洲區","樹林區","汐止區","鶯歌區","三峽區","淡水區","瑞芳區","五股區","泰山區","林口區","深坑區","石碇區","坪林區","三芝區","石門區","八里區","平溪區","雙溪區","貢寮區","金山區","萬里區","烏來區"],
-  "桃園市": ["桃園區","中壢區","平鎮區","八德區","楊梅區","蘆竹區","龜山區","大溪區","大園區","觀音區","新屋區","龍潭區","復興區"],
-  "台中市": ["中區","東區","南區","西區","北區","西屯區","南屯區","北屯區","豐原區","大里區","太平區","東勢區","大甲區","清水區","沙鹿區","梧棲區","后里區","神岡區","潭子區","大雅區","新社區","石岡區","外埔區","大安區","烏日區","大肚區","龍井區","霧峰區","和平區"],
-  "台南市": ["中西區","東區","南區","北區","安平區","安南區","永康區","歸仁區","新化區","左鎮區","玉井區","楠西區","南化區","仁德區","關廟區","龍崎區","官田區","麻豆區","佳里區","西港區","七股區","將軍區","學甲區","北門區","新營區","後壁區","白河區","東山區","六甲區","下營區","柳營區","鹽水區","善化區","大內區","山上區","新市區","安定區"],
-  "高雄市": ["新興區","前金區","苓雅區","鹽埕區","鼓山區","旗津區","前鎮區","三民區","楠梓區","小港區","左營區","仁武區","大社區","岡山區","路竹區","阿蓮區","田寮區","燕巢區","橋頭區","梓官區","彌陀區","永安區","湖內區","鳳山區","大寮區","林園區","鳥松區","大樹區","旗山區","美濃區","六龜區","內門區","杉林區","甲仙區","桃源區","那瑪夏區","茂林區"],
-  "基隆市": ["仁愛區","信義區","中正區","中山區","安樂區","暖暖區","七堵區"],
-  "新竹市": ["東區","北區","香山區"],
-  "新竹縣": ["竹北市","竹東鎮","新埔鎮","關西鎮","湖口鄉","新豐鄉","芎林鄉","橫山鄉","北埔鄉","寶山鄉","峨眉鄉","尖石鄉","五峰鄉"],
-  "苗栗縣": ["苗栗市","苑裡鎮","通霄鎮","竹南鎮","頭份市","後龍鎮","卓蘭鎮","大湖鄉","公館鄉","銅鑼鄉","南庄鄉","頭屋鄉","三義鄉","西湖鄉","造橋鄉","三灣鄉","獅潭鄉","泰安鄉"],
-  "彰化縣": ["彰化市","鹿港鎮","和美鎮","線西鄉","伸港鄉","福興鄉","秀水鄉","花壇鄉","芬園鄉","員林市","溪湖鎮","田中鎮","大村鄉","埔鹽鄉","埔心鄉","永靖鄉","社頭鄉","二水鄉","北斗鎮","二林鎮","田尾鄉","埤頭鄉","芳苑鄉","大城鄉","竹塘鄉","溪州鄉"],
-  "南投縣": ["南投市","埔里鎮","草屯鎮","竹山鎮","集集鎮","名間鄉","鹿谷鄉","中寮鄉","魚池鄉","國姓鄉","水里鄉","信義鄉","仁愛鄉"],
-  "雲林縣": ["斗六市","斗南鎮","虎尾鎮","西螺鎮","土庫鎮","北港鎮","古坑鄉","大埤鄉","莿桐鄉","林內鄉","二崙鄉","崙背鄉","麥寮鄉","東勢鄉","褒忠鄉","臺西鄉","元長鄉","四湖鄉","口湖鄉","水林鄉"],
-  "嘉義市": ["東區","西區"],
-  "嘉義縣": ["太保市","朴子市","布袋鎮","大林鎮","民雄鄉","溪口鄉","新港鄉","六腳鄉","東石鄉","義竹鄉","鹿草鄉","水上鄉","中埔鄉","竹崎鄉","梅山鄉","番路鄉","大埔鄉","阿里山鄉"],
-  "屏東縣": ["屏東市","潮州鎮","東港鎮","恆春鎮","萬丹鄉","長治鄉","麟洛鄉","九如鄉","里港鄉","鹽埔鄉","高樹鄉","萬巒鄉","內埔鄉","竹田鄉","新埤鄉","枋寮鄉","新園鄉","崁頂鄉","林邊鄉","南州鄉","佳冬鄉","琉球鄉","車城鄉","滿州鄉","枋山鄉","三地門鄉","霧臺鄉","瑪家鄉","泰武鄉","來義鄉","春日鄉","獅子鄉","牡丹鄉"],
-  "宜蘭縣": ["宜蘭市","羅東鎮","蘇澳鎮","頭城鎮","礁溪鄉","壯圍鄉","員山鄉","冬山鄉","五結鄉","三星鄉","大同鄉","南澳鄉"],
-  "花蓮縣": ["花蓮市","鳳林鎮","玉里鎮","新城鄉","吉安鄉","壽豐鄉","光復鄉","豐濱鄉","瑞穗鄉","萬榮鄉","卓溪鄉","富里鄉"],
-  "台東縣": ["台東市","成功鎮","關山鎮","長濱鄉","池上鄉","東河鄉","鹿野鄉","卑南鄉","大武鄉","綠島鄉","海端鄉","延平鄉","金峰鄉","達仁鄉","蘭嶼鄉"],
-  "澎湖縣": ["馬公市","湖西鄉","白沙鄉","西嶼鄉","望安鄉","七美鄉"],
-  "金門縣": ["金城鎮","金沙鎮","金湖鎮","金寧鄉","烈嶼鄉","烏坵鄉"],
-  "連江縣": ["南竿鄉","北竿鄉","莒光鄉","東引鄉"]
-};
-
-function initAddressSelects(){
-  const citySel = qs("addrCity");
-  const distSel = qs("addrDist");
-  if(!citySel || !distSel) return;
-
-  // 填縣市
-  citySel.innerHTML = `<option value="">請選擇縣市</option>` +
-    Object.keys(TW_CITY_DIST).map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
-
-  // 縣市變動 → 重新填行政區
-  citySel.addEventListener("change", ()=>{
-    const city = citySel.value;
-    distSel.innerHTML = `<option value="">請選擇區</option>`;
-    distSel.disabled = !city;
-
-    if(city && TW_CITY_DIST[city]){
-      distSel.innerHTML = `<option value="">請選擇區</option>` +
-        TW_CITY_DIST[city].map(d=>`<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("");
-    }
-  });
-}
-
-
-	// ✅身份證加浮水印
-async function fileToDataUrlWithWatermark(file, text, targetWidth){
-  if (!file) return "";
-
-  const srcDataUrl = await fileToDataUrl(file);
-
-  const img = await new Promise((resolve, reject)=>{
-    const im = new Image();
-    im.onload = ()=> resolve(im);
-    im.onerror = reject;
-    im.src = srcDataUrl;
-  });
-
-  // ✅ 先算等比尺寸（只縮放寬度，height 等比）
-  const ow = img.naturalWidth || img.width;
-  const oh = img.naturalHeight || img.height;
-
-  const tw = Math.max(1, Number(targetWidth) || ow);  // 沒給就用原寬
-  const scale = tw / ow;
-  const th = Math.max(1, Math.round(oh * scale));
-
-  const canvas = document.createElement("canvas");
-  canvas.width = tw;
-  canvas.height = th;
-
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(img, 0, 0, tw, th);
-
-  const wm = String(text || "").trim();
-  if (wm){
-    const base = Math.min(canvas.width, canvas.height);
-    const fontSize = Math.max(28, Math.floor(base * 0.06));
-
-    ctx.save();
-    ctx.globalAlpha = 0.18;
-    ctx.fillStyle = "#000";
-    ctx.strokeStyle = "rgba(0,0,0,0.35)";
-    ctx.lineWidth = Math.max(2, Math.floor(fontSize * 0.08));
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.font = `700 ${fontSize}px sans-serif`;
-
-    const angle = -18 * Math.PI / 180;
-    const W = canvas.width;
-    const H = canvas.height;
-
-    const padX = Math.max(60, Math.floor(W * 0.18));
-    const padY = Math.max(60, Math.floor(H * 0.18));
-
-    const positions = [
-      { x: padX,     y: padY     },
-      { x: W - padX, y: padY     },
-      { x: padX,     y: H - padY },
-      { x: W - padX, y: H - padY },
-      { x: W / 2,    y: H / 2    },
-    ];
-
-    positions.forEach(p => {
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(angle);
-      ctx.strokeText(wm, 0, 0);
-      ctx.fillText(wm, 0, 0);
-      ctx.restore();
-    });
-
-    ctx.restore();
-  }
-
-  // ✅ PNG 不吃 0.92 參數，直接輸出 PNG
-  return canvas.toDataURL("image/png");
-}
-
-
-
-    qs("btnClearSign").addEventListener("click", ()=> sig.clear());
-    qs("logout").addEventListener("click", (e)=>{ e.preventDefault(); clearSession(); location.href="./login.html"; });
-    qs("printPage").addEventListener("click", (e)=>{
-      e.preventDefault();
-      window.print();
-      });
-
-    // ✅ 若有選擇存摺檔案 -> 顯示三個必填欄位
-    qs("bankbook").addEventListener("change", ()=>{
-      const hasBankbook = qs("bankbook").files && qs("bankbook").files.length > 0;
-      qs("bankFields").style.display = hasBankbook ? "" : "none";
-    });
-
-    // =============== 銀行/分行 搜尋選取 ===============
-let selectedBankCode = "";    // 3碼
-let selectedBankName = "";
-let selectedBranchCode = "";  // 4碼
-let selectedBranchName = "";
-qs("bankBranchCode").value = ""; // 避免分行輸入中殘留舊 7碼
-
-function debounce(fn, ms=250){
-  let t=null;
-  return (...args)=>{
-    clearTimeout(t);
-    t=setTimeout(()=>fn(...args), ms);
-  };
-}
-
-function pickCodeFromDatalist(listId, inputValue){
-  const val = String(inputValue || "").trim();
-  if (!val) return "";
-
-  const opts = qs(listId).querySelectorAll("option");
-  let found = "";
-  opts.forEach(op=>{
-    if (op.value === val && op.dataset && op.dataset.code) found = op.dataset.code;
-  });
-  return found;
-}
-
-
-  // 分行先鎖住
-  qs("branchNameInput").value = "";
-  qs("branchNameInput").disabled = true;
-  qs("branchNameInput").placeholder = "請先選擇銀行";
-  qs("branchList").innerHTML = "";
-
-// 銀行名稱：輸入1字就查
-const onBankInput = debounce(async ()=>{
-  const kw = qs("bankNameInput").value.trim();
-
-  // 每次銀行輸入：分行狀態先重置（分行一定要跟著銀行走）
-  selectedBranchCode = "";
-  selectedBranchName = "";
-  qs("branchNameInput").value = "";
-  qs("branchNameInput").disabled = true;
-  qs("branchNameInput").placeholder = "請先選擇銀行";
-  qs("branchList").innerHTML = "";
-  qs("bankBranchCode").value = ""; // 清 7碼
-
-  // ✅ 不要在這裡清 selectedBankCode，避免 datalist 點選造成 input 時把 code 洗掉
-
-  if (kw.length < 1) {
-    qs("bankList").innerHTML = "";
-    selectedBankCode = "";
-    selectedBankName = "";
-    return;
-  }
-
-  const { phone, password } = loadSession();
-  const res = await apiCall({ action:"searchBanks", phone, password, keyword: kw });
-  const banks = (res && res.banks) ? res.banks : [];
-
-  qs("bankList").innerHTML = banks.map(b =>
-    `<option value="${escapeHtml(b.name)}" data-code="${escapeHtml(b.code)}"></option>`
-  ).join("");
-
-  // ✅ 如果目前輸入值「剛好等於清單內某一個 bank name」，就當作已選定銀行並解鎖分行
-  const opts = qs("bankList").querySelectorAll("option");
-  let foundCode = "";
-  opts.forEach(op=>{
-    if (op.value === kw && op.dataset && op.dataset.code) foundCode = op.dataset.code;
-  });
-
-  if (foundCode) {
-    selectedBankCode = foundCode;
-    selectedBankName = kw;
-
-    qs("branchNameInput").disabled = false;
-    qs("branchNameInput").placeholder = "輸入分行名稱開始搜尋";
-  } else {
-    selectedBankCode = "";
-    selectedBankName = "";
-  }
-
-}, 250);
-
-
-qs("bankNameInput").addEventListener("input", onBankInput);
-// ✅ 改3：銀行確定選定（change）後，正式解鎖分行 + 清掉舊分行/7碼
-qs("bankNameInput").addEventListener("change", ()=>{
-  const val = qs("bankNameInput").value.trim();
-  if (!val) return;
-
-  // 從 datalist 找對應 code（用 option.value 比對）
-  const opts = qs("bankList").querySelectorAll("option");
-  let foundCode = "";
-  opts.forEach(op=>{
-    if (op.value === val && op.dataset && op.dataset.code) foundCode = op.dataset.code;
-  });
-
-  // 沒有從下拉選到（用手打的）就視為未選定
-  if (!foundCode) {
-    selectedBankCode = "";
-    selectedBankName = "";
-
-    // 分行鎖回去 + 清掉分行/7碼
-    selectedBranchCode = "";
-    selectedBranchName = "";
-    qs("branchNameInput").value = "";
-    qs("branchNameInput").disabled = true;
-    qs("branchNameInput").placeholder = "請先選擇銀行";
-    qs("branchList").innerHTML = "";
-    qs("bankBranchCode").value = "";
-    return;
-  }
-
-  // ✅ 已確定選到下拉選單內的銀行
-  selectedBankCode = foundCode;
-  selectedBankName = val;
-
-  // ✅ 切換銀行時：清掉分行/7碼，避免殘留舊資料
-  selectedBranchCode = "";
-  selectedBranchName = "";
-  qs("branchNameInput").value = "";
-  qs("branchList").innerHTML = "";
-  qs("bankBranchCode").value = "";
-
-  // ✅ 解鎖分行
-  qs("branchNameInput").disabled = false;
-  qs("branchNameInput").placeholder = "輸入分行名稱開始搜尋";
-  qs("branchNameInput").focus();
-});
-
-// 當銀行名稱確定（change）時，抓出 bankCode
-qs("bankNameInput").addEventListener("change", ()=>{
-  // ✅ 新增：datalist點選時，常見是觸發 input 而不是 change
-
-
-  const val = qs("bankNameInput").value.trim();
-  if (!val) return;
-
-  // 從 datalist 找對應 code（用 option.value 比對）
-  const opts = qs("bankList").querySelectorAll("option");
-  let foundCode = "";
-  opts.forEach(op=>{
-    if (op.value === val && op.dataset && op.dataset.code) foundCode = op.dataset.code;
-  });
-
-  if (!foundCode) {
-    // 沒選到建議清單，就當作未選定
-    selectedBankCode = "";
-    selectedBankName = "";
-    qs("branchNameInput").disabled = true;
-    qs("branchNameInput").placeholder = "請先選擇銀行";
-    return;
-  }
-
-  selectedBankCode = foundCode;
-  selectedBankName = val;
-
-  // 開放分行輸入
-  qs("branchNameInput").disabled = false;
-  qs("branchNameInput").placeholder = "輸入分行名稱開始搜尋";
-  qs("branchNameInput").focus();
-});
-
-// 分行名稱：必須先選銀行
-const onBranchInput = debounce(async ()=>{
-  if (!selectedBankCode) {
-    qs("branchNameInput").value = "";
-    alert("請先選擇銀行");
-    return;
-  }
-
-  const kw = qs("branchNameInput").value.trim();
-  selectedBranchCode = "";
-  selectedBranchName = "";
-
-  if (kw.length < 1) {
-    qs("branchList").innerHTML = "";
-    return;
-  }
-
-  const { phone, password } = loadSession();
-  const res = await apiCall({ action:"searchBranches", phone, password, bankCode: selectedBankCode, keyword: kw });
-  const branches = (res && res.branches) ? res.branches : [];
-
-  // datalist：value 顯示「桃園分行」這種文字
-  qs("branchList").innerHTML = branches.map(b =>
-    `<option value="${escapeHtml(b.name)}" data-code="${escapeHtml(b.code)}"></option>`
-  ).join("");
-
-}, 250);
-
-qs("branchNameInput").addEventListener("input", onBranchInput);
-
-// 分行 change：選定後回填 7碼
-qs("branchNameInput").addEventListener("change", ()=>{
-  const val = qs("branchNameInput").value.trim();
-  if (!val || !selectedBankCode) return;
-
-  const opts = qs("branchList").querySelectorAll("option");
-  let foundCode = "";
-  opts.forEach(op=>{
-    if (op.value === val && op.dataset && op.dataset.code) foundCode = op.dataset.code;
-  });
-
-  if (!foundCode) return;
-
-  selectedBranchCode = foundCode;
-  selectedBranchName = val;
-
-  // ✅ 自動寫入 7碼：bankCode(3) + branchCode(4)
-  qs("bankBranchCode").value = `${selectedBankCode}${selectedBranchCode}`;
-});
-
-
-    function renderProfile(obj){
-      const order = [
-        "申請時間戳記","申請狀態","姓名","手機號碼","身分證字號","出生日期",
-        "加入資格","總監職級","完款日期","銀行分行","銀行帳戶","銀行戶名",
-        "通訊地址（縣市）","通訊地址（區）","通訊地址（詳細地址）",
-        "推薦人姓名","推薦人手機號碼",
-        "身份證正面檔案ID","身份證反面檔案ID","存摺封面檔案ID","申請簽名檔案ID","備註"
-	  ];  
-      let html = `<table class="table">`;
-      order.forEach(k=>{
-      if (obj[k] === undefined) return;
-      let v = obj[k];
-
-// ✅ 銀行分行顯示：銀行名稱 分行名稱 bankBranchCode(7碼)
-if (k === "銀行分行") {
-  const bn = String(obj["銀行名稱"] || "").trim();
-  const brn = String(obj["分行名稱"] || "").trim();
-  const code7 = String(obj["銀行分行"] || "").trim();
-  v = [bn, brn, code7].filter(Boolean).join(" ");
-}
-
-html += `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(String(v ?? ""))}</td></tr>`;
-      });
-      html += `</table>`;
-      qs("profile").innerHTML = html;
-    }
-
-    function driveToImgSrc(x){
-      const s = String(x || "").trim();
-      if(!s) return "";
-
-      // 1) 如果是純 Drive 檔案ID（你現在就是這種）
-      if (/^[a-zA-Z0-9_-]{20,}$/.test(s) && !s.startsWith("http")) {
-        return `https://drive.google.com/thumbnail?id=${s}&sz=w1600`;
-      }
-
-      // 2) 如果是 Drive 分享連結，抽出 id
-      const m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/) || s.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (m && m[1]) {
-        return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1600`;
-      }
-
-      // 3) 其他網址：原樣回傳
-      return s;
-    }
-
-    function imgBlock(title, urlOrId){
-      const imgSrc = driveToImgSrc(urlOrId);
-      if(!imgSrc) return "";
-
-      return `
-        <div>
-          <div class="muted" style="margin-bottom:6px;">${escapeHtml(title)}</div>
-              ${/* <a class="btn-ghost" href="${escapeHtml(imgSrc)}" target="_blank" rel="noopener">開新視窗</a> */""}
-          <div style="margin-top:8px;">
-            <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(title)}"
-                 style="max-width:100%; border-radius:12px; border:1px solid #eee;" />
-          </div>
-        </div>
-      `;
-    }
-
-    // ✅ 新增：把模板合約拆成第1頁/第2頁，塞到既有容器，不動其他版面
-// ✅ 修改：用「接續上頁｜」做切點，確保第1～7條一定進第1頁
-async function renderContractFromTemplate_(plan, name){
-  if (!plan) return;
-
-  const res = await apiCall({ action:"getContractTemplate", plan });
-  let tpl = String(res && res.html ? res.html : "");
-
-  // 只代入姓名
-  tpl = tpl.replaceAll("{{姓名}}", name || "");
-
-  // ✅ 把模板轉成純文字HTML（取 body 內容）
-  const doc = new DOMParser().parseFromString(tpl, "text/html");
-  const bodyHtml = (doc.body ? doc.body.innerHTML : tpl);
-
-  // ✅ 以「接續上頁｜」為切點分頁
-  const cutKey = "<b>第八條｜";
-  const idx = bodyHtml.indexOf(cutKey);
-
-  let p1 = "";
-  let p2 = "";
-
-  if (idx >= 0) {
-    p1 = bodyHtml.slice(0, idx);
-    p2 = bodyHtml.slice(idx);
-  } else {
-    // 找不到切點就全部放第1頁，避免空白
-    p1 = bodyHtml;
-    p2 = "";
-  }
-
-  // ✅ 塞回兩頁容器
-  const el1 = qs("contractPage1");
-  const el2 = qs("contractPage2");
-  if (el1) el1.innerHTML = p1;
-  if (el2) el2.innerHTML = p2;
-}
-
-
-    async function loadProfile(){
-      const { phone, password } = loadSession();
-      if(!phone || !password){
-        location.href="./login.html";
-        return;
-      }
-
-      const res = await apiCall({ action:"getProfile", phone, password });
-      const data = (res && res.data) ? res.data : {};
-      const status = String(data["申請狀態"] || "").trim();
-      qs("printPage").style.display = (status === "審核通過") ? "" : "none";
-
-      // ✅ 新增：載入會員資料後取得方案/姓名 -> 讀取模板合約並塞到第1/第2頁
-      const plan = data["加入方案"];
-      const name = data["姓名"];
-      await renderContractFromTemplate_(plan, name);
-
-      // ✅ 直接用主表的檔案ID顯示
-      const idFrontId = data["身份證正面檔案ID"] || "";
-      const idBackId  = data["身份證反面檔案ID"] || "";
-      const bankbookId = data["存摺封面檔案ID"] || "";
-      const signId = data["申請簽名檔案ID"] || "";
-
-      const card = qs("filesCard");
-      const wrap = qs("filesWrap");
-
-      // ✅ 改成 2x2 並排顯示：
-      // 第一排：身分證正面、身分證反面
-      // 第二排：存摺、簽名
-      const html =
-        `<div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">` +
-          imgBlock("身份證正面", idFrontId) +
-          imgBlock("身份證反面", idBackId) +
-          imgBlock("存摺封面", bankbookId) +
-          imgBlock("親筆簽名", signId) +
-        `</div>`;
-
-      if (idFrontId || idBackId || bankbookId || signId) {
-        wrap.innerHTML = html;
-        card.style.display = "";
-      } else {
-        wrap.innerHTML = `<div class="muted">尚未上傳任何文件。</div>`;
-        card.style.display = "";
-      }
-
-     initAddressSelects();
-
-// 回填已存在地址
-const city = String(data["通訊地址（縣市）"] || "").trim();
-const dist = String(data["通訊地址（區）"] || "").trim();
-const detail = String(data["通訊地址（詳細地址）"] || "").trim();
-
-if (city) {
-  qs("addrCity").value = city;
-  qs("addrCity").dispatchEvent(new Event("change")); // 觸發填行政區
-}
-if (dist) qs("addrDist").value = dist;
-if (detail) qs("addrDetail").value = detail;
-
-		
-      renderProfile(data);
-      await loadReferralBonus();
-
-    }
-
-    qs("btnUpload").addEventListener("click", async ()=>{
-      try{
-        setMsg(msg, "送出中…請稍等資料上傳中…請勿關閉視窗", "ok");
-        const { phone, password } = loadSession();
-        if(!phone || !password) throw new Error("未登入");
-
-        // ✅ 1) 如果要送出補件：一定要重新簽名
-        if (sig.isBlank()) {
-          throw new Error("更新資料必須重新簽名（簽名不可空白）");
-        }
-
-        const bankbookFile = qs("bankbook").files[0];
-        const hasBankbook = !!bankbookFile;
-
-        // ✅ 2) 如果有上傳存摺：三欄必填
-        const bankBranchCode = qs("bankBranchCode").value.trim();
-        const bankAccount = qs("bankAccount").value.trim();
-        const bankName = qs("bankName").value.trim();
-
-if (hasBankbook) {
-
-  // ✅ 送出當下再反查一次，避免 change 沒觸發導致 selectedXXX 為空
-  if (!selectedBankCode) {
-    const bankVal = qs("bankNameInput").value.trim();
-    selectedBankCode = pickCodeFromDatalist("bankList", bankVal);
-  }
-
-  // 分行的 datalist 是你在 onBranchInput 查詢後才填入的，所以也用同樣方式反查
-  if (!selectedBranchCode) {
-    const branchVal = qs("branchNameInput").value.trim();
-    selectedBranchCode = pickCodeFromDatalist("branchList", branchVal);
-  }
-
-  if (!selectedBankCode) throw new Error("請從下拉選單選擇銀行");
-  if (!selectedBranchCode) throw new Error("請從下拉選單選擇分行");
-
-  const bankBranchCode = qs("bankBranchCode").value.trim();
-  const bankAccount = qs("bankAccount").value.trim();
-  const bankName = qs("bankName").value.trim();
-  const bankNameText = qs("bankNameInput").value.trim();
-  const branchNameText = qs("branchNameInput").value.trim();
-
-  if (!bankNameText || !branchNameText || !bankBranchCode || !bankAccount || !bankName) {
-    throw new Error("上傳存摺時，「銀行名稱 / 分行名稱 / 銀行代碼與分行代碼(7碼) / 銀行帳號 / 銀行戶名」必須全部輸入");
-  }
-  if (!/^\d{7}$/.test(bankBranchCode)) {
-    throw new Error("銀行代碼與分行代碼必須為7碼數字");
-  }
-}
-
-const wmText = "僅限加入動元力國際";
-
-const payload = {
-	
-  // ✅身份證（原本就有浮水印）
-  idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText, 600),
-  idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText, 600),
-
-  // ✅ 存摺封面也加浮水印
-  bankbookDataUrl: await fileToDataUrlWithWatermark(bankbookFile, wmText, 600),
-
-  // ✅ 簽名也加浮水印（要先把canvas轉成圖片再丟進浮水印函式）
-  signatureDataUrl: await (async ()=>{
-    if (sig.isBlank()) return "";
-    const rawSign = sig.toDataUrl();
-    const blob = await (await fetch(rawSign)).blob();
-    const file = new File([blob], "sign.png", { type:"image/png" });
-    return await fileToDataUrlWithWatermark(file, wmText);
-  })(),
-
-  '銀行分行': hasBankbook ? bankBranchCode : "",
-  '銀行名稱': hasBankbook ? qs("bankNameInput").value.trim() : "",
-  '分行名稱': hasBankbook ? qs("branchNameInput").value.trim() : "",
-  '銀行帳戶': hasBankbook ? bankAccount : "",
-  '銀行戶名': hasBankbook ? bankName : "",
-  "通訊地址（縣市）": qs("addrCity").value.trim(),
-  "通訊地址（區）": qs("addrDist").value.trim(),
-  "通訊地址（詳細地址）": qs("addrDetail").value.trim(),
-
-};
-
-
-        // ✅ 仍保留：至少要有補件檔案之一或簽名（簽名必送，所以這裡等於檔案可全空也會送）
-        // 你要求「送出補件一定要重新簽名」，因此允許只簽名不選檔案也可送出
-        // 若你想「必須至少選一個檔案」再告訴我，我再照你規則改。
-
-        const res = await apiCall({ action:"uploadAfterLogin", phone, password, payload });
-        setMsg(msg, `✅ ${res.message}`, "ok");
-
-        // 送出後：清空存摺欄位區（不改原本UI結構）
-        qs("bankbook").value = "";
-        qs("bankFields").style.display = "none";
-        qs("bankBranchCode").value = "";
-        qs("bankAccount").value = "";
-        qs("bankName").value = "";
-        qs("bankNameInput").value = "";
-        qs("branchNameInput").value = "";
-        selectedBankCode = "";
-        selectedBranchCode = "";
-        qs("branchNameInput").disabled = true;
-        qs("branchNameInput").placeholder = "請先選擇銀行";
-        qs("bankList").innerHTML = "";
-        qs("branchList").innerHTML = "";
-        qs("bankBranchCode").value = "";
-
-
-
-        await loadProfile();
-      }catch(err){
-        setMsg(msg, `❌ ${err.message}`, "err");
-      }
-    });
-
-    loadProfile().catch(err=>{
-      qs("profile").innerHTML = `❌ 載入失敗：${escapeHtml(err.message)}`;
-    });
-
-function renderReferralBonus(rows){
-  if (!rows || !rows.length) {
-    qs("bonusWrap").innerHTML = `<div class="muted">目前尚無推薦加入紀錄。</div>`;
-    return;
-  }
-
-  let html = `<table class="table">`;
-  html += `<tr>
-    <th>加入日期</th>
-    <th>姓名</th>
-    <th>獎金</th>
-    <th>匯款日期</th>
-  </tr>`;
-
-  rows.forEach(r=>{
-    html += `<tr>
-      <td>${escapeHtml(String(r.joinDate || ""))}</td>
-      <td>${escapeHtml(String(r.name || ""))}</td>
-      <td>${escapeHtml(String(r.bonus || 10000))}</td>
-      <td>${escapeHtml(String(r.remitDate || ""))}</td>
-    </tr>`;
-  });
-
-  html += `</table>`;
-  qs("bonusWrap").innerHTML = html;
-	
-}
-
-async function loadReferralBonus(){
-  const { phone, password } = loadSession();
-  if(!phone || !password) return;
-
-  const res = await apiCall({ action:"getReferralBonus", phone, password });
-  const rows = (res && res.rows) ? res.rows : [];
-
-  qs("bonusCard").style.display = "";
-  renderReferralBonus(rows);
-}
-
-
- </script>
-</body>
-</html>
+1	<!doctype html>
+2	<html lang="zh-Hant">
+3	<head>
+4	<meta charset="utf-8" />
+5	<meta name="viewport" content="width=device-width, initial-scale=1" />
+6	<title>動元力國際會員資料</title>
+7	<link rel="stylesheet" href="./style.css" />
+8	<style>
+9	@media print {
+10	body * { visibility: hidden !important; }
+11	#printArea, #printArea * { visibility: visible !important; }
+12	#printArea { position: absolute; left: 0; top: 0; }
+13	/* ✅ 新增：分三頁列印 */
+14	#printArea { width: 210mm; }
+15	
+16	.print-page{
+17	width: 210mm;
+18	min-height: 297mm;
+19	padding: 6mm;
+20	box-sizing: border-box;
+21	page-break-after: always;
+22	break-after: page;
+23	}
+24	.print-page:last-child{
+25	page-break-after: auto;
+26	break-after: auto;
+27	}
+28	
+29	/* ✅ 新增：避免區塊被拆頁 */
+30	.print-block, .contract, #profileCardPrint{
+31	page-break-inside: avoid;
+32	break-inside: avoid;
+33	}
+34	
+35	/* ✅ 新增：列印圖縮放 */
+36	#printArea img{
+37	width: 100%;
+38	height: auto;
+39	max-height: 120mm;
+40	object-fit: contain;
+41	border: 1px solid #ddd;
+42	border-radius: 10px;
+43	}
+44	
+45	
+46	/* ✅ 1. 強制縮小上邊界（這一行最重要） */
+47	@page {
+48	size: A4;
+49	margin: 6mm 12mm 12mm 12mm; /* 上 右 下 左 */
+50	}
+51	
+52	/* ✅ 2. 把標題上方多餘空白砍掉 */
+53	#printArea .title {
+54	margin-top: 0 !important;
+55	padding-top: 0 !important;
+56	}
+57	
+58	/* ✅ 3. 合約內文第一段不要自己再撐高度 */
+59	#printArea .contract {
+60	margin-top: 0 !important;
+61	padding-top: 0 !important;
+62	}
+63	
+64	}
+65	/* ✅ 介紹獎金：表格置中對齊 */
+66	#bonusCard .table th,
+67	#bonusCard .table td{
+68	text-align: center;
+69	vertical-align: middle;
+70	}
+71	</style>
+72	
+73	</head>
+74	<body>
+75	<div class="container">
+76	<div class="header">
+77	<div>
+78	<div class="title">動元力國際會員資料</div>
+79	<div class="muted">你可以查詢合約書內容、個人資料、並補上傳文件及重新簽名。</div>
+80	</div>
+81	<div class="nav">
+82	<a href="#" id="printPage" style="display:none;">列印合約</a>
+83	<a href="./login.html" id="logout">登出</a>
+84	</div>
+85	</div>
+86	
+87	<div id="printArea">
+88	
+89	<!-- ==================== 第1頁：合約（到第九條結束） ==================== -->
+90	<section class="print-page">
+91	<!-- ✅ 修改：改成容器，合約第1頁內容由模板塞進來（其他不動） -->
+92	<div class="muted contract" style="font-size:16px; line-height:1.3;" id="contractPage1"></div>
+93	</section>
+94	
+95	<!-- ==================== 第2頁：合約（第十條起）+ 身分證 ==================== -->
+96	<section class="print-page">
+97	<!-- ✅ 修改：改成容器，合約第2頁內容由模板塞進來（其他不動） -->
+98	<div class="muted contract" style="font-size:16px; line-height:1.3;" id="contractPage2"></div>
+99	
+100	<!-- ✅ 證件/簽名預覽（最上方） -->
+101	<div class="card" id="filesCard" style="display:none;">
+102	<div class="row">
+103	<span class="badge">證件與簽名</span>
+104	</div>
+105	<div id="filesWrap" style="margin-top:12px;"></div>
+106	</div>
+107	</section>
+108	
+109	<section class="print-page">
+110	<div class="card" id="profileCard">
+111	<div class="row">
+112	<span class="badge">個人資料</span>
+113	</div>
+114	<div id="profile" class="muted" style="margin-top:10px;">載入中…</div>
+115	</div>
+116	
+117	</section>
+118	</div>
+119	<!-- ✅ 列印範圍的結尾 -->
+120	
+121	
+122	<div class="card" id="bonusCard" style="display:none;">
+123	<div class="row">
+124	<span class="badge">介紹獎金</span>
+125	<span class="muted">（每位 NT$10,000；匯款日＝加入隔月20日）</span>
+126	</div>
+127	<div id="bonusWrap" style="margin-top:10px;"></div>
+128	</div>
+129	
+130	<div class="card">
+131	<div class="row">
+132	<span class="badge">更新證件</span>
+133	<span class="muted">可上傳身份證/存摺；也可重新簽名。</span>
+134	</div>
+135	
+136	<div class="grid grid-2" style="margin-top:10px;">
+137	<div>
+138	<label>身份證正面</label>
+139	<input id="idFront" type="file" accept="image/*" />
+140	</div>
+141	<div>
+142	<label>身份證反面</label>
+143	<input id="idBack" type="file" accept="image/*" />
+144	</div>
+145	<div style="grid-column:1/-1;">
+146	<label>存摺封面</label>
+147	<input id="bankbook" type="file" accept="image/*" />
+148	</div>
+149	</div>
+150	
+151	<!-- ✅ 新增：若有上傳存摺，必填三欄（回存到 Google Sheet 的「會員申請資料」） -->
+152	<div id="bankFields" style="display:none; margin-top:10px;">
+153	<div class="grid grid-2">
+154	<!-- ✅ 新增：銀行名稱（輸入 1 字就查） -->
+155	<div>
+156	<label>銀行名稱</label>
+157	<input id="bankNameInput" placeholder="輸入 1 個字開始搜尋" list="bankList" />
+158	<datalist id="bankList"></datalist>
+159	</div>
+160	
+161	<!-- ✅ 新增：分行名稱（需先選銀行） -->
+162	<div>
+163	<label>分行名稱</label>
+164	<input id="branchNameInput" placeholder="請先選擇銀行" list="branchList" disabled />
+165	<datalist id="branchList"></datalist>
+166	</div>
+167	
+168	<!-- 原本既有：7碼 -->
+169	<div>
+170	<label>銀行代碼與分行代碼(共7碼，郵局為7000021)</label>
+171	<input id="bankBranchCode" placeholder="例：0123456" inputmode="numeric" readonly />
+172	</div>
+173	
+174	<div>
+175	<label>銀行帳號</label>
+176	<input id="bankAccount" placeholder="請輸入銀行帳號" inputmode="numeric" />
+177	</div>
+178	
+179	<div style="grid-column:1/-1;">
+180	<label>銀行戶名</label>
+181	<input id="bankName" placeholder="請輸入銀行戶名" />
+182	</div>
+183	</div>
+184	
+185	</div>
+186	
+187	<hr />
+188	
+189	<div class="row" style="margin-top:10px;">
+190	<span class="badge">更新通訊地址</span>
+191	<span class="muted">請填寫可以收到產品的地址</span>
+192	</div>
+193	
+194	<div class="grid grid-2" style="margin-top:10px;">
+195	<div>
+196	<label>縣市</label>
+197	<select id="addrCity">
+198	<option value="">請選擇縣市</option>
+199	</select>
+200	</div>
+201	
+202	<div>
+203	<label>鄉鎮市區</label>
+204	<select id="addrDist" disabled>
+205	<option value="">請先選擇縣市</option>
+206	</select>
+207	</div>
+208	
+209	<div style="grid-column:1/-1;">
+210	<label>詳細地址</label>
+211	<input id="addrDetail" placeholder="例：中山北路2號5樓" />
+212	</div>
+213	</div>
+214	
+215	
+216	<hr />
+217	
+218	<div class="row">
+219	<span class="badge">重新簽名（必填）</span>
+220	<button id="btnClearSign" class="btn-ghost" type="button">清除簽名</button>
+221	</div>
+222	<div style="margin-top:10px;">
+223	<canvas id="signCanvas"></canvas>
+224	</div>
+225	
+226	<div class="row" style="margin-top:12px;">
+227	<button id="btnUpload" class="btn-primary" type="button">送出</button>
+228	</div>
+229	
+230	<div id="msg" class="msg"></div>
+231	</div>
+232	</div>
+233	
+234	<script src="./app.js"></script>
+235	<script>
+236	const msg = qs("msg");
+237	const sig = setupSignatureCanvas(qs("signCanvas"));
+238	
+239	// ===== 台灣縣市/行政區（下拉）=====
+240	const TW_CITY_DIST = {
+241	"台北市": ["中正區","大同區","中山區","松山區","大安區","萬華區","信義區","士林區","北投區","內湖區","南港區","文山區"],
+242	"新北市": ["板橋區","三重區","中和區","永和區","新莊區","新店區","土城區","蘆洲區","樹林區","汐止區","鶯歌區","三峽區","淡水區","瑞芳區","五股區","泰山區","林口區","深坑區","石碇區","坪林區","三芝區","石門區","八里區","平溪區","雙溪區","貢寮區","金山區","萬里區","烏來區"],
+243	"桃園市": ["桃園區","中壢區","平鎮區","八德區","楊梅區","蘆竹區","龜山區","大溪區","大園區","觀音區","新屋區","龍潭區","復興區"],
+244	"台中市": ["中區","東區","南區","西區","北區","西屯區","南屯區","北屯區","豐原區","大里區","太平區","東勢區","大甲區","清水區","沙鹿區","梧棲區","后里區","神岡區","潭子區","大雅區","新社區","石岡區","外埔區","大安區","烏日區","大肚區","龍井區","霧峰區","和平區"],
+245	"台南市": ["中西區","東區","南區","北區","安平區","安南區","永康區","歸仁區","新化區","左鎮區","玉井區","楠西區","南化區","仁德區","關廟區","龍崎區","官田區","麻豆區","佳里區","西港區","七股區","將軍區","學甲區","北門區","新營區","後壁區","白河區","東山區","六甲區","下營區","柳營區","鹽水區","善化區","大內區","山上區","新市區","安定區"],
+246	"高雄市": ["新興區","前金區","苓雅區","鹽埕區","鼓山區","旗津區","前鎮區","三民區","楠梓區","小港區","左營區","仁武區","大社區","岡山區","路竹區","阿蓮區","田寮區","燕巢區","橋頭區","梓官區","彌陀區","永安區","湖內區","鳳山區","大寮區","林園區","鳥松區","大樹區","旗山區","美濃區","六龜區","內門區","杉林區","甲仙區","桃源區","那瑪夏區","茂林區"],
+247	"基隆市": ["仁愛區","信義區","中正區","中山區","安樂區","暖暖區","七堵區"],
+248	"新竹市": ["東區","北區","香山區"],
+249	"新竹縣": ["竹北市","竹東鎮","新埔鎮","關西鎮","湖口鄉","新豐鄉","芎林鄉","橫山鄉","北埔鄉","寶山鄉","峨眉鄉","尖石鄉","五峰鄉"],
+250	"苗栗縣": ["苗栗市","苑裡鎮","通霄鎮","竹南鎮","頭份市","後龍鎮","卓蘭鎮","大湖鄉","公館鄉","銅鑼鄉","南庄鄉","頭屋鄉","三義鄉","西湖鄉","造橋鄉","三灣鄉","獅潭鄉","泰安鄉"],
+251	"彰化縣": ["彰化市","鹿港鎮","和美鎮","線西鄉","伸港鄉","福興鄉","秀水鄉","花壇鄉","芬園鄉","員林市","溪湖鎮","田中鎮","大村鄉","埔鹽鄉","埔心鄉","永靖鄉","社頭鄉","二水鄉","北斗鎮","二林鎮","田尾鄉","埤頭鄉","芳苑鄉","大城鄉","竹塘鄉","溪州鄉"],
+252	"南投縣": ["南投市","埔里鎮","草屯鎮","竹山鎮","集集鎮","名間鄉","鹿谷鄉","中寮鄉","魚池鄉","國姓鄉","水里鄉","信義鄉","仁愛鄉"],
+253	"雲林縣": ["斗六市","斗南鎮","虎尾鎮","西螺鎮","土庫鎮","北港鎮","古坑鄉","大埤鄉","莿桐鄉","林內鄉","二崙鄉","崙背鄉","麥寮鄉","東勢鄉","褒忠鄉","臺西鄉","元長鄉","四湖鄉","口湖鄉","水林鄉"],
+254	"嘉義市": ["東區","西區"],
+255	"嘉義縣": ["太保市","朴子市","布袋鎮","大林鎮","民雄鄉","溪口鄉","新港鄉","六腳鄉","東石鄉","義竹鄉","鹿草鄉","水上鄉","中埔鄉","竹崎鄉","梅山鄉","番路鄉","大埔鄉","阿里山鄉"],
+256	"屏東縣": ["屏東市","潮州鎮","東港鎮","恆春鎮","萬丹鄉","長治鄉","麟洛鄉","九如鄉","里港鄉","鹽埔鄉","高樹鄉","萬巒鄉","內埔鄉","竹田鄉","新埤鄉","枋寮鄉","新園鄉","崁頂鄉","林邊鄉","南州鄉","佳冬鄉","琉球鄉","車城鄉","滿州鄉","枋山鄉","三地門鄉","霧臺鄉","瑪家鄉","泰武鄉","來義鄉","春日鄉","獅子鄉","牡丹鄉"],
+257	"宜蘭縣": ["宜蘭市","羅東鎮","蘇澳鎮","頭城鎮","礁溪鄉","壯圍鄉","員山鄉","冬山鄉","五結鄉","三星鄉","大同鄉","南澳鄉"],
+258	"花蓮縣": ["花蓮市","鳳林鎮","玉里鎮","新城鄉","吉安鄉","壽豐鄉","光復鄉","豐濱鄉","瑞穗鄉","萬榮鄉","卓溪鄉","富里鄉"],
+259	"台東縣": ["台東市","成功鎮","關山鎮","長濱鄉","池上鄉","東河鄉","鹿野鄉","卑南鄉","大武鄉","綠島鄉","海端鄉","延平鄉","金峰鄉","達仁鄉","蘭嶼鄉"],
+260	"澎湖縣": ["馬公市","湖西鄉","白沙鄉","西嶼鄉","望安鄉","七美鄉"],
+261	"金門縣": ["金城鎮","金沙鎮","金湖鎮","金寧鄉","烈嶼鄉","烏坵鄉"],
+262	"連江縣": ["南竿鄉","北竿鄉","莒光鄉","東引鄉"]
+263	};
+264	
+265	function initAddressSelects(){
+266	const citySel = qs("addrCity");
+267	const distSel = qs("addrDist");
+268	if(!citySel || !distSel) return;
+269	
+270	// 填縣市
+271	citySel.innerHTML = `<option value="">請選擇縣市</option>` +
+272	Object.keys(TW_CITY_DIST).map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+273	
+274	// 縣市變動 → 重新填行政區
+275	citySel.addEventListener("change", ()=>{
+276	const city = citySel.value;
+277	distSel.innerHTML = `<option value="">請選擇區</option>`;
+278	distSel.disabled = !city;
+279	
+280	if(city && TW_CITY_DIST[city]){
+281	distSel.innerHTML = `<option value="">請選擇區</option>` +
+282	TW_CITY_DIST[city].map(d=>`<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("");
+283	}
+284	});
+285	}
+286	
+287	
+288	// ✅身份證加浮水印
+289	async function fileToDataUrlWithWatermark(file, text, targetWidth){
+290	if (!file) return "";
+291	
+292	const srcDataUrl = await fileToDataUrl(file);
+293	
+294	const img = await new Promise((resolve, reject)=>{
+295	const im = new Image();
+296	im.onload = ()=> resolve(im);
+297	im.onerror = reject;
+298	im.src = srcDataUrl;
+299	});
+300	
+301	// ✅ 先算等比尺寸（只縮放寬度，height 等比）
+302	const ow = img.naturalWidth || img.width;
+303	const oh = img.naturalHeight || img.height;
+304	
+305	const tw = Math.max(1, Number(targetWidth) || ow); // 沒給就用原寬
+306	const scale = tw / ow;
+307	const th = Math.max(1, Math.round(oh * scale));
+308	
+309	const canvas = document.createElement("canvas");
+310	canvas.width = tw;
+311	canvas.height = th;
+312	
+313	const ctx = canvas.getContext("2d");
+314	ctx.drawImage(img, 0, 0, tw, th);
+315	
+316	const wm = String(text || "").trim();
+317	if (wm){
+318	const base = Math.min(canvas.width, canvas.height);
+319	const fontSize = Math.max(28, Math.floor(base * 0.06));
+320	
+321	ctx.save();
+322	ctx.globalAlpha = 0.18;
+323	ctx.fillStyle = "#000";
+324	ctx.strokeStyle = "rgba(0,0,0,0.35)";
+325	ctx.lineWidth = Math.max(2, Math.floor(fontSize * 0.08));
+326	ctx.textAlign = "center";
+327	ctx.textBaseline = "middle";
+328	ctx.font = `700 ${fontSize}px sans-serif`;
+329	
+330	const angle = -18 * Math.PI / 180;
+331	const W = canvas.width;
+332	const H = canvas.height;
+333	
+334	const padX = Math.max(60, Math.floor(W * 0.18));
+335	const padY = Math.max(60, Math.floor(H * 0.18));
+336	
+337	const positions = [
+338	{ x: padX, y: padY },
+339	{ x: W - padX, y: padY },
+340	{ x: padX, y: H - padY },
+341	{ x: W - padX, y: H - padY },
+342	{ x: W / 2, y: H / 2 },
+343	];
+344	
+345	positions.forEach(p => {
+346	ctx.save();
+347	ctx.translate(p.x, p.y);
+348	ctx.rotate(angle);
+349	ctx.strokeText(wm, 0, 0);
+350	ctx.fillText(wm, 0, 0);
+351	ctx.restore();
+352	});
+353	
+354	ctx.restore();
+355	}
+356	
+357	// ✅ PNG 不吃 0.92 參數，直接輸出 PNG
+358	return canvas.toDataURL("image/png");
+359	}
+360	
+361	
+362	
+363	qs("btnClearSign").addEventListener("click", ()=> sig.clear());
+364	qs("logout").addEventListener("click", (e)=>{ e.preventDefault(); clearSession(); location.href="./login.html"; });
+365	qs("printPage").addEventListener("click", (e)=>{
+366	e.preventDefault();
+367	window.print();
+368	});
+369	
+370	// ✅ 若有選擇存摺檔案 -> 顯示三個必填欄位
+371	qs("bankbook").addEventListener("change", ()=>{
+372	const hasBankbook = qs("bankbook").files && qs("bankbook").files.length > 0;
+373	qs("bankFields").style.display = hasBankbook ? "" : "none";
+374	});
+375	
+376	// =============== 銀行/分行 搜尋選取 ===============
+377	let selectedBankCode = ""; // 3碼
+378	let selectedBankName = "";
+379	let selectedBranchCode = ""; // 4碼
+380	let selectedBranchName = "";
+381	qs("bankBranchCode").value = ""; // 避免分行輸入中殘留舊 7碼
+382	
+383	function debounce(fn, ms=250){
+384	let t=null;
+385	return (...args)=>{
+386	clearTimeout(t);
+387	t=setTimeout(()=>fn(...args), ms);
+388	};
+389	}
+390	
+391	function pickCodeFromDatalist(listId, inputValue){
+392	const val = String(inputValue || "").trim();
+393	if (!val) return "";
+394	
+395	const opts = qs(listId).querySelectorAll("option");
+396	let found = "";
+397	opts.forEach(op=>{
+398	if (op.value === val && op.dataset && op.dataset.code) found = op.dataset.code;
+399	});
+400	return found;
+401	}
+402	
+403	
+404	// 分行先鎖住
+405	qs("branchNameInput").value = "";
+406	qs("branchNameInput").disabled = true;
+407	qs("branchNameInput").placeholder = "請先選擇銀行";
+408	qs("branchList").innerHTML = "";
+409	
+410	// 銀行名稱：輸入1字就查
+411	const onBankInput = debounce(async ()=>{
+412	const kw = qs("bankNameInput").value.trim();
+413	
+414	// 每次銀行輸入：分行狀態先重置（分行一定要跟著銀行走）
+415	selectedBranchCode = "";
+416	selectedBranchName = "";
+417	qs("branchNameInput").value = "";
+418	qs("branchNameInput").disabled = true;
+419	qs("branchNameInput").placeholder = "請先選擇銀行";
+420	qs("branchList").innerHTML = "";
+421	qs("bankBranchCode").value = ""; // 清 7碼
+422	
+423	// ✅ 不要在這裡清 selectedBankCode，避免 datalist 點選造成 input 時把 code 洗掉
+424	
+425	if (kw.length < 1) {
+426	qs("bankList").innerHTML = "";
+427	selectedBankCode = "";
+428	selectedBankName = "";
+429	return;
+430	}
+431	
+432	const { phone, password } = loadSession();
+433	const res = await apiCall({ action:"searchBanks", phone, password, keyword: kw });
+434	const banks = (res && res.banks) ? res.banks : [];
+435	
+436	qs("bankList").innerHTML = banks.map(b =>
+437	`<option value="${escapeHtml(b.name)}" data-code="${escapeHtml(b.code)}"></option>`
+438	).join("");
+439	
+440	// ✅ 如果目前輸入值「剛好等於清單內某一個 bank name」，就當作已選定銀行並解鎖分行
+441	const opts = qs("bankList").querySelectorAll("option");
+442	let foundCode = "";
+443	opts.forEach(op=>{
+444	if (op.value === kw && op.dataset && op.dataset.code) foundCode = op.dataset.code;
+445	});
+446	
+447	if (foundCode) {
+448	selectedBankCode = foundCode;
+449	selectedBankName = kw;
+450	
+451	qs("branchNameInput").disabled = false;
+452	qs("branchNameInput").placeholder = "輸入分行名稱開始搜尋";
+453	} else {
+454	selectedBankCode = "";
+455	selectedBankName = "";
+456	}
+457	
+458	}, 250);
+459	
+460	
+461	qs("bankNameInput").addEventListener("input", onBankInput);
+462	// ✅ 改3：銀行確定選定（change）後，正式解鎖分行 + 清掉舊分行/7碼
+463	qs("bankNameInput").addEventListener("change", ()=>{
+464	const val = qs("bankNameInput").value.trim();
+465	if (!val) return;
+466	
+467	// 從 datalist 找對應 code（用 option.value 比對）
+468	const opts = qs("bankList").querySelectorAll("option");
+469	let foundCode = "";
+470	opts.forEach(op=>{
+471	if (op.value === val && op.dataset && op.dataset.code) foundCode = op.dataset.code;
+472	});
+473	
+474	// 沒有從下拉選到（用手打的）就視為未選定
+475	if (!foundCode) {
+476	selectedBankCode = "";
+477	selectedBankName = "";
+478	
+479	// 分行鎖回去 + 清掉分行/7碼
+480	selectedBranchCode = "";
+481	selectedBranchName = "";
+482	qs("branchNameInput").value = "";
+483	qs("branchNameInput").disabled = true;
+484	qs("branchNameInput").placeholder = "請先選擇銀行";
+485	qs("branchList").innerHTML = "";
+486	qs("bankBranchCode").value = "";
+487	return;
+488	}
+489	
+490	// ✅ 已確定選到下拉選單內的銀行
+491	selectedBankCode = foundCode;
+492	selectedBankName = val;
+493	
+494	// ✅ 切換銀行時：清掉分行/7碼，避免殘留舊資料
+495	selectedBranchCode = "";
+496	selectedBranchName = "";
+497	qs("branchNameInput").value = "";
+498	qs("branchList").innerHTML = "";
+499	qs("bankBranchCode").value = "";
+500	
+501	// ✅ 解鎖分行
+502	qs("branchNameInput").disabled = false;
+503	qs("branchNameInput").placeholder = "輸入分行名稱開始搜尋";
+504	qs("branchNameInput").focus();
+505	});
+506	
+507	// 當銀行名稱確定（change）時，抓出 bankCode
+508	qs("bankNameInput").addEventListener("change", ()=>{
+509	// ✅ 新增：datalist點選時，常見是觸發 input 而不是 change
+510	
+511	
+512	const val = qs("bankNameInput").value.trim();
+513	if (!val) return;
+514	
+515	// 從 datalist 找對應 code（用 option.value 比對）
+516	const opts = qs("bankList").querySelectorAll("option");
+517	let foundCode = "";
+518	opts.forEach(op=>{
+519	if (op.value === val && op.dataset && op.dataset.code) foundCode = op.dataset.code;
+520	});
+521	
+522	if (!foundCode) {
+523	// 沒選到建議清單，就當作未選定
+524	selectedBankCode = "";
+525	selectedBankName = "";
+526	qs("branchNameInput").disabled = true;
+527	qs("branchNameInput").placeholder = "請先選擇銀行";
+528	return;
+529	}
+530	
+531	selectedBankCode = foundCode;
+532	selectedBankName = val;
+533	
+534	// 開放分行輸入
+535	qs("branchNameInput").disabled = false;
+536	qs("branchNameInput").placeholder = "輸入分行名稱開始搜尋";
+537	qs("branchNameInput").focus();
+538	});
+539	
+540	// 分行名稱：必須先選銀行
+541	const onBranchInput = debounce(async ()=>{
+542	if (!selectedBankCode) {
+543	qs("branchNameInput").value = "";
+544	alert("請先選擇銀行");
+545	return;
+546	}
+547	
+548	const kw = qs("branchNameInput").value.trim();
+549	selectedBranchCode = "";
+550	selectedBranchName = "";
+551	
+552	if (kw.length < 1) {
+553	qs("branchList").innerHTML = "";
+554	return;
+555	}
+556	
+557	const { phone, password } = loadSession();
+558	const res = await apiCall({ action:"searchBranches", phone, password, bankCode: selectedBankCode, keyword: kw });
+559	const branches = (res && res.branches) ? res.branches : [];
+560	
+561	// datalist：value 顯示「桃園分行」這種文字
+562	qs("branchList").innerHTML = branches.map(b =>
+563	`<option value="${escapeHtml(b.name)}" data-code="${escapeHtml(b.code)}"></option>`
+564	).join("");
+565	
+566	}, 250);
+567	
+568	qs("branchNameInput").addEventListener("input", onBranchInput);
+569	
+570	// 分行 change：選定後回填 7碼
+571	qs("branchNameInput").addEventListener("change", ()=>{
+572	const val = qs("branchNameInput").value.trim();
+573	if (!val || !selectedBankCode) return;
+574	
+575	const opts = qs("branchList").querySelectorAll("option");
+576	let foundCode = "";
+577	opts.forEach(op=>{
+578	if (op.value === val && op.dataset && op.dataset.code) foundCode = op.dataset.code;
+579	});
+580	
+581	if (!foundCode) return;
+582	
+583	selectedBranchCode = foundCode;
+584	selectedBranchName = val;
+585	
+586	// ✅ 自動寫入 7碼：bankCode(3) + branchCode(4)
+587	qs("bankBranchCode").value = `${selectedBankCode}${selectedBranchCode}`;
+588	});
+589	
+590	
+591	function renderProfile(obj){
+592	const order = [
+593	"申請時間戳記","申請狀態","姓名","手機號碼","身分證字號","出生日期",
+594	"加入資格","總監職級","完款日期","銀行分行","銀行帳戶","銀行戶名",
+595	"通訊地址（縣市）","通訊地址（區）","通訊地址（詳細地址）",
+596	"推薦人姓名","推薦人手機號碼",
+597	"身份證正面檔案ID","身份證反面檔案ID","存摺封面檔案ID","申請簽名檔案ID","備註"
+598	];
+599	let html = `<table class="table">`;
+600	order.forEach(k=>{
+601	if (obj[k] === undefined) return;
+602	let v = obj[k];
+603	
+604	// ✅ 銀行分行顯示：銀行名稱 分行名稱 bankBranchCode(7碼)
+605	if (k === "銀行分行") {
+606	const bn = String(obj["銀行名稱"] || "").trim();
+607	const brn = String(obj["分行名稱"] || "").trim();
+608	const code7 = String(obj["銀行分行"] || "").trim();
+609	v = [bn, brn, code7].filter(Boolean).join(" ");
+610	}
+611	
+612	html += `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(String(v ?? ""))}</td></tr>`;
+613	});
+614	html += `</table>`;
+615	qs("profile").innerHTML = html;
+616	}
+617	
+618	function driveToImgSrc(x){
+619	const s = String(x || "").trim();
+620	if(!s) return "";
+621	
+622	// 1) 如果是純 Drive 檔案ID（你現在就是這種）
+623	if (/^[a-zA-Z0-9_-]{20,}$/.test(s) && !s.startsWith("http")) {
+624	return `https://drive.google.com/thumbnail?id=${s}&sz=w1600`;
+625	}
+626	
+627	// 2) 如果是 Drive 分享連結，抽出 id
+628	const m = s.match(/[?&]id=([a-zA-Z0-9_-]+)/) || s.match(/\/d\/([a-zA-Z0-9_-]+)/);
+629	if (m && m[1]) {
+630	return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1600`;
+631	}
+632	
+633	// 3) 其他網址：原樣回傳
+634	return s;
+635	}
+636	
+637	function imgBlock(title, urlOrId){
+638	const imgSrc = driveToImgSrc(urlOrId);
+639	if(!imgSrc) return "";
+640	
+641	return `
+642	<div>
+643	<div class="muted" style="margin-bottom:6px;">${escapeHtml(title)}</div>
+644	${/* <a class="btn-ghost" href="${escapeHtml(imgSrc)}" target="_blank" rel="noopener">開新視窗</a> */""}
+645	<div style="margin-top:8px;">
+646	<img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(title)}"
+647	style="max-width:100%; border-radius:12px; border:1px solid #eee;" />
+648	</div>
+649	</div>
+650	`;
+651	}
+652	
+653	// ✅ 新增：把模板合約拆成第1頁/第2頁，塞到既有容器，不動其他版面
+654	// ✅ 修改：用「接續上頁｜」做切點，確保第1～7條一定進第1頁
+655	async function renderContractFromTemplate_(plan, name){
+656	if (!plan) return;
+657	
+658	const res = await apiCall({ action:"getContractTemplate", plan });
+659	let tpl = String(res && res.html ? res.html : "");
+660	
+661	// 只代入姓名
+662	tpl = tpl.replaceAll("{{姓名}}", name || "");
+663	
+664	// ✅ 把模板轉成純文字HTML（取 body 內容）
+665	const doc = new DOMParser().parseFromString(tpl, "text/html");
+666	const bodyHtml = (doc.body ? doc.body.innerHTML : tpl);
+667	
+668	// ✅ 以「接續上頁｜」為切點分頁
+669	const cutKey = "<b>第八條｜";
+670	const idx = bodyHtml.indexOf(cutKey);
+671	
+672	let p1 = "";
+673	let p2 = "";
+674	
+675	if (idx >= 0) {
+676	p1 = bodyHtml.slice(0, idx);
+677	p2 = bodyHtml.slice(idx);
+678	} else {
+679	// 找不到切點就全部放第1頁，避免空白
+680	p1 = bodyHtml;
+681	p2 = "";
+682	}
+683	
+684	// ✅ 塞回兩頁容器
+685	const el1 = qs("contractPage1");
+686	const el2 = qs("contractPage2");
+687	if (el1) el1.innerHTML = p1;
+688	if (el2) el2.innerHTML = p2;
+689	}
+690	
+691	
+692	async function loadProfile(){
+693	const { phone, password, city, district } = loadSession();
+694	if(!phone || !password  || !city || !district){
+695	location.href="./login.html";
+696	return;
+697	}
+698	
+699	const res = await apiGetProfile(phone, password, city, district);
+700	const data = (res && res.data) ? res.data : {};
+701	const status = String(data["申請狀態"] || "").trim();
+702	qs("printPage").style.display = (status === "審核通過") ? "" : "none";
+703	
+704	// ✅ 新增：載入會員資料後取得方案/姓名 -> 讀取模板合約並塞到第1/第2頁
+705	const plan = data["加入方案"];
+706	const name = data["姓名"];
+707	await renderContractFromTemplate_(plan, name);
+708	
+709	// ✅ 直接用主表的檔案ID顯示
+710	const idFrontId = data["身份證正面檔案ID"] || "";
+711	const idBackId = data["身份證反面檔案ID"] || "";
+712	const bankbookId = data["存摺封面檔案ID"] || "";
+713	const signId = data["申請簽名檔案ID"] || "";
+714	
+715	const card = qs("filesCard");
+716	const wrap = qs("filesWrap");
+717	
+718	// ✅ 改成 2x2 並排顯示：
+719	// 第一排：身分證正面、身分證反面
+720	// 第二排：存摺、簽名
+721	const html =
+722	`<div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">` +
+723	imgBlock("身份證正面", idFrontId) +
+724	imgBlock("身份證反面", idBackId) +
+725	imgBlock("存摺封面", bankbookId) +
+726	imgBlock("親筆簽名", signId) +
+727	`</div>`;
+728	
+729	if (idFrontId || idBackId || bankbookId || signId) {
+730	wrap.innerHTML = html;
+731	card.style.display = "";
+732	} else {
+733	wrap.innerHTML = `<div class="muted">尚未上傳任何文件。</div>`;
+734	card.style.display = "";
+735	}
+736	
+737	initAddressSelects();
+738	
+739	// 回填已存在地址
+740	const city = String(data["通訊地址（縣市）"] || "").trim();
+741	const dist = String(data["通訊地址（區）"] || "").trim();
+742	const detail = String(data["通訊地址（詳細地址）"] || "").trim();
+743	
+744	if (city) {
+745	qs("addrCity").value = city;
+746	qs("addrCity").dispatchEvent(new Event("change")); // 觸發填行政區
+747	}
+748	if (dist) qs("addrDist").value = dist;
+749	if (detail) qs("addrDetail").value = detail;
+750	
+751	
+752	renderProfile(data);
+753	await loadReferralBonus();
+754	
+755	}
+756	
+757	qs("btnUpload").addEventListener("click", async ()=>{
+758	try{
+759	setMsg(msg, "送出中…請稍等資料上傳中…請勿關閉視窗", "ok");
+760	const { phone, password, city, district } = loadSession();
+761	if(!phone || !password) throw new Error("未登入");
+762	
+763	// ✅ 1) 如果要送出補件：一定要重新簽名
+764	if (sig.isBlank()) {
+765	throw new Error("更新資料必須重新簽名（簽名不可空白）");
+766	}
+767	
+768	const bankbookFile = qs("bankbook").files[0];
+769	const hasBankbook = !!bankbookFile;
+770	
+771	// ✅ 2) 如果有上傳存摺：三欄必填
+772	const bankBranchCode = qs("bankBranchCode").value.trim();
+773	const bankAccount = qs("bankAccount").value.trim();
+774	const bankName = qs("bankName").value.trim();
+775	
+776	if (hasBankbook) {
+777	
+778	// ✅ 送出當下再反查一次，避免 change 沒觸發導致 selectedXXX 為空
+779	if (!selectedBankCode) {
+780	const bankVal = qs("bankNameInput").value.trim();
+781	selectedBankCode = pickCodeFromDatalist("bankList", bankVal);
+782	}
+783	
+784	// 分行的 datalist 是你在 onBranchInput 查詢後才填入的，所以也用同樣方式反查
+785	if (!selectedBranchCode) {
+786	const branchVal = qs("branchNameInput").value.trim();
+787	selectedBranchCode = pickCodeFromDatalist("branchList", branchVal);
+788	}
+789	
+790	if (!selectedBankCode) throw new Error("請從下拉選單選擇銀行");
+791	if (!selectedBranchCode) throw new Error("請從下拉選單選擇分行");
+792	
+793	const bankBranchCode = qs("bankBranchCode").value.trim();
+794	const bankAccount = qs("bankAccount").value.trim();
+795	const bankName = qs("bankName").value.trim();
+796	const bankNameText = qs("bankNameInput").value.trim();
+797	const branchNameText = qs("branchNameInput").value.trim();
+798	
+799	if (!bankNameText || !branchNameText || !bankBranchCode || !bankAccount || !bankName) {
+800	throw new Error("上傳存摺時，「銀行名稱 / 分行名稱 / 銀行代碼與分行代碼(7碼) / 銀行帳號 / 銀行戶名」必須全部輸入");
+801	}
+802	if (!/^\d{7}$/.test(bankBranchCode)) {
+803	throw new Error("銀行代碼與分行代碼必須為7碼數字");
+804	}
+805	}
+806	
+807	const wmText = "僅限加入動元力國際";
+808	
+809	const payload = {
+810	
+811	// ✅身份證（原本就有浮水印）
+812	idFrontDataUrl: await fileToDataUrlWithWatermark(qs("idFront").files[0], wmText, 600),
+813	idBackDataUrl: await fileToDataUrlWithWatermark(qs("idBack").files[0], wmText, 600),
+814	
+815	// ✅ 存摺封面也加浮水印
+816	bankbookDataUrl: await fileToDataUrlWithWatermark(bankbookFile, wmText, 600),
+817	
+818	// ✅ 簽名也加浮水印（要先把canvas轉成圖片再丟進浮水印函式）
+819	signatureDataUrl: await (async ()=>{
+820	if (sig.isBlank()) return "";
+821	const rawSign = sig.toDataUrl();
+822	const blob = await (await fetch(rawSign)).blob();
+823	const file = new File([blob], "sign.png", { type:"image/png" });
+824	return await fileToDataUrlWithWatermark(file, wmText);
+825	})(),
+826	
+827	'銀行分行': hasBankbook ? bankBranchCode : "",
+828	'銀行名稱': hasBankbook ? qs("bankNameInput").value.trim() : "",
+829	'分行名稱': hasBankbook ? qs("branchNameInput").value.trim() : "",
+830	'銀行帳戶': hasBankbook ? bankAccount : "",
+831	'銀行戶名': hasBankbook ? bankName : "",
+832	"通訊地址（縣市）": qs("addrCity").value.trim(),
+833	"通訊地址（區）": qs("addrDist").value.trim(),
+834	"通訊地址（詳細地址）": qs("addrDetail").value.trim(),
+835	
+836	};
+837	
+838	
+839	// ✅ 仍保留：至少要有補件檔案之一或簽名（簽名必送，所以這裡等於檔案可全空也會送）
+840	// 你要求「送出補件一定要重新簽名」，因此允許只簽名不選檔案也可送出
+841	// 若你想「必須至少選一個檔案」再告訴我，我再照你規則改。
+842	
+843	const res = await apiUploadAfterLogin(phone, password, city, district, payload);
+844	setMsg(msg, `✅ ${res.message}`, "ok");
+845	
+846	// 送出後：清空存摺欄位區（不改原本UI結構）
+847	qs("bankbook").value = "";
+848	qs("bankFields").style.display = "none";
+849	qs("bankBranchCode").value = "";
+850	qs("bankAccount").value = "";
+851	qs("bankName").value = "";
+852	qs("bankNameInput").value = "";
+853	qs("branchNameInput").value = "";
+854	selectedBankCode = "";
+855	selectedBranchCode = "";
+856	qs("branchNameInput").disabled = true;
+857	qs("branchNameInput").placeholder = "請先選擇銀行";
+858	qs("bankList").innerHTML = "";
+859	qs("branchList").innerHTML = "";
+860	qs("bankBranchCode").value = "";
+861	
+862	
+863	
+864	await loadProfile();
+865	}catch(err){
+866	setMsg(msg, `❌ ${err.message}`, "err");
+867	}
+868	});
+869	
+870	loadProfile().catch(err=>{
+871	qs("profile").innerHTML = `❌ 載入失敗：${escapeHtml(err.message)}`;
+872	});
+873	
+874	function renderReferralBonus(rows){
+875	if (!rows || !rows.length) {
+876	qs("bonusWrap").innerHTML = `<div class="muted">目前尚無推薦加入紀錄。</div>`;
+877	return;
+878	}
+879	
+880	let html = `<table class="table">`;
+881	html += `<tr>
+882	<th>加入日期</th>
+883	<th>姓名</th>
+884	<th>獎金</th>
+885	<th>匯款日期</th>
+886	</tr>`;
+887	
+888	rows.forEach(r=>{
+889	html += `<tr>
+890	<td>${escapeHtml(String(r.joinDate || ""))}</td>
+891	<td>${escapeHtml(String(r.name || ""))}</td>
+892	<td>${escapeHtml(String(r.bonus || 10000))}</td>
+893	<td>${escapeHtml(String(r.remitDate || ""))}</td>
+894	</tr>`;
+895	});
+896	
+897	html += `</table>`;
+898	qs("bonusWrap").innerHTML = html;
+899	
+900	}
+901	
+902	async function loadReferralBonus(){
+903	const { phone, password } = loadSession();
+904	if(!phone || !password) return;
+905	
+906	const res = await apiCall({ action:"getReferralBonus", phone, password });
+907	const rows = (res && res.rows) ? res.rows : [];
+908	
+909	qs("bonusCard").style.display = "";
+910	renderReferralBonus(rows);
+911	}
+912	
+913	
+914	</script>
+915	</body>
+916	</html>
