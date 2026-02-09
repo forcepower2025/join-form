@@ -40,22 +40,59 @@
 
   <script src="./app.js"></script>
   <script>
-    const msg = qs("msg");
+function login(phone, password, city, district) {
+  const sh = sh_(CONFIG.SHEET_MAIN);
+  const headers = headers_(sh);
 
-    qs("btnLogin").addEventListener("click", async ()=>{
-      try{
-        setMsg(msg, "登入中…", "ok");
-        const phone = qs("phone").value.trim();
-        const password = qs("pwd").value.trim();
-        if(!phone || !password) throw new Error("請輸入手機與密碼");
+  const row = findRowByPhone_(sh, headers, String(phone));
+  if (row === -1) throw new Error('帳號錯誤');
 
-        await apiCall({ action:"login", phone, password });
-        saveSession(phone, password);
-        location.href = "./portal.html";
-      }catch(err){
-        setMsg(msg, `❌ ${err.message}`, "err");
-      }
-    });
+  const now = Date.now();
+
+  const failCol = col_(headers,'登入錯誤次數') || 0;
+  const lockCol = col_(headers,'鎖定到期時間') || 0;
+
+  let failCount = Number(sh.getRange(row, failCol).getValue() || 0);
+  let lockUntil = Number(sh.getRange(row, lockCol).getValue() || 0);
+
+  if(lockUntil && now < lockUntil){
+    throw new Error('帳號已鎖定，請10分鐘後再試');
+  }
+
+  const idno = String(sh.getRange(row, col_(headers,'身分證字號')).getValue() || '');
+  const birth = String(sh.getRange(row, col_(headers,'出生日期')).getValue() || '');
+
+  const last5 = idno.slice(-5);
+  const d = new Date(birth);
+  const roc = (d.getFullYear() - 1911).toString().padStart(3,'0') +
+              (d.getMonth()+1).toString().padStart(2,'0') +
+              d.getDate().toString().padStart(2,'0');
+
+  const correctPwd = last5 + roc;
+
+  const sheetCity = String(sh.getRange(row, col_(headers,'通訊地址（縣市）')).getValue() || '').trim();
+  const sheetDistrict = String(sh.getRange(row, col_(headers,'通訊地址（區）')).getValue() || '').trim();
+
+  const ok = password === correctPwd && city === sheetCity && district === sheetDistrict;
+
+  if(!ok){
+    failCount++;
+    sh.getRange(row, failCol).setValue(failCount);
+    if(failCount >= 5){
+      sh.getRange(row, lockCol).setValue(now + 10*60*1000);
+      sh.getRange(row, failCol).setValue(0);
+      throw new Error('錯誤達5次，帳號鎖定10分鐘');
+    }
+    throw new Error('登入資料錯誤');
+  }
+
+  sh.getRange(row, failCol).setValue(0);
+  sh.getRange(row, lockCol).setValue(0);
+
+  return { message:'登入成功' };
+}
+
+    
   </script>
 </body>
 </html>
