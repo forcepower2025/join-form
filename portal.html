@@ -429,8 +429,8 @@ selectedBankName = "";
 return;
 }
 
-const { phone, password } = loadSession();
-const res = await apiCall({ action:"searchBanks", phone, password, keyword: kw });
+const { phone, password, city, district } = loadSession();
+const res = await apiCall({ action:"searchBanks", phone, password, city, district, keyword: kw });
 const banks = (res && res.banks) ? res.banks : [];
 
 qs("bankList").innerHTML = banks.map(b =>
@@ -554,8 +554,8 @@ qs("branchList").innerHTML = "";
 return;
 }
 
-const { phone, password } = loadSession();
-const res = await apiCall({ action:"searchBranches", phone, password, bankCode: selectedBankCode, keyword: kw });
+const { phone, password, city, district } = loadSession();
+const res = await apiCall({ action:"searchBranches", phone, password, city, district, bankCode: selectedBankCode, keyword: kw });
 const branches = (res && res.branches) ? res.branches : [];
 
 // datalist：value 顯示「桃園分行」這種文字
@@ -758,8 +758,14 @@ await loadReferralBonus();
 qs("btnUpload").addEventListener("click", async ()=>{
 try{
 setMsg(msg, "送出中…請稍等資料上傳中…請勿關閉視窗", "ok");
-const { phone, password, city, district } = loadSession();
+let { phone, password, city, district } = loadSession();
 if(!phone || !password) throw new Error("未登入");
+
+// ✅ 修正：如果 Session 裡沒有縣市(舊登入狀態)，就抓取頁面上目前選單的值來驗證
+if (!city || !district) {
+  city = qs("addrCity").value.trim();
+  district = qs("addrDist").value.trim();
+}
 
 // ✅ 1) 如果要送出補件：一定要重新簽名
 if (sig.isBlank()) {
