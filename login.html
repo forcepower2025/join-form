@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>動元力會員系統</title>
+  <title>動元力國際會員系統</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
   <div class="container">
     <div class="header">
       <div>
-        <div class="title">動元力會員系統</div>
+        <div class="title">動元力國際會員系統</div>
         <div class="muted">請輸入：手機號碼 + 密碼（身分證末5碼+民國出生年月日7碼）+ 通訊地址縣市 + 鄉鎮市區。</div>
       </div>
       <div class="nav">
@@ -176,7 +176,7 @@
       const district = qs("loginDistrict").value.trim();
 
       if (!phone || !password || !city || !district) {
-        setMsg(msgEl, "❌ 請完整填寫：手機 / 密碼 / 縣市 / 區", "err");
+        setMsg(msgEl, "❌ 請完整填寫：手機 / 密碼 / 縣市 / 鄉鎮市區", "err");
         return;
       }
 
