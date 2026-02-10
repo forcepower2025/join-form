@@ -607,7 +607,7 @@ if (age < 18) {
     if (!payload.consentChecked) throw new Error("請先勾選同意聲明");
 
     const res = await apiCall({ action: "submitApplication", payload });
-    setMsg(msg, `✅ ${res.message}（手機：${res.phone}）\n你可以使用「手機＋身分證末5碼」登入補件。`, "ok");
+    setMsg(msg, `✅ ${res.message}（手機：${res.phone}）\n您之後可以登入系統查詢合約與獎金並更新資料。`, "ok");
   } catch (err) {
     setMsg(msg, `❌ ${String(err?.message || err)}`, "err");
     console.error(err);
