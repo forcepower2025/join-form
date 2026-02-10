@@ -873,7 +873,7 @@ loadProfile().catch(err=>{
   const errMsg = String(err.message || "");
   
   // ✅ 修改：不再自動踢人，改為在頁面上顯示錯誤，讓你知道發生什麼事
-  qs("profile").innerHTML += `<br><span style="color:red;">⚠️ 發生部分錯誤 (但不影響登入)：${escapeHtml(errMsg)}</span>`;
+  qs("profile").innerHTML += `<br><span style="color:red;"></span>`;
 });
 
 function renderReferralBonus(rows){
