@@ -868,7 +868,15 @@ setMsg(msg, `❌ ${err.message}`, "err");
 });
 
 loadProfile().catch(err=>{
-qs("profile").innerHTML = `❌ 載入失敗：${escapeHtml(err.message)}`;
+  const errMsg = String(err.message || "");
+  // 如果錯誤訊息包含 "缺少登入資料" 或 "登入資料錯誤"，代表 Session 資料過期或無效
+  if(errMsg.includes("缺少登入資料") || errMsg.includes("登入資料錯誤") || errMsg.includes("未登入")){
+    alert("您的登入資訊已過期或缺少通訊地址驗證，請重新登入。");
+    clearSession();
+    location.href = "./login.html";
+    return;
+  }
+  qs("profile").innerHTML = `❌ 載入失敗：${escapeHtml(errMsg)}`;
 });
 
 function renderReferralBonus(rows){
