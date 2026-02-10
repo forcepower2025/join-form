@@ -587,8 +587,14 @@ if (age < 18) {
       // ✅ 存摺 600px 等比 + 浮水印（沒選檔就空）
       bankbookDataUrl: await fileToDataUrlWithWatermark(bankbookFile, wmText, 600),
 
-      // ✅ 簽名：不縮不改（你說已 OK）
-      signatureDataUrl: sig.toDataUrl(),
+      // ✅ 簽名也加浮水印（要先把canvas轉成圖片再丟進浮水印函式）
+      signatureDataUrl: await (async ()=>{
+      if (sig.isBlank()) return "";
+      const rawSign = sig.toDataUrl();
+      const blob = await (await fetch(rawSign)).blob();
+      const file = new File([blob], "sign.png", { type:"image/png" });
+      return await fileToDataUrlWithWatermark(file, wmText);
+      })(),
     };
 
     // ✅ 基本必填檢核
