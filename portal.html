@@ -850,6 +850,9 @@ return await fileToDataUrlWithWatermark(file, wmText);
 const res = await apiUploadAfterLogin(phone, password, city, district, payload);
 setMsg(msg, `✅ ${res.message}`, "ok");
 
+// ✅ 關鍵修復：更新成功後，立刻把新的地址存入瀏覽器，這樣等下的 loadProfile 就不會報錯了
+    saveSession(phone, password, city, district);
+
 // 送出後：清空存摺欄位區（不改原本UI結構）
 qs("bankbook").value = "";
 qs("bankFields").style.display = "none";
