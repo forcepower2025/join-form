@@ -737,14 +737,15 @@ card.style.display = "";
 initAddressSelects();
 
 // 回填已存在地址
-const city = String(data["通訊地址（縣市）"] || "").trim();
+const addrCity = String(data["通訊地址（縣市）"] || "").trim();
 const dist = String(data["通訊地址（區）"] || "").trim();
 const detail = String(data["通訊地址（詳細地址）"] || "").trim();
 
-if (city) {
-qs("addrCity").value = city;
-qs("addrCity").dispatchEvent(new Event("change")); // 觸發填行政區
+if (addrCity) {
+  qs("addrCity").value = addrCity;
+  qs("addrCity").dispatchEvent(new Event("change")); // 觸發填行政區
 }
+  
 if (dist) qs("addrDist").value = dist;
 if (detail) qs("addrDetail").value = detail;
 
