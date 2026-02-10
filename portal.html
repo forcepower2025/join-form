@@ -869,15 +869,11 @@ setMsg(msg, `❌ ${err.message}`, "err");
 });
 
 loadProfile().catch(err=>{
+  console.error(err); // 在 F12 console 顯示詳細錯誤
   const errMsg = String(err.message || "");
-  // 如果錯誤訊息包含 "缺少登入資料" 或 "登入資料錯誤"，代表 Session 資料過期或無效
-  if(errMsg.includes("缺少登入資料") || errMsg.includes("登入資料錯誤") || errMsg.includes("未登入")){
-    alert("您的登入資訊已過期或缺少通訊地址驗證，請重新登入。");
-    clearSession();
-    location.href = "./login.html";
-    return;
-  }
-  qs("profile").innerHTML = `❌ 載入失敗：${escapeHtml(errMsg)}`;
+  
+  // ✅ 修改：不再自動踢人，改為在頁面上顯示錯誤，讓你知道發生什麼事
+  qs("profile").innerHTML += `<br><span style="color:red;">⚠️ 發生部分錯誤 (但不影響登入)：${escapeHtml(errMsg)}</span>`;
 });
 
 function renderReferralBonus(rows){
