@@ -914,14 +914,18 @@ qs("bonusWrap").innerHTML = html;
 }
 
 async function loadReferralBonus(){
-const { phone, password } = loadSession();
-if(!phone || !password) return;
+  // ✅ 1. 從 Session 多抓取 city 和 district
+  const { phone, password, city, district } = loadSession();
+  
+  // 如果資料不全就不抓獎金
+  if(!phone || !password || !city || !district) return;
 
-const res = await apiCall({ action:"getReferralBonus", phone, password });
-const rows = (res && res.rows) ? res.rows : [];
-
-qs("bonusCard").style.display = "";
-renderReferralBonus(rows);
+  // ✅ 2. 呼叫 API 時，補上 city 和 district
+  const res = await apiCall({ action:"getReferralBonus", phone, password, city, district });
+  
+  const rows = (res && res.rows) ? res.rows : [];
+  qs("bonusCard").style.display = "";
+  renderReferralBonus(rows);
 }
 
 
