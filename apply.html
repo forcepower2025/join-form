@@ -614,7 +614,29 @@ if (age < 18) {
   }
 });
 
+// ✅ 自動填入推薦人資料 (從網址讀取)
+(function autoFillReferrer(){
+  const params = new URLSearchParams(window.location.search);
+  const refName = params.get("ref");   // 抓取 ?ref=...
+  const refPhone = params.get("phone");// 抓取 &phone=...
 
+  if(refName && refPhone){
+    // 填入欄位
+    const nameInput = qs("refName");
+    const phoneInput = qs("refPhone");
+    
+    if(nameInput && phoneInput){
+      nameInput.value = decodeURIComponent(refName);
+      phoneInput.value = decodeURIComponent(refPhone);
+      
+      // (選擇性) 鎖定欄位，避免新朋友不小心改掉，確保業績是你的
+      // nameInput.readOnly = true;
+      // phoneInput.readOnly = true;
+      // nameInput.style.backgroundColor = "#f0f0f0";
+      // phoneInput.style.backgroundColor = "#f0f0f0";
+    }
+  }
+})();
   </script>
 
 </body>
