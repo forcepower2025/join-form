@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>動元力國際會員資料</title>
 <link rel="stylesheet" href="./style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 @media print {
 body * { visibility: hidden !important; }
@@ -118,6 +119,26 @@ vertical-align: middle;
 </div>
 <!-- ✅ 列印範圍的結尾 -->
 
+<!-- ✅ 新增分享連結QRC -->
+  <div class="card" id="shareCard" style="display:none;">
+  <div class="row">
+    <span class="badge" style="background:#28a745;">推薦分享連結</span>
+    <span class="muted">掃描或複製連結給朋友</span>
+  </div>
+  
+  <div style="margin-top:20px; display:flex; flex-direction:column; align-items:center; gap:15px;">
+    <div id="qrcode" style="padding:10px; background:white; border:1px solid #ddd; border-radius:8px;"></div>
+    
+    <div style="width:100%; display:flex; gap:10px;">
+      <input id="shareLink" readonly style="flex:1; font-size:12px; color:#666;" />
+      <button id="btnCopy" class="btn-ghost" style="width:auto; padding:0 15px;">複製</button>
+    </div>
+    
+    <div class="muted" style="font-size:13px; text-align:center;">
+      朋友透過此連結加入，推薦人將自動填寫為您。
+    </div>
+  </div>
+</div>
 
 <div class="card" id="bonusCard" style="display:none;">
 <div class="row">
@@ -751,6 +772,10 @@ if (detail) qs("addrDetail").value = detail;
 
 
 renderProfile(data);
+
+// ✅ 產生推薦連結與 QR Code
+    generateReferralCode(data["姓名"], phone);
+  
 await loadReferralBonus();
 
 }
@@ -928,6 +953,43 @@ async function loadReferralBonus(){
   renderReferralBonus(rows);
 }
 
+// ✅ 產生推薦連結與 QR Code 的函式
+function generateReferralCode(name, phone){
+  if(!name || !phone) return;
+  
+  // 1. 組合網址：自動抓目前網站的網域，並指向 apply.html
+  // 假設 apply.html 跟 portal.html 在同一層目錄
+  const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf("/"));
+  const applyUrl = `${baseUrl}/apply.html?ref=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
+  
+  // 2. 顯示卡片
+  qs("shareCard").style.display = "";
+  
+  // 3. 填入輸入框
+  const input = qs("shareLink");
+  input.value = applyUrl;
+  
+  // 4. 產生 QR Code (先清空舊的避免重複)
+  const qrDiv = qs("qrcode");
+  qrDiv.innerHTML = "";
+  new QRCode(qrDiv, {
+    text: applyUrl,
+    width: 160,
+    height: 160,
+    colorDark : "#000000",
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
+  });
+  
+  // 5. 綁定複製按鈕
+  qs("btnCopy").onclick = () => {
+    input.select();
+    input.setSelectionRange(0, 99999); // 手機版相容
+    navigator.clipboard.writeText(input.value).then(() => {
+      alert("連結已複製！傳送給朋友即可。");
+    });
+  };
+}
 
 </script>
 </body>
