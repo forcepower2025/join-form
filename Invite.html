@@ -59,33 +59,54 @@
             document.getElementById('genBtn').style.display = (cleanVal.length === 10 && name) ? 'block' : 'none';
         }
 
-        async function generateAll() {
-            const name = document.getElementById('refName').value;
-            const phone = document.getElementById('refPhone').value;
-            const longUrl = `${REGISTER_URL}?ref=${encodeURIComponent(name)}&refp=${phone}`;
-            
-            // 呼叫 TinyURL API (使用匿名 API 方式)
-            try {
-                const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
-                const shortUrl = await response.text();
-                
-                document.getElementById('link-display').innerText = shortUrl;
-                document.getElementById('displayName').innerText = name;
-                
-                // 產生 QRC
-                document.getElementById('qrcode').innerHTML = "";
-                new QRCode(document.getElementById("qrcode"), {
-                    text: shortUrl,
-                    width: 180,
-                    height: 180
-                });
-                
-                document.getElementById('result-area').style.display = "block";
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            } catch (e) {
-                alert("縮網址失敗，請稍後再試");
-            }
-        }
+     async function generateAll() {
+    const name = document.getElementById('refName').value.trim();
+    const phone = document.getElementById('refPhone').value.trim();
+    const longUrl = `${REGISTER_URL}?ref=${encodeURIComponent(name)}&refp=${phone}`;
+    
+    // 顯示處理中訊息
+    document.getElementById('msg') ? document.getElementById('msg').innerText = "正在產生直連連結..." : null;
+
+    try {
+        // 使用 is.gd API，這家支援直接跳轉，不會停留在縮網址網頁
+        // format=simple 會直接回傳字串格式的短網址
+        const response = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(longUrl)}`);
+        
+        if (!response.ok) throw new Error('API 無法回應');
+        
+        const shortUrl = await response.text();
+        
+        // 1. 顯示短網址
+        document.getElementById('link-display').innerHTML = `
+            <div style="font-size: 14px; color: #718096; margin-bottom: 5px;">您的直連邀約連結：</div>
+            <strong style="font-size: 16px; color: #2d3748;">${shortUrl}</strong>
+        `;
+        
+        // 2. 更新 QRC 圖片內的姓名
+        document.getElementById('displayName').innerText = name;
+        
+        // 3. 產生 QR Code
+        document.getElementById('qrcode').innerHTML = "";
+        new QRCode(document.getElementById("qrcode"), {
+            text: shortUrl,
+            width: 180,
+            height: 180,
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        
+        document.getElementById('result-area').style.display = "block";
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+    } catch (e) {
+        console.error("縮網址失敗:", e);
+        // 備案：如果 API 失敗，直接用原始長網址產生 QRC
+        document.getElementById('link-display').innerText = longUrl;
+        document.getElementById('qrcode').innerHTML = "";
+        new QRCode(document.getElementById("qrcode"), { text: longUrl, width: 180, height: 180 });
+        document.getElementById('result-area').style.display = "block";
+        alert("縮網址服務暫時忙碌，已使用原網址產生 QRC，功能不受影響。");
+    }
+}
 
         function copyLink() {
             const link = document.getElementById('link-display').innerText;
