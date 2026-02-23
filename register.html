@@ -1,30 +1,75 @@
-<script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzzC1Z8g5EaXe-6KRK7eCNc7PMYbiqAhat13iG9EqlHiHx8kyjYcjxiic7rGkcoE9_6Gw/exec";
-const COURSE_DATE = "20260225";
-
-// 手機號碼輸入比對
-async function checkUser(phone) {
-    const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'checkUser', phone: phone, courseDate: COURSE_DATE }) });
-    const user = await res.json();
-    if (user.exists) {
-        document.getElementById('referrer').value = user.referrer;
-        document.getElementById('referrer').disabled = true;
-        if (user.status === "已報名" || user.status === "已報到完成") {
-            alert("您已經報名過囉！");
-            showQRCode(user.name, phone);
-        }
-    } else {
-        document.getElementById('msg').innerText = "您為第一次報名，請填寫介紹人";
-        document.getElementById('referrer').disabled = false;
-    }
-}
-
-function generateQRC(name, phone) {
-    const rand1 = Math.random().toString(36).substring(2, 4).toUpperCase();
-    const rand2 = Math.random().toString(36).substring(2, 3).toUpperCase();
-    const timestamp = new Date().getTime().toString().slice(-4);
-    const qrcContent = `${rand1}${phone}${rand2}${COURSE_DATE}${timestamp}`;
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>課程報名系統</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <h2>課程報名</h2>
+    <div id="msg" style="color: red;"></div>
     
-    // 使用 qrcode.js 產生並顯示，下方附加上姓名與提示語
-}
-</script>
+    <label>手機號碼：</label>
+    <input type="text" id="phone" onblur="checkUser(this.value)"> <br><br>
+    
+    <label>姓名：</label>
+    <input type="text" id="name"> <br><br>
+    
+    <label>介紹人：</label>
+    <input type="text" id="referrer" disabled> <br><br>
+    
+    <button onclick="submitForm()">提交報名</button>
+
+    <hr>
+    <div id="qrcode-container" style="display:none; text-align: center;">
+        <div id="qrcode"></div>
+        <p id="student-name" style="font-weight: bold;"></p>
+        <p>您已完成報名，請於報到時出示此圖掃瞄簽到</p>
+    </div>
+
+    <script>
+        const GAS_URL = "https://docs.google.com/spreadsheets/d/1cyGLmOfdH0OKtgppFqw9stf1eWpzngorAu4cIcWrr3E/edit?usp=sharing"; // 請確認已部署為所有人可存取
+        const COURSE_DATE = "20260225";
+
+        async function checkUser(phone) {
+            if(!phone) return;
+            const res = await fetch(GAS_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: 'checkUser', phone: phone, courseDate: COURSE_DATE }) 
+            });
+            const user = await res.json();
+            
+            if (user.exists) {
+                document.getElementById('name').value = user.name;
+                document.getElementById('referrer').value = user.referrer;
+                document.getElementById('referrer').disabled = true;
+                if (user.status === "已報名" || user.status === "已報到完成") {
+                    alert("您已經報名過囉！");
+                    showQRCode(user.name, phone);
+                }
+            } else {
+                document.getElementById('msg').innerText = "您為第一次報名，請填寫介紹人";
+                document.getElementById('referrer').disabled = false;
+                document.getElementById('referrer').value = "";
+            }
+        }
+
+        function showQRCode(name, phone) {
+            document.getElementById('qrcode-container').style.display = 'block';
+            document.getElementById('student-name').innerText = name;
+            document.getElementById('qrcode').innerHTML = ""; // 清空舊內容
+            
+            const rand1 = Math.random().toString(36).substring(2, 4).toUpperCase();
+            const rand2 = Math.random().toString(36).substring(2, 3).toUpperCase();
+            const timestamp = new Date().getTime().toString().slice(-4);
+            const content = `${rand1}${phone}${rand2}${COURSE_DATE}${timestamp}`;
+
+            new QRCode(document.getElementById("qrcode"), {
+                text: content,
+                width: 128,
+                height: 128
+            });
+        }
+    </script>
+</body>
+</html>
