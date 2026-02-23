@@ -1,0 +1,31 @@
+// 掃描邏輯
+function onScanSuccess(decodedText) {
+    // 1. 格式校驗 (正則表達式檢查：2英+10數字+1英+8日期+4亂數)
+    const regex = /^[A-Z]{2}(\d{10})[A-Z](\d{8})\d{4}$/;
+    const match = decodedText.match(regex);
+    
+    if (!match) {
+        alert("請出示正確的報到 QR Code");
+        return;
+    }
+
+    const phone = match[1];
+    const date = match[2];
+
+    if (date !== COURSE_DATE) {
+        alert("此 QRC 為其他場次課程");
+        return;
+    }
+
+    // 發送至 GAS 進行報到
+    fetch(GAS_URL, { 
+        method: 'POST', 
+        body: JSON.stringify({ action: 'checkIn', phone: phone, courseDate: COURSE_DATE }) 
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.result === 'success') alert(`${data.name} 報到成功！`);
+        else if (data.result === 'already') alert("此學員已完成報到，請勿重複掃描");
+        else alert("報到失敗：" + data.message);
+    });
+}
