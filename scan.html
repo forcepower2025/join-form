@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理員報到系統</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body { background-color: #1a202c; font-family: "PingFang TC", sans-serif; margin: 0; padding: 0; color: white; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
+        
+        h2 { text-align: center; margin-top: 20px; color: #63b3ed; }
+
+        /* 掃描器外框 */
+        #reader { width: 100%; border-radius: 20px; overflow: hidden; border: 2px solid #4a5568 !important; background: black; }
+
+        /* 結果顯示卡片 */
+        .result-card {
+            background: #2d3748;
+            padding: 20px;
+            border-radius: 20px;
+            margin-top: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
+            display: none; /* 預設隱藏 */
+        }
+        .status-success { color: #48bb78; font-size: 1.5em; font-weight: bold; }
+        .status-error { color: #f56565; font-size: 1.2em; font-weight: bold; }
+        .info { margin: 10px 0; font-size: 1.1em; color: #cbd5e0; }
+
+        /* 重新掃描按鈕 */
+        .btn-retry {
+            background: #4a5568;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+        
+        /* 說明區 */
+        .instruction { color: #718096; font-size: 0.9em; text-align: center; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>管理員報到掃描</h2>
+        
+        <div id="reader"></div>
+        <p class="instruction">請將學員的 QR Code 置於鏡頭框內</p>
+
+        <div id="result-card" class="result-card">
+            <div id="status-icon"></div>
+            <div id="status-text"></div>
+            <div id="student-info" class="info"></div>
+            <button class="btn-retry" onclick="restartScanner()">繼續掃描下一個</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 設定區 (須與報名頁一致) ---
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyR67m5WIn4j1u0iB9iGAnS1hO95uN6G7N5D7P7-F-F-F-F-F-F-F/exec"; 
+        const COURSE_DATE = "20260225"; 
+
+        const html5QrCode = new Html5Qrcode("reader");
+        const qrConfig = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+        // 啟動掃描器
+        function startScanner() {
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                qrConfig, 
+                onScanSuccess
+            ).catch(err => {
+                alert("無法啟動相機，請確認是否允許權限且使用 HTTPS 連線。");
+            });
+        }
+
+        // 掃描成功處理
+        async function onScanSuccess(decodedText) {
+            // 暫停掃描避免重複讀取
+            await html5QrCode.pause(true);
+            
+            // 1. 格式校驗 (隨機2英 + 手機10碼 + 隨機1英 + 日期8碼 + 亂數)
+            // 範例格式: AX0912345678B202602251234
+            const regex = /^[A-Z]{2}(\d{10})[A-Z](\d{8})\d+/;
+            const match = decodedText.match(regex);
+
+            if (!match) {
+                showResult("error", "格式錯誤", "請出示正確的報到 QR Code");
+                return;
+            }
+
+            const phone = match[1];
+            const date = match[2];
+
+            // 2. 日期校驗 (防呆：檢查是否為今日場次)
+            if (date !== COURSE_DATE) {
+                showResult("error", "日期不符", `此憑證日期為 ${date}<br>非今日場次 (${COURSE_DATE})`);
+                return;
+            }
+
+            // 3. 發送至 GAS 進行報到
+            showResult("processing", "讀取中...", "正在更新報到狀態...");
+            
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        action: 'checkIn', 
+                        phone: phone, 
+                        courseDate: COURSE_DATE 
+                    })
+                });
+                const data = await res.json();
+
+                if (data.result === 'success') {
+                    showResult("success", "報到成功！", `學員：${data.name}`);
+                } else if (data.result === 'already') {
+                    showResult("error", "重複報到", "此學員已完成報到過囉！");
+                } else if (data.result === 'not_registered') {
+                    showResult("error", "未報名", "此手機號碼尚未報名本場次。");
+                } else {
+                    showResult("error", "失敗", data.message || "系統發生錯誤");
+                }
+            } catch (e) {
+                showResult("error", "連線失敗", "請檢查網路或 GAS 部署設定。");
+            }
+        }
+
+        // 顯示結果畫面
+        function showResult(type, title, message) {
+            const card = document.getElementById('result-card');
+            const statusText = document.getElementById('status-text');
+            const infoText = document.getElementById('student-info');
+            
+            card.style.display = 'block';
+            statusText.innerText = title;
+            infoText.innerHTML = message;
+
+            if (type === 'success') {
+                statusText.className = 'status-success';
+                // 成功報到可加入震動提示 (部分手機支援)
+                if (navigator.vibrate) navigator.vibrate(200);
+            } else if (type === 'processing') {
+                statusText.className = 'info';
+            } else {
+                statusText.className = 'status-error';
+            }
+        }
+
+        // 重啟掃描
+        function restartScanner() {
+            document.getElementById('result-card').style.display = 'none';
+            html5QrCode.resume();
+        }
+
+        // 初始化
+        startScanner();
+    </script>
+</body>
+</html>
