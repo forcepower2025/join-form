@@ -3,47 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>產生專屬邀約連結</title>
+    <title>專屬邀約連結產生器</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body { background-color: #f4f7f6; font-family: "PingFang TC", sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #edf2f7; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
-        .btn { background-color: #4299e1; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        #result-area { display: none; margin-top: 20px; padding: 15px; background: #f0fff4; border-radius: 12px; border: 1px solid #c6f6d5; }
-        #link-text { word-break: break-all; color: #2f855a; font-weight: bold; font-size: 14px; }
+        body { background-color: #f4f7f6; font-family: "PingFang TC", sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; }
+        .card { background: white; width: 100%; max-width: 450px; padding: 30px; border-radius: 24px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); box-sizing: border-box; text-align: center; }
+        h2 { color: #2c3e50; margin-bottom: 25px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; }
+        input { width: 100%; padding: 14px; border: 2px solid #edf2f7; border-radius: 14px; font-size: 16px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 16px; background-color: #4299e1; color: white; border: none; border-radius: 14px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        #result-area { display: none; margin-top: 30px; padding-top: 20px; border-top: 2px dashed #eee; }
+        #link-display { background: #f8fafc; padding: 15px; border-radius: 12px; word-break: break-all; font-size: 14px; margin-bottom: 15px; color: #2d3748; }
+        #capture-area { background: white; padding: 30px; border-radius: 10px; width: 250px; margin: 0 auto; }
+        .download-btn { background-color: #48bb78; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>專屬邀約連結生成</h2>
-        <input type="text" id="refName" placeholder="請輸入您的姓名">
-        <input type="tel" id="refPhone" placeholder="請輸入您的手機號碼">
-        <button onclick="generateLink()" class="btn">產生邀約連結</button>
+        <h2>專屬邀約生成</h2>
+        <div class="form-group">
+            <label>介紹人姓名</label>
+            <input type="text" id="refName" placeholder="請輸入姓名">
+        </div>
+        <div class="form-group">
+            <label>介紹人手機</label>
+            <input type="tel" id="refPhone" placeholder="請輸入 10 碼手機" oninput="autoCheck(this.value)">
+        </div>
+        <button id="genBtn" class="btn" style="display:none;" onclick="generateAll()">產生邀約連結與 QRC</button>
 
         <div id="result-area">
-            <p style="color: #276749; margin-top: 0;">您的專屬連結已產生：</p>
-            <div id="link-text"></div>
-            <button onclick="copyLink()" class="btn" style="background-color: #48bb78; font-size: 14px; padding: 8px;">複製連結</button>
+            <div id="link-display"></div>
+            <button class="btn" onclick="copyLink()">一鍵複製連結</button>
+            
+            <div id="capture-area">
+                <h2 style="margin:0 0 15px 0; color:#2d3748; font-size: 22px;">動元力國際</h2>
+                <div id="qrcode" style="display:flex; justify-content:center; margin-bottom:15px;"></div>
+                <div id="displayName" style="font-weight:bold; font-size: 18px;"></div>
+                <div style="margin-top:5px; color:#718096;">誠摯的邀請您</div>
+            </div>
+            <button class="btn download-btn" onclick="downloadInviteImage()">下載邀約圖片</button>
         </div>
     </div>
 
     <script>
-        function generateLink() {
-            const name = document.getElementById('refName').value.trim();
-            const phone = document.getElementById('refPhone').value.trim();
-            if (!name || !phone) { alert("請填寫姓名與手機"); return; }
+        const REGISTER_URL = "https://forcepower2026.com/register.html";
 
-            // 網址參數編碼，避免中文亂碼
-            const baseUrl = "https://forcepower2026.com/register.html";
-            const finalUrl = `${baseUrl}?ref=${encodeURIComponent(name)}&refp=${encodeURIComponent(phone)}`;
+        function autoCheck(val) {
+            const cleanVal = val.replace(/\D/g, '').slice(0, 10);
+            document.getElementById('refPhone').value = cleanVal;
+            const name = document.getElementById('refName').value;
+            // 姓名不為空且手機滿 10 碼才顯示按鈕
+            document.getElementById('genBtn').style.display = (cleanVal.length === 10 && name) ? 'block' : 'none';
+        }
+
+        async function generateAll() {
+            const name = document.getElementById('refName').value;
+            const phone = document.getElementById('refPhone').value;
+            const longUrl = `${REGISTER_URL}?ref=${encodeURIComponent(name)}&refp=${phone}`;
             
-            document.getElementById('link-text').innerText = finalUrl;
-            document.getElementById('result-area').style.display = "block";
+            // 呼叫 TinyURL API (使用匿名 API 方式)
+            try {
+                const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
+                const shortUrl = await response.text();
+                
+                document.getElementById('link-display').innerText = shortUrl;
+                document.getElementById('displayName').innerText = name;
+                
+                // 產生 QRC
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), {
+                    text: shortUrl,
+                    width: 180,
+                    height: 180
+                });
+                
+                document.getElementById('result-area').style.display = "block";
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            } catch (e) {
+                alert("縮網址失敗，請稍後再試");
+            }
         }
 
         function copyLink() {
-            const text = document.getElementById('link-text').innerText;
-            navigator.clipboard.writeText(text).then(() => alert("連結已複製！"));
+            const link = document.getElementById('link-display').innerText;
+            navigator.clipboard.writeText(link).then(() => alert("連結已複製！"));
+        }
+
+        function downloadInviteImage() {
+            const area = document.getElementById('capture-area');
+            html2canvas(area, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `邀約卡_${document.getElementById('refName').value}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
         }
     </script>
 </body>
