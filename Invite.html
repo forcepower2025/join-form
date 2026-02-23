@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>產生專屬邀約連結</title>
+    <style>
+        body { background-color: #f4f7f6; font-family: "PingFang TC", sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #edf2f7; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
+        .btn { background-color: #4299e1; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #result-area { display: none; margin-top: 20px; padding: 15px; background: #f0fff4; border-radius: 12px; border: 1px solid #c6f6d5; }
+        #link-text { word-break: break-all; color: #2f855a; font-weight: bold; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>專屬邀約連結生成</h2>
+        <input type="text" id="refName" placeholder="請輸入您的姓名">
+        <input type="tel" id="refPhone" placeholder="請輸入您的手機號碼">
+        <button onclick="generateLink()" class="btn">產生邀約連結</button>
+
+        <div id="result-area">
+            <p style="color: #276749; margin-top: 0;">您的專屬連結已產生：</p>
+            <div id="link-text"></div>
+            <button onclick="copyLink()" class="btn" style="background-color: #48bb78; font-size: 14px; padding: 8px;">複製連結</button>
+        </div>
+    </div>
+
+    <script>
+        function generateLink() {
+            const name = document.getElementById('refName').value.trim();
+            const phone = document.getElementById('refPhone').value.trim();
+            if (!name || !phone) { alert("請填寫姓名與手機"); return; }
+
+            // 網址參數編碼，避免中文亂碼
+            const baseUrl = "https://forcepower2026.com/register.html";
+            const finalUrl = `${baseUrl}?ref=${encodeURIComponent(name)}&refp=${encodeURIComponent(phone)}`;
+            
+            document.getElementById('link-text').innerText = finalUrl;
+            document.getElementById('result-area').style.display = "block";
+        }
+
+        function copyLink() {
+            const text = document.getElementById('link-text').innerText;
+            navigator.clipboard.writeText(text).then(() => alert("連結已複製！"));
+        }
+    </script>
+</body>
+</html>
