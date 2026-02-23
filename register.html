@@ -188,16 +188,31 @@
         }
 
         // 顯示 QR Code
-        function showQRCode(name, phone) {
-            document.getElementById('qrc-result').style.display = 'block';
-            document.getElementById('display-name').innerText = name;
-            document.getElementById('qrcode').innerHTML = "";
-            const rand1 = Math.random().toString(36).substring(2, 4).toUpperCase();
-            const rand2 = Math.random().toString(36).substring(2, 3).toUpperCase();
-            const content = `${rand1}${phone}${rand2}${COURSE_DATE}${new Date().getTime().toString().slice(-4)}`;
-            new QRCode(document.getElementById("qrcode"), { text: content, width: 180, height: 180 });
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
+function showQRCode(name, phone) {
+    document.getElementById('qrc-result').style.display = 'block';
+    document.getElementById('display-name').innerText = name;
+    document.getElementById('qrcode').innerHTML = "";
+
+    // 強制產生純英文字母的隨機碼
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const rand1 = letters.charAt(Math.floor(Math.random() * letters.length)) + 
+                  letters.charAt(Math.floor(Math.random() * letters.length));
+    const rand2 = letters.charAt(Math.floor(Math.random() * letters.length));
+    
+    const timestamp = new Date().getTime().toString().slice(-4);
+    
+    // 組合成最終格式：2英 + 10手機 + 1英 + 8日期 + 4亂數
+    const content = `${rand1}${phone}${rand2}${COURSE_DATE}${timestamp}`;
+
+    new QRCode(document.getElementById("qrcode"), {
+        text: content,
+        width: 180,
+        height: 180,
+        correctLevel : QRCode.CorrectLevel.H
+    });
+    
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
 
         // 下載圖片
         function downloadImage() {
