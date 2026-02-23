@@ -151,7 +151,7 @@ function autoCheck(val) {
     }
 }
 
-        async function checkUser(phone) {
+async function checkUser(phone) {
             document.getElementById('msg').innerText = "系統查詢中...";
             try {
                 const res = await fetch(GAS_URL, {
@@ -165,30 +165,49 @@ function autoCheck(val) {
                 const refPhoneField = document.getElementById('introPhone');
 
                 if (user.exists) {
+                    // --- 舊學員警示邏輯開始 ---
+                    // 如果這名學員原本就有介紹人資料
+                    if (user.referrer) {
+                        // 1. 跳出訊息視窗
+                        alert("您已綁定介紹人為 " + user.referrer + "，如需更換介紹人，請聯絡公司客服line");
+                        
+                        // 2. 強制將欄位填入舊資料 (不管網址帶什麼參數，都要以舊資料為準)
+                        refField.value = user.referrer;
+                        refPhoneField.value = user.referrerPhone || "";
+                    }
+                    
+                    // 3. 鎖定所有欄位
                     nameField.value = user.name;
                     nameField.disabled = true;
-                    refField.value = user.referrer;
                     refField.disabled = true;
-                    refPhoneField.value = user.referrerPhone || "";
                     refPhoneField.disabled = true;
+                    // --- 舊學員警示邏輯結束 ---
+
                     document.getElementById('msg').innerText = "";
 
+                    // 若已報名過，則顯示 QRC
                     if (user.status === "已報名" || user.status === "已報到完成") {
                         alert("您已經報名過囉！");
                         showQRCode(user.name, phone);
                     }
                 } else {
+                    // 這裡是新學員的邏輯 (維持現狀)
                     document.getElementById('msg').innerText = "您為第一次報名，請填寫完整資訊";
                     nameField.value = "";
                     nameField.disabled = false;
-                    refField.value = "";
-                    refField.disabled = false;
-                    refPhoneField.value = "";
-                    refPhoneField.disabled = false;
+                    
+                    // 注意：如果是點邀約連結進來的新學員，這兩個欄位在 window.onload 已經鎖定了
+                    // 只有在「非點連結進來」的新學員，才會解鎖介紹人欄位
+                    if (!refField.disabled) {
+                        refField.value = "";
+                        refField.disabled = false;
+                        refPhoneField.value = "";
+                        refPhoneField.disabled = false;
+                    }
                     nameField.focus(); 
                 }
             } catch (e) {
-                document.getElementById('msg').innerText = "連線失敗";
+                document.getElementById('msg').innerText = "查詢失敗";
             }
         }
 
