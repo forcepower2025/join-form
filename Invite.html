@@ -80,7 +80,7 @@
 
         function renderResult(url, name, isLong = false) {
             document.getElementById('link-display').innerHTML = `
-                <div style="font-size:13px; color:#718096; margin-bottom:5px;">${isLong?'縮網址失敗，改用原連結：':'專屬連結：'}</div>
+                <div style="font-size:13px; color:#718096; margin-bottom:5px;">${isLong?'：':'專屬連結：'}</div>
                 <strong style="word-break:break-all;">${url}</strong>
             `;
             document.getElementById('displayName').innerText = name;
