@@ -2,74 +2,162 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>課程報名系統</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程報名</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* RWD 與 基礎樣式 */
+        body { 
+            background-color: #f0f2f5; 
+            font-family: "Microsoft JhengHei", sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px;
+        }
+
+        /* 卡片包裝 */
+        .card { 
+            background: white; 
+            width: 100%; 
+            max-width: 400px; 
+            padding: 30px; 
+            border-radius: 20px; /* 圓角卡片 */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            box-sizing: border-box;
+        }
+
+        h2 { text-align: center; color: #333; margin-bottom: 25px; }
+
+        /* 欄位排列邏輯 */
+        .form-group { margin-bottom: 20px; }
+
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: bold; 
+            color: #555; 
+            font-size: 0.9em;
+        }
+
+        /* 輸入框一致化與圓角 */
+        input { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 1px solid #ddd; 
+            border-radius: 12px; /* 圓角輸入框 */
+            font-size: 16px; 
+            box-sizing: border-box; 
+            transition: border 0.3s;
+        }
+
+        input:focus { outline: none; border-color: #007bff; }
+        input:disabled { background-color: #f8f9fa; color: #aaa; cursor: not-allowed; }
+
+        /* 按鈕樣式 */
+        .submit-btn { 
+            width: 100%; 
+            padding: 15px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover { background-color: #0056b3; }
+
+        #msg { color: #d9534f; font-size: 0.85em; margin-bottom: 15px; text-align: center; height: 1.2em; }
+
+        /* QR Code 結果區域 */
+        #qrc-result { 
+            display: none; 
+            margin-top: 25px; 
+            text-align: center; 
+            border-top: 2px dashed #eee; 
+            padding-top: 25px; 
+        }
+
+        #capture-area { background: white; padding: 15px; border-radius: 15px; }
+        
+        #qrcode { display: flex; justify-content: center; margin-bottom: 15px; }
+
+        .download-btn { 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            padding: 12px 25px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            margin-top: 15px; 
+        }
+    </style>
 </head>
 <body>
-    <h2>課程報名</h2>
-    <div id="msg" style="color: red;"></div>
-    
-    <label>手機號碼：</label>
-    <input type="text" id="phone" onblur="checkUser(this.value)"> <br><br>
-    
-    <label>姓名：</label>
-    <input type="text" id="name"> <br><br>
-    
-    <label>介紹人：</label>
-    <input type="text" id="referrer" disabled> <br><br>
-    
-    <button onclick="submitForm()">提交報名</button>
 
-    <hr>
-    <div id="qrcode-container" style="display:none; text-align: center;">
-        <div id="qrcode"></div>
-        <p id="student-name" style="font-weight: bold;"></p>
-        <p>您已完成報名，請於報到時出示此圖掃瞄簽到</p>
+    <div class="card">
+        <h2>課程報名</h2>
+        <div id="msg"></div>
+
+        <div class="form-group">
+            <label>手機號碼</label>
+            <input type="tel" id="phone" placeholder="請輸入手機號碼" onblur="checkUser(this.value)">
+        </div>
+
+        <div class="form-group">
+            <label>學員姓名</label>
+            <input type="text" id="name" placeholder="輸入手機後自動顯示" disabled>
+        </div>
+
+        <div class="form-group">
+            <label>介紹人</label>
+            <input type="text" id="referrer" placeholder="輸入手機後自動顯示" disabled>
+        </div>
+
+        <button onclick="submitRegistration()" class="submit-btn" id="btn-text">確認報名</button>
+
+        <div id="qrc-result">
+            <div id="capture-area">
+                <div id="qrcode"></div>
+                <h3 id="display-name" style="margin: 10px 0;"></h3>
+                <p style="font-size: 0.9em; color: #666; line-height: 1.5;">您已完成報名，<br>請於報到時出示此圖掃瞄簽到</p>
+            </div>
+            <button class="download-btn" onclick="downloadImage()">下載報到圖片</button>
+        </div>
     </div>
 
     <script>
-        const GAS_URL = "https://docs.google.com/spreadsheets/d/1cyGLmOfdH0OKtgppFqw9stf1eWpzngorAu4cIcWrr3E/edit?usp=sharing"; // 請確認已部署為所有人可存取
-        const COURSE_DATE = "20260225";
+        const GAS_URL = "您的GAS網址"; 
+        const COURSE_DATE = "20260225"; 
 
         async function checkUser(phone) {
-            if(!phone) return;
-            const res = await fetch(GAS_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({ action: 'checkUser', phone: phone, courseDate: COURSE_DATE }) 
-            });
-            const user = await res.json();
+            if (!phone) return;
+            document.getElementById('msg').innerText = "系統查詢中...";
             
-            if (user.exists) {
-                document.getElementById('name').value = user.name;
-                document.getElementById('referrer').value = user.referrer;
-                document.getElementById('referrer').disabled = true;
-                if (user.status === "已報名" || user.status === "已報到完成") {
-                    alert("您已經報名過囉！");
-                    showQRCode(user.name, phone);
-                }
-            } else {
-                document.getElementById('msg').innerText = "您為第一次報名，請填寫介紹人";
-                document.getElementById('referrer').disabled = false;
-                document.getElementById('referrer').value = "";
-            }
-        }
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'checkUser', phone: phone, courseDate: COURSE_DATE })
+                });
+                const user = await res.json();
 
-        function showQRCode(name, phone) {
-            document.getElementById('qrcode-container').style.display = 'block';
-            document.getElementById('student-name').innerText = name;
-            document.getElementById('qrcode').innerHTML = ""; // 清空舊內容
-            
-            const rand1 = Math.random().toString(36).substring(2, 4).toUpperCase();
-            const rand2 = Math.random().toString(36).substring(2, 3).toUpperCase();
-            const timestamp = new Date().getTime().toString().slice(-4);
-            const content = `${rand1}${phone}${rand2}${COURSE_DATE}${timestamp}`;
+                if (user.exists) {
+                    document.getElementById('name').value = user.name;
+                    document.getElementById('name').disabled = true;
+                    document.getElementById('referrer').value = user.referrer;
+                    document.getElementById('referrer').disabled = true;
+                    document.getElementById('msg').innerText = "";
 
-            new QRCode(document.getElementById("qrcode"), {
-                text: content,
-                width: 128,
-                height: 128
-            });
-        }
-    </script>
-</body>
-</html>
+                    if (user.status === "已報名" || user.status === "已報到完成") {
+                        alert("您已經報名過囉！");
+                        showQRCode(user.name, phone);
+                    }
+                } else {
+                    document.getElementById('msg').innerText = "您為第一次報名，請
