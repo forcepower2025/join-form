@@ -110,6 +110,11 @@
                 <input type="text" id="referrer" placeholder="輸入手機後自動顯示" disabled>
             </div>
 
+            <div class="form-group">
+            <label>介紹人手機</label>
+            <input type="tel" id="introPhone" placeholder="查詢後自動顯示" disabled>
+            </div>
+
             <button onclick="submitRegistration()" class="submit-btn" id="btn-text">確認報名</button>
 
             <div id="qrc-result">
@@ -167,24 +172,94 @@
             }
         }
 
-        // 提交報名
+// --- JS 修改段落 ---
+        
+        // 自動偵測輸入長度
+        function autoCheck(val) {
+            // 過濾非數字字元，並限制長度為 10
+            const cleanVal = val.replace(/\D/g, '').slice(0, 10);
+            document.getElementById('phone').value = cleanVal;
+            
+            if (cleanVal.length === 10) {
+                checkUser(cleanVal);
+            }
+        }
+
+        async function checkUser(phone) {
+            document.getElementById('msg').innerText = "系統查詢中...";
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'checkUser', phone: phone, courseDate: COURSE_DATE })
+                });
+                const user = await res.json();
+
+                const nameField = document.getElementById('name');
+                const refField = document.getElementById('referrer');
+                const refPhoneField = document.getElementById('introPhone');
+
+                if (user.exists) {
+                    nameField.value = user.name;
+                    nameField.disabled = true;
+                    refField.value = user.referrer;
+                    refField.disabled = true;
+                    refPhoneField.value = user.referrerPhone || "";
+                    refPhoneField.disabled = true;
+                    document.getElementById('msg').innerText = "";
+
+                    if (user.status === "已報名" || user.status === "已報到完成") {
+                        alert("您已經報名過囉！");
+                        showQRCode(user.name, phone);
+                    }
+                } else {
+                    document.getElementById('msg').innerText = "您為第一次報名，請填寫完整資訊";
+                    nameField.value = "";
+                    nameField.disabled = false;
+                    refField.value = "";
+                    refField.disabled = false;
+                    refPhoneField.value = "";
+                    refPhoneField.disabled = false;
+                    nameField.focus(); // 自動聚焦到姓名欄位
+                }
+            } catch (e) {
+                document.getElementById('msg').innerText = "查詢失敗";
+            }
+        }
+
+        // 修改提交報名函式，加入介紹人手機
         async function submitRegistration() {
             const name = document.getElementById('name').value;
             const phone = document.getElementById('phone').value;
             const referrer = document.getElementById('referrer').value;
-            if (!name || !phone || !referrer) { alert("請填寫完整資訊"); return; }
+            const introPhone = document.getElementById('introPhone').value;
+
+            if (!name || phone.length < 10 || !referrer || !introPhone) {
+                alert("請填寫完整資訊（手機須為10碼）");
+                return;
+            }
+
             document.getElementById('btn-text').innerText = "處理中...";
             try {
                 const res = await fetch(GAS_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'register', name: name, phone: phone, referrer: referrer, courseDate: COURSE_DATE })
+                    body: JSON.stringify({
+                        action: 'register',
+                        name: name,
+                        phone: phone,
+                        referrer: referrer,
+                        introPhone: introPhone, // 傳送新欄位
+                        courseDate: COURSE_DATE
+                    })
                 });
                 const result = await res.json();
                 if (result.result === 'success') {
                     showQRCode(name, phone);
                     document.getElementById('btn-text').innerText = "報名成功";
                 }
-            } catch (e) { alert("報名失敗"); document.getElementById('btn-text').innerText = "確認報名"; }
+            } catch (e) {
+                alert("報名失敗");
+                document.getElementById('btn-text').innerText = "確認報名";
+            }
         }
 
         // 顯示 QR Code
