@@ -1,0 +1,30 @@
+<script>
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzzC1Z8g5EaXe-6KRK7eCNc7PMYbiqAhat13iG9EqlHiHx8kyjYcjxiic7rGkcoE9_6Gw/exec";
+const COURSE_DATE = "20260225";
+
+// 手機號碼輸入比對
+async function checkUser(phone) {
+    const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'checkUser', phone: phone, courseDate: COURSE_DATE }) });
+    const user = await res.json();
+    if (user.exists) {
+        document.getElementById('referrer').value = user.referrer;
+        document.getElementById('referrer').disabled = true;
+        if (user.status === "已報名" || user.status === "已報到完成") {
+            alert("您已經報名過囉！");
+            showQRCode(user.name, phone);
+        }
+    } else {
+        document.getElementById('msg').innerText = "您為第一次報名，請填寫介紹人";
+        document.getElementById('referrer').disabled = false;
+    }
+}
+
+function generateQRC(name, phone) {
+    const rand1 = Math.random().toString(36).substring(2, 4).toUpperCase();
+    const rand2 = Math.random().toString(36).substring(2, 3).toUpperCase();
+    const timestamp = new Date().getTime().toString().slice(-4);
+    const qrcContent = `${rand1}${phone}${rand2}${COURSE_DATE}${timestamp}`;
+    
+    // 使用 qrcode.js 產生並顯示，下方附加上姓名與提示語
+}
+</script>
