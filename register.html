@@ -106,11 +106,33 @@
                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.647276601334!2d121.519626860567!3d25.0460416094302!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442a972222f6c45%3A0x79fd56661170c0b0!2zMTAw6Ie65YyX5biC5Lit5q2j5Y2A5Lit5bGx5YyX6Lev5LiA5q61MuiZn-S4reWkruWkp-aokw!5e0!3m2!1szh-TW!2stw!4v1771872010582!5m2!1szh-TW!2stw" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </div>
+
+        <div style="text-align: center; margin-top: 20px; padding-bottom: 40px;">
+    <a href="https://lin.ee/HlcqleG" target="_blank">
+        <img src="https://drive.google.com/thumbnail?id=1hpOvyW86lt2VRbDnZBVCgA-denPpvDDi&sz=w500" alt="客服中心" style="width: 100%; max-width: 400px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+    </a>
+</div>
     </div>
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzzC1Z8g5EaXe-6KRK7eCNc7PMYbiqAhat13iG9EqlHiHx8kyjYcjxiic7rGkcoE9_6Gw/exec"; 
         const COURSE_DATE = "20260225"; 
+
+        // --- 在 window.onload 加入讀取網址參數 ---
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refName = urlParams.get('ref');
+    const refPhone = urlParams.get('refp');
+
+    if (refName) {
+        document.getElementById('referrer').value = decodeURIComponent(refName);
+        document.getElementById('referrer').disabled = true;
+    }
+    if (refPhone) {
+        document.getElementById('introPhone').value = refPhone;
+        document.getElementById('introPhone').disabled = true;
+    }
+};
 
         // 自動偵測輸入長度
        // 自動偵測輸入長度：每打一個字都會執行此函式
