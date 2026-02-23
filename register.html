@@ -112,13 +112,21 @@
         const COURSE_DATE = "20260225"; 
 
         // 自動偵測輸入長度
-        function autoCheck(val) {
-            const cleanVal = val.replace(/\D/g, '').slice(0, 10);
-            document.getElementById('phone').value = cleanVal;
-            if (cleanVal.length === 10) {
-                checkUser(cleanVal);
-            }
-        }
+       // 自動偵測輸入長度：每打一個字都會執行此函式
+function autoCheck(val) {
+    // 1. 直接取得輸入框原始字串 (不要做任何 replace 動作，避免 0 消失)
+    const phoneInput = document.getElementById('phone');
+    const currentVal = phoneInput.value;
+
+    // 2. 判斷如果長度剛好等於 10，就執行查詢
+    if (currentVal.length === 10) {
+        checkUser(currentVal);
+    } 
+    // 3. 如果超過 10 碼，自動截斷 (維持 10 碼)
+    else if (currentVal.length > 10) {
+        phoneInput.value = currentVal.slice(0, 10);
+    }
+}
 
         async function checkUser(phone) {
             document.getElementById('msg').innerText = "系統查詢中...";
