@@ -197,7 +197,7 @@
                     }
                     result.data.forEach(item => {
                         const tr = document.createElement('tr');
-                        const statusColor = item.status === "已報到完成" ? "#48bb78" : "#f6ad55";
+                        const statusColor = item.status === "已報到" ? "#f6ad55" : "#f6ad55";
                         tr.innerHTML = `
                             <td>${item.name}</td>
                             <td>${item.phone}</td>
