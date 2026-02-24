@@ -3,45 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理員報到系統</title>
+    <title>動元力國際管理員報到系統</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         body { background-color: #1a202c; font-family: "PingFang TC", sans-serif; margin: 0; padding: 0; color: white; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
-        
         h2 { text-align: center; margin-top: 20px; color: #63b3ed; }
-
-        /* 掃描器外框 */
         #reader { width: 100%; border-radius: 20px; overflow: hidden; border: 2px solid #4a5568 !important; background: black; }
-
-        /* 結果顯示卡片 */
-        .result-card {
-            background: #2d3748;
-            padding: 20px;
-            border-radius: 20px;
-            margin-top: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            text-align: center;
-            display: none; /* 預設隱藏 */
-        }
+        .result-card { background: #2d3748; padding: 20px; border-radius: 20px; margin-top: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; display: none; }
         .status-success { color: #48bb78; font-size: 1.5em; font-weight: bold; }
         .status-error { color: #f56565; font-size: 1.2em; font-weight: bold; }
         .info { margin: 10px 0; font-size: 1.1em; color: #cbd5e0; }
-
-        /* 重新掃描按鈕 */
-        .btn-retry {
-            background: #4a5568;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 12px;
-            cursor: pointer;
-            margin-top: 15px;
-            font-size: 16px;
-        }
-        
-        /* 說明區 */
+        .btn-retry { background: #4a5568; color: white; border: none; padding: 12px 25px; border-radius: 12px; cursor: pointer; margin-top: 15px; font-size: 16px; }
         .instruction { color: #718096; font-size: 0.9em; text-align: center; margin-top: 15px; }
+        
+        /* 管理面板 */
+        .admin-panel { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; }
+        h3 { color: #63b3ed; border-left: 4px solid #4299e1; padding-left: 10px; margin-bottom: 15px; }
+        select { width: 100%; padding: 12px; border-radius: 12px; border: none; background: #2d3748; color: white; font-size: 16px; margin-bottom: 15px; cursor: pointer; border: 1px solid #4a5568; }
+        .table-container { overflow-x: auto; background: #2d3748; border-radius: 15px; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
+        th { padding: 12px 10px; border-bottom: 2px solid #4a5568; color: #63b3ed; }
+        td { padding: 12px 10px; border-bottom: 1px solid #3d4957; color: #cbd5e0; }
     </style>
 </head>
 <body>
@@ -49,11 +32,17 @@
     <div class="container">
         <h2>管理員報到掃描</h2>
         
+        <div class="form-group">
+            <label style="display:block; margin-bottom:8px; color:#cbd5e0; font-size:0.9em;">請先選擇活動場次：</label>
+            <select id="dateSelect" onchange="onDateChange()">
+                <option value="">載入日期中...</option>
+            </select>
+        </div>
+
         <div id="reader"></div>
         <p class="instruction">請將學員的 QR Code 置於鏡頭框內</p>
 
         <div id="result-card" class="result-card">
-            <div id="status-icon"></div>
             <div id="status-text"></div>
             <div id="student-info" class="info"></div>
             <button class="btn-retry" onclick="restartScanner()">繼續掃描下一個</button>
@@ -61,75 +50,102 @@
     </div>
 
     <div class="admin-panel">
-    <h3>報名名單查詢</h3>
-    <div class="form-group" style="display:flex; gap:10px; margin-bottom: 15px;">
-        <select id="dateSelect" style="flex:1; padding:10px; border-radius:10px; border:none; background:#2d3748; color:white;">
-            <option value="20260225">2026-02-25</option>
-            <option value="20260301">2026-03-01</option> </select>
-        <button onclick="loadList()" style="padding:10px 20px; border-radius:10px; background:#4299e1; color:white; border:none; cursor:pointer;">查詢</button>
-    </div>
-
-    <div style="overflow-x: auto; background: #2d3748; border-radius: 15px; padding: 10px;">
-        <table id="listTable" style="width:100%; border-collapse: collapse; font-size: 14px; text-align: left;">
-            <thead>
-                <tr style="border-bottom: 2px solid #4a5568; color: #63b3ed;">
-                    <th style="padding:10px;">姓名</th>
-                    <th style="padding:10px;">手機</th>
-                    <th style="padding:10px;">介紹人</th>
-                    <th style="padding:10px;">介紹人手機</th>
-                    <th style="padding:10px;">狀態</th>
-                </tr>
-            </thead>
-            <tbody id="listBody" style="color: #cbd5e0;">
+        <h3>當前報名名單</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>手機</th>
+                        <th>介紹人</th>
+                        <th>狀態</th>
+                    </tr>
+                </thead>
+                <tbody id="listBody">
+                    <tr><td colspan="4" style="text-align:center; padding:20px;">請先選擇日期</td></tr>
                 </tbody>
-        </table>
+            </table>
+        </div>
     </div>
-</div>
 
     <script>
-        // --- 設定區 (須與報名頁一致) ---
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzzC1Z8g5EaXe-6KRK7eCNc7PMYbiqAhat13iG9EqlHiHx8kyjYcjxiic7rGkcoE9_6Gw/exec"; 
-        const COURSE_DATE = "20260225"; 
-
         const html5QrCode = new Html5Qrcode("reader");
         const qrConfig = { fps: 10, qrbox: { width: 250, height: 250 } };
 
-        // 啟動掃描器
-        function startScanner() {
-            html5QrCode.start(
-                { facingMode: "environment" }, 
-                qrConfig, 
-                onScanSuccess
-            ).catch(err => {
-                alert("無法啟動相機，請確認是否允許權限且使用 HTTPS 連線。");
-            });
+        // 1. 頁面開啟自動初始化日期
+        window.onload = async function() {
+            await fetchDates();
+            startScanner();
+        };
+
+        // 2. 抓取 Google Sheet 上的 8 位數日期標題
+        async function fetchDates() {
+            const dateSelect = document.getElementById('dateSelect');
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getDates' })
+                });
+                const result = await res.json();
+                if (result.result === 'success' && result.dates.length > 0) {
+                    dateSelect.innerHTML = ''; 
+                    result.dates.forEach(date => {
+                        const opt = document.createElement('option');
+                        opt.value = date;
+                        opt.innerText = date.toString().replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+                        dateSelect.appendChild(opt);
+                    });
+                    // 自動載入第一個場次的清單
+                    loadList();
+                } else {
+                    dateSelect.innerHTML = '<option value="">無日期資料</option>';
+                }
+            } catch (e) {
+                dateSelect.innerHTML = '<option value="">連線日期失敗</option>';
+            }
         }
 
-        // 掃描成功處理
+        // 3. 當日期切換時
+        function onDateChange() {
+            loadList(); // 更新下方名單
+            // 如果正在顯示結果卡片，則隱藏它
+            document.getElementById('result-card').style.display = 'none';
+        }
+
+        // 4. 啟動掃描器
+        function startScanner() {
+            html5QrCode.start({ facingMode: "environment" }, qrConfig, onScanSuccess)
+            .catch(err => { alert("無法啟動相機，請確認權限或使用 HTTPS 連線。"); });
+        }
+
+        // 5. 掃描成功處理 (連動日期)
         async function onScanSuccess(decodedText) {
-            // 暫停掃描避免重複讀取
+            const selectedDate = document.getElementById('dateSelect').value;
+            if (!selectedDate) {
+                alert("請先選擇報到日期場次！");
+                return;
+            }
+
             await html5QrCode.pause(true);
             
-            // 1. 格式校驗 (隨機2英 + 手機10碼 + 隨機1英 + 日期8碼 + 亂數)
-            // 範例格式: AX0912345678B202602251234
             const regex = /^[A-Z]{2}(\d{10})[A-Z](\d{8})\d+/;
             const match = decodedText.match(regex);
 
             if (!match) {
-                showResult("error", "格式錯誤", "請出示正確的報到 QR Code");
+                showResult("error", "格式錯誤", "非本系統產生之 QR Code");
                 return;
             }
 
             const phone = match[1];
-            const date = match[2];
+            const qrcDate = match[2];
 
-            // 2. 日期校驗 (防呆：檢查是否為今日場次)
-            if (date !== COURSE_DATE) {
-                showResult("error", "日期不符", `此憑證日期為 ${date}<br>非今日場次 (${COURSE_DATE})`);
+            // 比對選單日期與 QRC 內含日期
+            if (qrcDate !== selectedDate) {
+                showResult("error", "場次不符", `此憑證為 ${qrcDate}<br>您目前選擇的場次是 ${selectedDate}`);
                 return;
             }
 
-            // 3. 發送至 GAS 進行報到
             showResult("processing", "讀取中...", "正在更新報到狀態...");
             
             try {
@@ -138,13 +154,14 @@
                     body: JSON.stringify({ 
                         action: 'checkIn', 
                         phone: phone, 
-                        courseDate: COURSE_DATE 
+                        courseDate: selectedDate // 使用選單的日期
                     })
                 });
                 const data = await res.json();
 
                 if (data.result === 'success') {
                     showResult("success", "報到成功！", `學員：${data.name}`);
+                    loadList(); // 報到成功後即時更新下方清單狀態
                 } else if (data.result === 'already') {
                     showResult("error", "重複報到", "此學員已完成報到過囉！");
                 } else if (data.result === 'not_registered') {
@@ -153,23 +170,58 @@
                     showResult("error", "失敗", data.message || "系統發生錯誤");
                 }
             } catch (e) {
-                showResult("error", "連線失敗", "請檢查網路或 GAS 部署設定。");
+                showResult("error", "連線失敗", "請檢查網路。");
             }
         }
 
-        // 顯示結果畫面
+        // 6. 抓取報名名單 (不含介紹人手機)
+        async function loadList() {
+            const selectedDate = document.getElementById('dateSelect').value;
+            const tbody = document.getElementById('listBody');
+            if (!selectedDate) return;
+
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">資料載入中...</td></tr>';
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getList', courseDate: selectedDate })
+                });
+                const result = await res.json();
+
+                if (result.result === 'success') {
+                    tbody.innerHTML = '';
+                    if (result.data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">此場次尚無報名資料</td></tr>';
+                        return;
+                    }
+                    result.data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        const statusColor = item.status === "已報到完成" ? "#48bb78" : "#f6ad55";
+                        tr.innerHTML = `
+                            <td>${item.name}</td>
+                            <td>${item.phone}</td>
+                            <td>${item.referrer}</td>
+                            <td style="color:${statusColor}; font-weight:bold;">${item.status}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#f56565;">資料載入失敗</td></tr>';
+            }
+        }
+
         function showResult(type, title, message) {
             const card = document.getElementById('result-card');
             const statusText = document.getElementById('status-text');
             const infoText = document.getElementById('student-info');
-            
             card.style.display = 'block';
             statusText.innerText = title;
             infoText.innerHTML = message;
 
             if (type === 'success') {
                 statusText.className = 'status-success';
-                // 成功報到可加入震動提示 (部分手機支援)
                 if (navigator.vibrate) navigator.vibrate(200);
             } else if (type === 'processing') {
                 statusText.className = 'info';
@@ -178,57 +230,10 @@
             }
         }
 
-        // 重啟掃描
         function restartScanner() {
             document.getElementById('result-card').style.display = 'none';
             html5QrCode.resume();
         }
-
-        // 初始化
-        startScanner();
-
-        // 新增：抓取清單函式
-    async function loadList() {
-        const selectedDate = document.getElementById('dateSelect').value;
-        const tbody = document.getElementById('listBody');
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">讀取中...</td></tr>';
-
-        try {
-            const res = await fetch(GAS_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'getList', courseDate: selectedDate })
-            });
-            const result = await res.json();
-
-            if (result.result === 'success') {
-                tbody.innerHTML = ''; // 清空
-                if (result.data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">尚無報名資料</td></tr>';
-                    return;
-                }
-                
-                result.data.forEach(item => {
-                    const tr = document.createElement('tr');
-                    tr.style.borderBottom = "1px solid #4a5568";
-                    const statusColor = item.status === "已報到完成" ? "#48bb78" : "#f6ad55";
-                    
-                    tr.innerHTML = `
-                        <td style="padding:10px;">${item.name}</td>
-                        <td style="padding:10px;">${item.phone}</td>
-                        <td style="padding:10px;">${item.referrer}</td>
-                        <td style="padding:10px;">${item.referrerPhone}</td>
-                        <td style="padding:10px; color:${statusColor};">${item.status}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } else {
-                alert("查詢失敗：" + result.message);
-            }
-        } catch (e) {
-            alert("連線失敗，請檢查網路");
-        }
-    }
-        
     </script>
 </body>
 </html>
