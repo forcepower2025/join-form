@@ -60,6 +60,32 @@
         </div>
     </div>
 
+    <div class="admin-panel">
+    <h3>報名名單查詢</h3>
+    <div class="form-group" style="display:flex; gap:10px; margin-bottom: 15px;">
+        <select id="dateSelect" style="flex:1; padding:10px; border-radius:10px; border:none; background:#2d3748; color:white;">
+            <option value="20260225">2026-02-25</option>
+            <option value="20260301">2026-03-01</option> </select>
+        <button onclick="loadList()" style="padding:10px 20px; border-radius:10px; background:#4299e1; color:white; border:none; cursor:pointer;">查詢</button>
+    </div>
+
+    <div style="overflow-x: auto; background: #2d3748; border-radius: 15px; padding: 10px;">
+        <table id="listTable" style="width:100%; border-collapse: collapse; font-size: 14px; text-align: left;">
+            <thead>
+                <tr style="border-bottom: 2px solid #4a5568; color: #63b3ed;">
+                    <th style="padding:10px;">姓名</th>
+                    <th style="padding:10px;">手機</th>
+                    <th style="padding:10px;">介紹人</th>
+                    <th style="padding:10px;">介紹人手機</th>
+                    <th style="padding:10px;">狀態</th>
+                </tr>
+            </thead>
+            <tbody id="listBody" style="color: #cbd5e0;">
+                </tbody>
+        </table>
+    </div>
+</div>
+
     <script>
         // --- 設定區 (須與報名頁一致) ---
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzzC1Z8g5EaXe-6KRK7eCNc7PMYbiqAhat13iG9EqlHiHx8kyjYcjxiic7rGkcoE9_6Gw/exec"; 
@@ -160,6 +186,49 @@
 
         // 初始化
         startScanner();
+
+        // 新增：抓取清單函式
+    async function loadList() {
+        const selectedDate = document.getElementById('dateSelect').value;
+        const tbody = document.getElementById('listBody');
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">讀取中...</td></tr>';
+
+        try {
+            const res = await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'getList', courseDate: selectedDate })
+            });
+            const result = await res.json();
+
+            if (result.result === 'success') {
+                tbody.innerHTML = ''; // 清空
+                if (result.data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">尚無報名資料</td></tr>';
+                    return;
+                }
+                
+                result.data.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.style.borderBottom = "1px solid #4a5568";
+                    const statusColor = item.status === "已報到完成" ? "#48bb78" : "#f6ad55";
+                    
+                    tr.innerHTML = `
+                        <td style="padding:10px;">${item.name}</td>
+                        <td style="padding:10px;">${item.phone}</td>
+                        <td style="padding:10px;">${item.referrer}</td>
+                        <td style="padding:10px;">${item.referrerPhone}</td>
+                        <td style="padding:10px; color:${statusColor};">${item.status}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                alert("查詢失敗：" + result.message);
+            }
+        } catch (e) {
+            alert("連線失敗，請檢查網路");
+        }
+    }
+        
     </script>
 </body>
 </html>
