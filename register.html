@@ -165,27 +165,29 @@ async function checkUser(phone) {
                 const refPhoneField = document.getElementById('introPhone');
 
                 if (user.exists) {
-                    // --- 舊學員警示邏輯開始 ---
-                    // 如果這名學員原本就有介紹人資料
-                    if (user.referrer) {
-                        // 1. 跳出訊息視窗
-                        alert("您已綁定介紹人為 " + user.referrer + "，如需更換介紹人，請聯絡公司客服line");
-                        
-                        // 2. 強制將欄位填入舊資料 (不管網址帶什麼參數，都要以舊資料為準)
-                        refField.value = user.referrer;
-                        refPhoneField.value = user.referrerPhone || "";
+                    // 取得目前表單上「介紹人姓名」欄位的值 (可能是網址帶入的，也可能是空的)
+                    const currentRefName = refField.value.trim();
+                    const dbRefName = (user.referrer || "").toString().trim();
+
+                    // --- 核心修正比對邏輯 ---
+                    // 只有當「表單已有資料」且「跟資料庫舊資料不同」時，才跳出警示
+                    if (currentRefName !== "" && dbRefName !== "" && currentRefName !== dbRefName) {
+                        alert("您已綁定介紹人為 " + dbRefName + "，如需更換介紹人，請聯絡公司客服line");
                     }
-                    
-                    // 3. 鎖定所有欄位
+
+                    // 無論有沒有跳警示，如果是舊學員，一律還原為資料庫的正確資料並鎖定
                     nameField.value = user.name;
                     nameField.disabled = true;
-                    refField.disabled = true;
-                    refPhoneField.disabled = true;
-                    // --- 舊學員警示邏輯結束 ---
-
+                    
+                    if (dbRefName !== "") {
+                        refField.value = dbRefName;
+                        refField.disabled = true;
+                        refPhoneField.value = user.referrerPhone || "";
+                        refPhoneField.disabled = true;
+                    }
+                    
                     document.getElementById('msg').innerText = "";
 
-                    // 若已報名過，則顯示 QRC
                     if (user.status === "已報名" || user.status === "已報到完成") {
                         alert("您已經報名過囉！");
                         showQRCode(user.name, phone);
