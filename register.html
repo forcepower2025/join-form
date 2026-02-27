@@ -49,13 +49,13 @@
 </head>
 <body>
 
-    //活動圖片DM
+    /* 1. DM 圖片區 */
     <div class="container">
         <div class="dm-container">
             <img src="https://lh3.googleusercontent.com/d/1zpc8Q3OrjwGZnnv76iKmn0G4sV-ANVzA" alt="課程海報" class="dm-image">
         </div>
 
-        //Google地圖區塊
+        /* 4. Google 地圖區 */
         <div class="map-card">
             <label style="margin-bottom: 10px; display: block; font-weight: bold; color: #555;">📍 活動地點</label>
             <div class="map-container">
@@ -63,17 +63,18 @@
             </div>
         </div>
 
-        //注意事項區塊
+        /* 2. 文字說明 Card */
         <div class="info-card">
             <h3>📖 報名須知</h3>
             <p>感謝您的參與！請輸入手機號碼進行身分確認。如果是首次報名，請協助填寫姓名與介紹人。
 
-📅 活動日期：請由下方下拉選單選擇
+📅 活動日期：每週（一）
 ⏰ 活動時間：下午２點                
-📍 活動地點：請參考下方地圖導覽
+📍 活動地點：台北市中正區中山北路一段２號５樓５Ｂ－１
 ⚠️ 注意事項：報名完成後請截圖或下載 QR Code 憑證。</p>
         </div>
 
+         /* 3. 報名表單 Card */
         <div class="form-card">
             <h2>即刻報名</h2>
             <div id="msg"></div>
@@ -107,7 +108,7 @@
 
             <button onclick="submitRegistration()" class="submit-btn" id="btn-text">確認報名</button>
 
-           //顯示報到QRC
+            /* QR Code 結果顯示 */
             <div id="qrc-result">
                 <div id="capture-area">
                     <div id="qrcode"></div>
@@ -118,7 +119,7 @@
             </div>
         </div>
 
-        //客服line的連結
+         /* 客服ＬＩＮＥ連結 */
         <div style="text-align: center; margin-top: 20px; padding-bottom: 40px;">
             <a href="https://lin.ee/HlcqleG" target="_blank">
                 <img src="https://drive.google.com/thumbnail?id=1k0Hb8GJM3eje2mQYiT-mH-vWIFJexCaG&sz=w500" alt="客服中心" style="width: 100%; max-width: 400px;">
