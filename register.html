@@ -8,21 +8,39 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body { background-color: #f4f7f6; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
+        
         .container { width: 100%; max-width: 500px; padding: 15px; box-sizing: border-box; }
+
+        /* 1. DM 圖片區 */
         .dm-container { width: 100%; margin-bottom: 20px; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .dm-image { width: 100%; display: block; }
+
+        /* 2. 文字說明 Card */
         .info-card { background: #ffffff; padding: 25px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 20px; border-left: 6px solid #4299e1; }
         .info-card h3 { margin-top: 0; color: #2d3748; font-size: 1.2em; border-bottom: 1px solid #edf2f7; padding-bottom: 10px; }
         .info-card p { color: #4a5568; line-height: 1.8; font-size: 0.95em; white-space: pre-wrap; margin-bottom: 0; }
+
+        /* 3. 報名表單 Card */
         .form-card { background: white; padding: 30px; border-radius: 24px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); box-sizing: border-box; margin-bottom: 20px; }
         h2 { text-align: center; color: #2c3e50; margin-top: 0; margin-bottom: 25px; font-size: 1.5em; }
+
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568; font-size: 0.9em; }
-        input, select { width: 100%; padding: 14px 18px; border: 2px solid #edf2f7; border-radius: 14px; font-size: 16px; box-sizing: border-box; transition: all 0.3s; background-color: white; }
+        input, select { width: 100%; padding: 14px 18px; border: 2px solid #edf2f7; border-radius: 14px; font-size: 16px; box-sizing: border-box; transition: all 0.3s; }
         input:focus, select:focus { outline: none; border-color: #4299e1; box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15); }
         input:disabled { background-color: #f7fafc; color: #a0aec0; cursor: not-allowed; }
+
         .submit-btn { width: 100%; padding: 16px; background-color: #4299e1; color: white; border: none; border-radius: 14px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .submit-btn:hover { background-color: #3182ce; }
+
         #msg { color: #e53e3e; font-size: 0.85em; margin-bottom: 15px; text-align: center; min-height: 1.2em; font-weight: bold; }
+
+        /* 4. Google 地圖區 */
+        .map-card { background: white; padding: 15px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); margin-bottom: 40px; overflow: hidden; }
+        .map-container { position: relative; padding-bottom: 75%; height: 0; overflow: hidden; border-radius: 12px; }
+        .map-container iframe { position: absolute; top: 0; left: 0; width: 100% !important; height: 100% !important; border: 0; }
+
+        /* QR Code 結果顯示 */
         #qrc-result { display: none; margin-top: 25px; text-align: center; border-top: 2px dashed #eee; padding-top: 25px; }
         #capture-area { background: white; padding: 20px; border-radius: 18px; }
         #qrcode { display: flex; justify-content: center; margin-bottom: 15px; }
@@ -33,14 +51,17 @@
 
     <div class="container">
         <div class="dm-container">
-            <img src="https://drive.google.com/thumbnail?id=1k0Hb8GJM3eje2mQYiT-mH-vWIFJexCaG&sz=w1000" alt="課程海報" class="dm-image">
+            <img src="https://lh3.googleusercontent.com/d/1zpc8Q3OrjwGZnnv76iKmn0G4sV-ANVzA" alt="課程海報" class="dm-image">
         </div>
 
         <div class="info-card">
             <h3>📖 報名須知</h3>
-            <p>感謝您的參與！請選擇報名場次並輸入手機號碼進行確認。
+            <p>感謝您的參與！請輸入手機號碼進行身分確認。如果是首次報名，請協助填寫姓名與介紹人。
 
-⚠️ 注意事項：報名完成後請下載 QR Code 憑證於現場出示。</p>
+📅 活動日期：請由下方下拉選單選擇
+⏰ 活動時間：下午２點                
+📍 活動地點：請參考下方地圖導覽
+⚠️ 注意事項：報名完成後請截圖或下載 QR Code 憑證。</p>
         </div>
 
         <div class="form-card">
@@ -48,15 +69,15 @@
             <div id="msg"></div>
 
             <div class="form-group">
-                <label>選擇報名場次</label>
+                <label>選擇活動日期</label>
                 <select id="dateSelect">
-                    <option value="">載入場次中...</option>
+                    <option value="">載入日期中...</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label>手機號碼</label>
-                <input type="tel" id="phone" placeholder="輸入 10 碼手機自動查詢" oninput="autoCheck(this.value)" inputmode="numeric" pattern="[0-9]*">
+                <input type="tel" id="phone" placeholder="輸入 10 碼手機自動查詢" oninput="autoCheck(this.value)" inputmode="numeric">
             </div>
 
             <div class="form-group">
@@ -80,20 +101,32 @@
                 <div id="capture-area">
                     <div id="qrcode"></div>
                     <h3 id="display-name" style="margin: 10px 0;"></h3>
-                    <p id="display-date" style="font-size: 1em; font-weight: bold; color: #4299e1; margin-bottom: 5px;"></p>
                     <p style="font-size: 0.9em; color: #666;">您已完成報名，<br>請於報到時出示此圖掃瞄簽到</p>
                 </div>
                 <button class="download-btn" onclick="downloadImage()">下載報到憑證圖片</button>
             </div>
+        </div>
+
+        <div class="map-card">
+            <label style="margin-bottom: 10px; display: block; font-weight: bold; color: #555;">📍 活動地點</label>
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.647276601334!2d121.519626860567!3d25.0460416094302!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442a972222f6c45%3A0x79fd56661170c0b0!2zMTAw6Ie65YyX5biC5Lit5q2j5Y2A5Lit5bGx5YyX6Lev5LiA5q61MuiZn-S4reWkruWkp-aokw!5e0!3m2!1szh-TW!2stw!4v1771872010582!5m2!1szh-TW!2stw" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px; padding-bottom: 40px;">
+            <a href="https://lin.ee/HlcqleG" target="_blank">
+                <img src="https://drive.google.com/thumbnail?id=1k0Hb8GJM3eje2mQYiT-mH-vWIFJexCaG&sz=w500" alt="客服中心" style="width: 100%; max-width: 400px;">
+            </a>
         </div>
     </div>
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzzC1Z8g5EaXe-6KRK7eCNc7PMYbiqAhat13iG9EqlHiHx8kyjYcjxiic7rGkcoE9_6Gw/exec"; 
 
-        // 1. 初始化抓取日期與網址參數
+        // --- 初始化：讀取網址參數 & 抓取選單日期 ---
         window.onload = async function() {
-            await fetchDates(); // 優先抓取選單日期
+            await fetchDates(); // 先執行抓取日期
             
             const urlParams = new URLSearchParams(window.location.search);
             const refName = urlParams.get('ref');
@@ -109,7 +142,7 @@
             }
         };
 
-        // 2. 自動抓取 GAS 的日期選單
+        // 新增：抓取 GAS 日期選單函式
         async function fetchDates() {
             const dateSelect = document.getElementById('dateSelect');
             try {
@@ -127,20 +160,18 @@
                         dateSelect.appendChild(opt);
                     });
                 } else {
-                    dateSelect.innerHTML = '<option value="">目前無開放場次</option>';
+                    dateSelect.innerHTML = '<option value="">目前無開放日期</option>';
                 }
             } catch (e) {
-                dateSelect.innerHTML = '<option value="">連線場次失敗</option>';
+                dateSelect.innerHTML = '<option value="">讀取日期失敗</option>';
             }
         }
 
-        // 3. 自動偵測輸入長度與純數字限制
+        // 修改：自動偵測輸入長度（僅限數字且限制 10 碼）
         function autoCheck(val) {
             const phoneInput = document.getElementById('phone');
-            // 只保留數字
+            // 只保留數字，防止輸入符號
             let cleanVal = val.replace(/\D/g, '');
-            
-            // 限制 10 碼
             if (cleanVal.length > 10) cleanVal = cleanVal.slice(0, 10);
             phoneInput.value = cleanVal;
 
@@ -149,11 +180,10 @@
             } 
         }
 
-        // 4. 查詢學員身分
         async function checkUser(phone) {
             const selectedDate = document.getElementById('dateSelect').value;
-            if(!selectedDate) {
-                alert("請先選擇報名場次");
+            if (!selectedDate) {
+                alert("請先選擇報名日期場次");
                 return;
             }
 
@@ -190,11 +220,11 @@
                     document.getElementById('msg').innerText = "";
 
                     if (user.status === "已報名" || user.status === "已報到") {
-                        alert("您已經報名過本場次囉！");
+                        alert("您已經報名過囉！");
                         showQRCode(user.name, phone, selectedDate);
                     }
                 } else {
-                    document.getElementById('msg').innerText = "第一次報名，請填寫完整資訊";
+                    document.getElementById('msg').innerText = "您為第一次報名，請填寫完整資訊";
                     nameField.value = "";
                     nameField.disabled = false;
                     if (!refField.disabled) {
@@ -210,7 +240,6 @@
             }
         }
 
-        // 5. 提交報名
         async function submitRegistration() {
             const name = document.getElementById('name').value;
             const phone = document.getElementById('phone').value;
@@ -219,7 +248,7 @@
             const selectedDate = document.getElementById('dateSelect').value;
 
             if (!name || phone.length < 10 || !referrer || !introPhone || !selectedDate) {
-                alert("請填寫完整資訊");
+                alert("請填寫完整資訊（手機須為10碼）");
                 return;
             }
 
@@ -247,17 +276,19 @@
             }
         }
 
-        // 6. 產生 QR Code (加入日期顯示)
+        // 修改：產生 QR Code（傳入選擇的日期）
         function showQRCode(name, phone, date) {
             document.getElementById('qrc-result').style.display = 'block';
             document.getElementById('display-name').innerText = name;
-            document.getElementById('display-date').innerText = "場次日期：" + date.toString().replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
             document.getElementById('qrcode').innerHTML = "";
 
             const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            const rand1 = letters.charAt(Math.floor(Math.random() * letters.length)) + letters.charAt(Math.floor(Math.random() * letters.length));
+            const rand1 = letters.charAt(Math.floor(Math.random() * letters.length)) + 
+                          letters.charAt(Math.floor(Math.random() * letters.length));
             const rand2 = letters.charAt(Math.floor(Math.random() * letters.length));
             const timestamp = new Date().getTime().toString().slice(-4);
+            
+            // 使用選定的日期作為 QR Code 內容的一部分
             const content = `${rand1}${phone}${rand2}${date}${timestamp}`;
 
             new QRCode(document.getElementById("qrcode"), {
@@ -269,14 +300,12 @@
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
-        // 7. 下載憑證
         function downloadImage() {
             const area = document.getElementById('capture-area');
-            const name = document.getElementById('name').value;
-            html2canvas(area, { scale: 3 }).then(canvas => {
+            html2canvas(area, { scale: 2 }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `課程憑證_${name}.png`;
-                link.href = canvas.toDataURL("image/png");
+                link.download = `課程報名碼_${document.getElementById('name').value}.png`;
+                link.href = canvas.toDataURL();
                 link.click();
             });
         }
