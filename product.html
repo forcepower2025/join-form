@@ -3,93 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>動元活力蔬果餐包|GM-67</title>
+    <title>動元活力蔬果餐包 GM-67</title>
     <style>
-        /* 基礎樣式設定 */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        /* 基礎設定 */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
-            background-color: #f8f9f8;
+            background-color: #fff;
             color: #333;
-            line-height: 1.6;
         }
 
-        /* 外層容器：確保在各裝置上的間距與寬度 */
-        .wrapper {
+        /* 導覽列：放置 Logo */
+        nav {
             width: 100%;
-            max-width: 1200px; /* 電腦版最大寬度 */
+            padding: 15px 5%;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            height: 50px; /* 控制 Logo 高度 */
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* 主容器 */
+        .container {
+            width: 100%;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        /* 圖片容器 */
-        .image-card {
-            background: #fff;
-            border-radius: 12px;
+        /* 產品主圖卡片 */
+        .product-card {
+            margin-top: 20px;
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
 
-        /* RWD 圖片關鍵設定 */
-.responsive-img {
-    display: block;
-    width: 100%;
-    height: auto;
-/* 強化圖片清晰度 */
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: high-quality;
-}
+        .responsive-img {
+            display: block;
+            width: 100%;
+            height: auto;
+            image-rendering: -webkit-optimize-contrast; /* 優化清晰度 */
+        }
 
-        /* 文案樣式 */
-        .content-section {
-            padding: 30px;
+        /* 文案區塊 */
+        .content {
+            padding: 40px 20px;
             text-align: center;
         }
 
-        h1 {
-            color: #2e7d32; /* 品牌綠色 */
-            font-size: 1.8rem;
-            margin-bottom: 10px;
+        .content h1 {
+            color: #2e7d32;
+            font-size: 2rem;
+            margin-bottom: 15px;
         }
 
-        p {
+        .content p {
+            font-size: 1.1rem;
             color: #666;
-            font-size: 1rem;
+            letter-spacing: 1px;
         }
 
-        /* 手機版微調 */
+        /* 頁尾 */
+        footer {
+            background: #f4f4f4;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .footer-logo {
+            height: 40px;
+            margin-bottom: 20px;
+            filter: grayscale(0.5); /* 頁尾 Logo 稍微收斂一點 */
+        }
+
+        /* RWD 手機版調整 */
         @media (max-width: 768px) {
-            .wrapper {
-                padding: 10px;
-            }
-            .content-section {
-                padding: 20px 15px;
-            }
-            h1 {
-                font-size: 1.4rem;
-            }
+            .logo { height: 40px; }
+            .content h1 { font-size: 1.5rem; }
+            .container { padding: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="wrapper">
-        <div class="image-card">
-            <img src="https://lh3.googleusercontent.com/d/1FagClCsNPGstHBqCngz1w3LgrFvWvXFI=s0" 
-                 alt="動元活力 GM-67 產品詳情圖" 
-                 class="responsive-img">
-            
-            <div class="content-section">
-                
-            </div>
+    <nav>
+        <img src="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s0" alt="動元活力 Logo" class="logo">
+    </nav>
+
+    <div class="container">
+        <div class="product-card">
+            <img src="https://lh3.googleusercontent.com/d/1FagClCsNPGstHBqCngz1w3LgrFvWvXFI=s0" alt="GM-67 產品詳情" class="responsive-img">
         </div>
-    </div>
+
+    //    <div class="content">
+         //   <h1>動元活力 GM-67</h1>
+          //  <p>六大指標守護純淨營養，一包動元補足全家健康。</p>
+        </div>
+  //  </div>
+
+    <footer>
+        <img src="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s0" alt="動元活力" class="footer-logo">
+        <p>© 2026 動元活力國際 版權所有</p>
+    </footer>
 
 </body>
 </html>
