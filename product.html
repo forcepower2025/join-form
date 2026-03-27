@@ -37,11 +37,14 @@
         }
 
         /* RWD 圖片關鍵設定 */
-        .responsive-img {
-            display: block;
-            width: 100%;    /* 寬度隨容器 100% 縮放 */
-            height: auto;   /* 高度自動，維持比例不變形 */
-        }
+.responsive-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    /* 加入以下兩行優化畫質 */
+    image-rendering: -webkit-optimize-contrast; 
+    image-rendering: crisp-edges;
+}
 
         /* 文案樣式 */
         .content-section {
