@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>聯絡我們｜動元力國際</title>
-<link rel="stylesheet" href="./style.css" />
+
 <link rel="icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s32" type="image/x-icon">
 <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s180">
 <link rel="apple-touch-icon" sizes="152x152" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s152">
@@ -17,7 +17,6 @@
 <meta property="og:type" content="website">
 
 <style>
-    /* 基礎樣式設定 */
     * {
         box-sizing: border-box;
         margin: 0;
@@ -39,32 +38,29 @@
         text-decoration: none;
     }
 
-    /* ===== 第一層 Header（purna 形式） ===== */
-
+    /* ===== 第一層 Header ===== */
     #header-top .logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transform: translateX(2px);
-}
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: translateX(2px);
+    }
     
     #header-top {
-    position: sticky;
-    top: 0;
-    z-index: 3000;
-    height: 72px;
-    background: #e5e5e5;
+        position: sticky;
+        top: 0;
+        z-index: 3000;
+        height: 72px;
+        background: #e5e5e5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-    display: flex;
-    align-items: center;
-    justify-content: center; /* 用這個置中 */
-}
-
-#header-top .left-icon {
-    position: absolute;
-    left: 12px;
-}
-
+    #header-top .left-icon {
+        position: absolute;
+        left: 12px;
+    }
 
     #header-top .logo img {
         max-height: 42px;
@@ -72,8 +68,7 @@
         display: block;
     }
 
-    #header-top .hamburger,
-    #header-top .member {
+    #header-top .hamburger {
         color: #5b5959;
         font-size: 24px;
         cursor: pointer;
@@ -126,7 +121,7 @@
         top: 100%;
         left: 0;
         min-width: 190px;
-        background:  #a59e8a;
+        background: #a59e8a;
         box-shadow: 0 10px 30px rgba(0,0,0,0.12);
         opacity: 0;
         visibility: hidden;
@@ -154,73 +149,106 @@
         transform: translateY(0);
     }
 
-    /* 外層容器 */
-    .wrapper {
+    /* ===== 聯絡頁主區塊 ===== */
+    .contact-wrapper {
         width: 100%;
-        max-width: 1200px;
+        max-width: 1100px;
         margin: 0 auto;
-        padding: 20px;
+        padding: 40px 20px 20px;
     }
 
-    /* 圖片容器 */
-    .image-card {
-        position: relative;
+    .page-title {
+        text-align: center;
+        font-size: 32px;
+        color: #333;
+        margin-bottom: 30px;
+        letter-spacing: 2px;
+    }
+
+    .cards {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .card {
         background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: #a59e8a;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 600;
+        padding: 14px 20px;
+        letter-spacing: 1px;
+    }
+
+    .card-body {
+        padding: 24px;
+    }
+
+    .contact-item {
+        margin-bottom: 16px;
+        font-size: 17px;
+        color: #555;
+    }
+
+    .contact-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .contact-item strong {
+        display: inline-block;
+        min-width: 92px;
+        color: #333;
+    }
+
+    .map-box {
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        margin-bottom: 30px;
     }
 
-    /* 長圖錨點定位 */
-    .anchor-point {
-        position: absolute;
-        left: 0;
-        width: 1px;
-        height: 1px;
-        pointer-events: none;
-        scroll-margin-top: 150px;
-    }
-
-    /* RWD 圖片關鍵設定 */
-    .responsive-img {
-        display: block;
+    .map-box iframe {
         width: 100%;
-        height: auto;
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: high-quality;
+        height: 420px;
+        border: 0;
+        display: block;
     }
 
-    /* 文案樣式 */
-    .content-section {
-        padding: 30px;
-        text-align: center;
+    .social {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
     }
 
-    h1 {
-        color: #2e7d32;
-        font-size: 1.8rem;
-        margin-bottom: 10px;
+    .social a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 120px;
+        height: 48px;
+        padding: 0 20px;
+        border-radius: 999px;
+        background: #f2f2f2;
+        color: #333;
+        font-size: 16px;
+        transition: all 0.25s ease;
     }
 
-    p {
-        color: #666;
-        font-size: 1rem;
+    .social a:hover {
+        background: #a59e8a;
+        color: #fff;
     }
 
-    /* 頁尾樣式優化 */
     footer {
         background-color: #f4f4f4;
         padding: 40px 20px;
         text-align: center;
         margin-top: 50px;
-    }
-
-    .footer-logo {
-        height: 40px;
-        width: auto;
-        margin-bottom: 15px;
-        object-fit: contain;
     }
 
     /* ===== 手機選單 ===== */
@@ -273,16 +301,44 @@
         }
     }
 
-    /* 手機版微調 */
     @media (max-width: 768px) {
-        .wrapper {
-            padding: 10px;
+        .contact-wrapper {
+            padding: 24px 12px 12px;
         }
-        .content-section {
-            padding: 20px 15px;
+
+        .page-title {
+            font-size: 26px;
+            margin-bottom: 20px;
         }
-        h1 {
-            font-size: 1.4rem;
+
+        .card-header {
+            font-size: 18px;
+            padding: 12px 16px;
+        }
+
+        .card-body {
+            padding: 18px 16px;
+        }
+
+        .contact-item {
+            font-size: 16px;
+        }
+
+        .contact-item strong {
+            min-width: 78px;
+        }
+
+        .map-box iframe {
+            height: 320px;
+        }
+
+        .social {
+            gap: 12px;
+        }
+
+        .social a {
+            min-width: calc(50% - 6px);
+            font-size: 15px;
         }
     }
 </style>
@@ -296,10 +352,8 @@
     </div>
 
     <a class="logo" href="index.html">
-    <img src="https://lh3.googleusercontent.com/d/1pLB5WF3lUy3zz7gLvaTBKaARo6BULVZ-" alt="動元力國際">
-</a>
-
-
+        <img src="https://lh3.googleusercontent.com/d/1pLB5WF3lUy3zz7gLvaTBKaARo6BULVZ-" alt="動元力國際">
+    </a>
 </header>
 
 <!-- 第二層：主選單列 -->
@@ -358,46 +412,59 @@
 </div>
 
 <div class="contact-wrapper">
-<div class="card" id="map">
-<div class="row">
-<span class="badge">詳細地圖</span>
+    <h1 class="page-title">聯絡我們</h1>
 
-        <!-- 地圖 -->
-        <div class="map-box">
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.646041669516!2d121.5194629!3d25.046083499999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442a9261ac4f499%3A0x7cf3333a12bb5f49!2z5YuV5YWD5Yqb5ZyL6Zqb772c5Y-w5YyX54ef5qWt6JmV!5e0!3m2!1szh-TW!2stw!4v1774907941009!5m2!1szh-TW!2stw" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    <div class="cards">
+
+        <!-- Card 1 -->
+        <div class="card" id="contact">
+            <div class="card-header">台北營業處</div>
+            <div class="card-body">
+                <div class="contact-item">
+                    <strong>公司名稱</strong> 動元力國際｜台北營業處
+                </div>
+                <div class="contact-item">
+                    <strong>地址</strong> 100臺北市中正區中山北路一段2號5樓B-1
+                </div>
+            </div>
         </div>
 
-</div>
-</div>
-
-<div class="card" id="media">
-<div class="row">
-<span class="badge">社群媒體</span>  
-    <!-- 社群 -->
-        <div class="social">
-            <a href="#">Facebook</a>
-            <a href="#">Instagram</a>
-            <a href="#">LINE</a>
+        <!-- Card 2 -->
+        <div class="card" id="map">
+            <div class="card-header">詳細地圖</div>
+            <div class="card-body">
+                <div class="map-box">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.646041669516!2d121.5194629!3d25.046083499999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3442a9261ac4f499%3A0x7cf3333a12bb5f49!5YuV5YWD5Yqb5ZyL6Zqb772c5Y-w5YyX54ef5qWt6JmV!5e0!3m2!1szh-TW!2stw!4v1774907941009!5m2!1szh-TW!2stw" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
         </div>
+
+        <!-- Card 3 -->
+        <div class="card" id="social">
+            <div class="card-header">社群媒體</div>
+            <div class="card-body">
+                <div class="social">
+                    <a href="#">Facebook</a>
+                    <a href="#">Instagram</a>
+                    <a href="#">LINE</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
-</div>
-</div>
-  
 
 <footer>
     <p>© 2026 動元力國際 版權所有</p>
 </footer>
 
 <script>
-/* 手機漢堡開關 */
 const hamburger = document.getElementById("hamburger");
 const menuTitles = document.getElementById("menu-titles");
 
 hamburger.addEventListener("click", function () {
     menuTitles.classList.toggle("active");
 });
-
-
 </script>
 
 </body>
