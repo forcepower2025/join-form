@@ -2,141 +2,417 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>動元活力蔬果餐包 GM-67</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>動元活力蔬果餐包 GM-67</title>
 
-    <link rel="icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s32" type="image/x-icon">
+<link rel="icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s32" type="image/x-icon">
+<link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s180">
+<link rel="apple-touch-icon" sizes="152x152" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s152">
+<link rel="apple-touch-icon" sizes="180x180" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s180">
+<link rel="icon" sizes="192x192" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s192">
 
-    <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s180">
-    <link rel="apple-touch-icon" sizes="152x152" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s152">
-    <link rel="apple-touch-icon" sizes="180x180" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s180">
+<meta property="og:title" content="動元活力蔬果餐包 GM-67">
+<meta property="og:description" content="換個早餐 找回健康">
+<meta property="og:image" content="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s600">
+<meta property="og:type" content="website">
 
-    <link rel="icon" sizes="192x192" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s192">
+<style>
+    /* 基礎樣式設定 */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
-    <meta property="og:title" content="動元活力蔬果餐包 GM-67">
-    <meta property="og:description" content="換個早餐 找回健康">
-    <meta property="og:image" content="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s600">
-    <meta property="og:type" content="website">
+    html {
+        scroll-behavior: smooth;
+    }
 
-    <style>
-        /* 基礎樣式設定 */
-        * {
-            box-sizing: border-box;
-            margin: 0;
+    body {
+        font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
+        background-color: #f8f9f8;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    a {
+        text-decoration: none;
+    }
+
+    /* ===== 第一層 Header（purna 形式） ===== */
+
+    #header-top .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(1.8px);
+}
+    
+    #header-top {
+    position: sticky;
+    top: 0;
+    z-index: 3000;
+    height: 72px;
+    background: #e5e5e5;
+
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 用這個置中 */
+}
+
+#header-top .left-icon {
+    position: absolute;
+    left: 12px;
+}
+
+
+    #header-top .logo img {
+        max-height: 42px;
+        width: auto;
+        display: block;
+    }
+
+    #header-top .hamburger,
+    #header-top .member {
+        color: #5b5959;
+        font-size: 24px;
+        cursor: pointer;
+        line-height: 1;
+        user-select: none;
+    }
+
+    /* ===== 第二層 主選單 ===== */
+    #menu-titles {
+        letter-spacing: 1px;
+        position: sticky;
+        top: 72px;
+        z-index: 2900;
+        background: #a59e8a;
+        backdrop-filter: blur(6px);
+        border-top: 1px solid rgba(255,255,255,0.12);
+        border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .menu-inner {
+        max-width: 1280px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        padding: 0 20px;
+    }
+
+    .menu-item {
+        position: relative;
+    }
+
+    .menu-title {
+        display: block;
+        color: #fff;
+        font-size: 18px;
+        padding: 10px 14px;
+        white-space: nowrap;
+        transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    .menu-title:hover {
+        background: rgba(255,255,255,0.08);
+    }
+
+    .submenu-list {
+        list-style: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 190px;
+        background:  #a59e8a;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s ease;
+        z-index: 2950;
+    }
+
+    .submenu-list li a {
+        display: block;
+        color: #fff;
+        padding: 11px 16px;
+        font-size: 18px;
+        white-space: nowrap;
+        transition: background 0.25s ease;
+    }
+
+    .submenu-list li a:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    .menu-item:hover .submenu-list {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    /* 外層容器 */
+    .wrapper {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* 圖片容器 */
+    .image-card {
+        position: relative;
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+    }
+
+    /* 長圖錨點定位 */
+    .anchor-point {
+        position: absolute;
+        left: 0;
+        width: 1px;
+        height: 1px;
+        pointer-events: none;
+        scroll-margin-top: 150px;
+    }
+
+    /* RWD 圖片關鍵設定 */
+    .responsive-img {
+        display: block;
+        width: 100%;
+        height: auto;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: high-quality;
+    }
+
+    /* 文案樣式 */
+    .content-section {
+        padding: 30px;
+        text-align: center;
+    }
+
+    h1 {
+        color: #2e7d32;
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+    }
+
+    p {
+        color: #666;
+        font-size: 1rem;
+    }
+
+    /* 頁尾樣式優化 */
+    footer {
+        background-color: #f4f4f4;
+        padding: 40px 20px;
+        text-align: center;
+        margin-top: 50px;
+    }
+
+    .footer-logo {
+        height: 40px;
+        width: auto;
+        margin-bottom: 15px;
+        object-fit: contain;
+    }
+
+    /* ===== 手機選單 ===== */
+    @media (max-width: 992px) {
+        #header-top {
+            height: 64px;
+        }
+
+        #menu-titles {
+            top: 64px;
+        }
+
+        .menu-inner {
+            display: none;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
             padding: 0;
         }
 
-        body {
-            font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
-            background-color: #f8f9f8;
-            color: #333;
-            line-height: 1.6;
+        #menu-titles.active .menu-inner {
+            display: flex;
         }
 
-        /* 外層容器 */
-        .wrapper {
+        .menu-item {
             width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.12);
         }
 
-        /* 圖片容器 */
-        .image-card {
-            background: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
+        .menu-title {
+            padding: 14px 18px;
         }
 
-        /* RWD 圖片關鍵設定 */
-        .responsive-img {
+        .submenu-list {
+            position: static;
+            min-width: auto;
+            box-shadow: none;
+            opacity: 1;
+            visibility: visible;
+            transform: none;
+            display: none;
+        }
+
+        .menu-item.open .submenu-list {
             display: block;
-            width: 100%;
-            height: auto;
-            /* 強化圖片清晰度 */
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: high-quality;
         }
 
-        /* 文案樣式 */
+        .submenu-list li a {
+            padding: 11px 30px;
+        }
+    }
+
+    /* 手機版微調 */
+    @media (max-width: 768px) {
+        .wrapper {
+            padding: 10px;
+        }
         .content-section {
-            padding: 30px;
-            text-align: center;
+            padding: 20px 15px;
         }
-
         h1 {
-            color: #2e7d32;
-            font-size: 1.8rem;
-            margin-bottom: 10px;
+            font-size: 1.4rem;
         }
-
-        p {
-            color: #666;
-            font-size: 1rem;
-        }
-
-        /* 頁尾樣式優化 */
-        footer {
-            background-color: #f4f4f4;
-            padding: 40px 20px;
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        .footer-logo {
-            height: 40px; /* 固定 Logo 高度 */
-            width: auto;
-            margin-bottom: 15px;
-            object-fit: contain;
-        }
-
-        /* 手機版微調 */
-        @media (max-width: 768px) {
-            .wrapper {
-                padding: 10px;
-            }
-            .content-section {
-                padding: 20px 15px;
-            }
-            h1 {
-                font-size: 1.4rem;
-            }
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif; background-color: #f8f9f8; color: #333; line-height: 1.6; }
-        .wrapper { width: 100%; max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .image-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        .responsive-img { display: block; width: 100%; height: auto; image-rendering: -webkit-optimize-contrast; image-rendering: high-quality; }
-        .content-section { padding: 30px; text-align: center; }
-        h1 { color: #2e7d32; font-size: 1.8rem; margin-bottom: 10px; }
-        p { color: #666; font-size: 1rem; }
-        footer { background-color: #f4f4f4; padding: 40px 20px; text-align: center; margin-top: 50px; }
-        .footer-logo { height: 40px; width: auto; margin-bottom: 15px; object-fit: contain; }
-        @media (max-width: 768px) { .wrapper { padding: 10px; } .content-section { padding: 20px 15px; } h1 { font-size: 1.4rem; } }
-        
-    </style>
+    }
+</style>
 </head>
 <body>
 
-    <div class="wrapper">
-        <div class="image-card">
-            <img src="https://lh3.googleusercontent.com/d/1FagClCsNPGstHBqCngz1w3LgrFvWvXFI=s0" 
-                 alt="動元活力 GM-67 產品詳情圖" 
-                 class="responsive-img">
-            
-            <div class="content-section">
-                <h1></h1>
-                <p></p>
-            </div>
-        </div>
+<!-- 第一層：Header -->
+<header id="header-top">
+    <div class="left-icon">
+        <div class="hamburger" id="hamburger">☰</div>
     </div>
 
-    <footer>
-        <p>© 2026 動元力國際 版權所有</p>
-    </footer>
+    <a class="logo" href="index.html">
+    <img src="https://lh3.googleusercontent.com/d/1pLB5WF3lUy3zz7gLvaTBKaARo6BULVZ-" alt="動元力國際">
+</a>
+
+
+</header>
+
+<!-- 第二層：主選單列 -->
+<div id="menu-titles">
+    <div class="menu-inner">
+
+        <div class="menu-item">
+            <a class="menu-title" href="about.html">關於公司</a>
+            <ul class="submenu-list">
+                <li><a href="about.html#philosophy">▶企業理念</a></li>
+                <li><a href="about.html#origin">▶創業緣起</a></li>
+                <li><a href="about.html#trademark">▶註冊商標</a></li>
+                <li><a href="about.html#vision">▶品牌願景</a></li>
+                <li><a href="about.html#social">▶社會回饋</a></li>
+            </ul>
+        </div>
+
+        <div class="menu-item">
+            <a class="menu-title" href="product.html">產品介紹</a>
+            <ul class="submenu-list">
+                <li><a href="product.html#features">▶產品特色</a></li>
+                <li><a href="product.html#details">▶詳細說明</a></li>
+                <li><a href="product.html#target">▶適用對象</a></li>
+                <li><a href="product.html#guarantee">▶安心保證</a></li>
+                <li><a href="product.html#faq">▶常見問題</a></li>
+            </ul>
+        </div>
+
+        <div class="menu-item">
+            <a class="menu-title" href="business.html">事業合作</a>
+            <ul class="submenu-list">
+                <li><a href="business.html#model">▶經營模式</a></li>
+                <li><a href="business.html#partner">▶合作對象</a></li>
+                <li><a href="business.html#advantage">▶加入優勢</a></li>
+                <li><a href="business.html#opportunity">▶無限商機</a></li>
+            </ul>
+        </div>
+
+        <div class="menu-item">
+            <a class="menu-title" href="news.html">最新消息</a>
+        </div>
+
+        <div class="menu-item">
+            <a class="menu-title" href="contact.html">聯絡我們</a>
+        </div>
+
+        <div class="menu-item">
+            <a class="menu-title" href="apply.html" target="_blank" rel="noopener">加入我們</a>
+        </div>
+
+        <div class="menu-item">
+            <a class="menu-title" href="login.html" target="_blank" rel="noopener">登入會員</a>
+        </div>
+
+    </div>
+</div>
+
+<div class="wrapper">
+    <div class="image-card">
+
+        <!-- 長圖定位點 -->
+        <span id="features" class="anchor-point" style="top: 8%;"></span>
+        <span id="details" class="anchor-point" style="top: 28%;"></span>
+        <span id="target" class="anchor-point" style="top: 48%;"></span>
+        <span id="guarantee" class="anchor-point" style="top: 68%;"></span>
+        <span id="faq" class="anchor-point" style="top: 88%;"></span>
+
+        <img src="https://lh3.googleusercontent.com/d/1FagClCsNPGstHBqCngz1w3LgrFvWvXFI=s0" 
+             alt="動元活力 GM-67 產品詳情圖" 
+             class="responsive-img">
+        
+        <div class="content-section">
+            <h1></h1>
+            <p></p>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 動元力國際 版權所有</p>
+</footer>
+
+<script>
+/* 手機漢堡開關 */
+const hamburger = document.getElementById("hamburger");
+const menuTitles = document.getElementById("menu-titles");
+
+hamburger.addEventListener("click", function () {
+    menuTitles.classList.toggle("active");
+});
+
+/* 手機版子選單展開 */
+document.querySelectorAll(".menu-item > .menu-title").forEach(link => {
+    link.addEventListener("click", function(e) {
+        if (window.innerWidth <= 992) {
+            const parent = this.parentElement;
+            const submenu = parent.querySelector(".submenu-list");
+
+            if (submenu) {
+                e.preventDefault();
+
+                document.querySelectorAll(".menu-item").forEach(item => {
+                    if (item !== parent) {
+                        item.classList.remove("open");
+                    }
+                });
+
+                parent.classList.toggle("open");
+            }
+        }
+    });
+});
+</script>
 
 </body>
 </html>
