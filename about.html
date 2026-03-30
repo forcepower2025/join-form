@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>動元活力蔬果餐包 GM-67</title>
+<title>關於公司｜動元力國際</title>
 
 <link rel="icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s32" type="image/x-icon">
 <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s180">
@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s180">
 <link rel="icon" sizes="192x192" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s192">
 
-<meta property="og:title" content="動元活力蔬果餐包 GM-67">
+<meta property="og:title" content="關於公司｜動元力國際">
 <meta property="og:description" content="換個早餐 找回健康">
 <meta property="og:image" content="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s600">
 <meta property="og:type" content="website">
@@ -45,7 +45,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transform: translateX(1.8px);
+    transform: translateX(2px);
 }
     
     #header-top {
@@ -361,14 +361,14 @@
     <div class="image-card">
 
         <!-- 長圖定位點 -->
-        <span id="features" class="anchor-point" style="top: 8%;"></span>
-        <span id="details" class="anchor-point" style="top: 28%;"></span>
-        <span id="target" class="anchor-point" style="top: 48%;"></span>
-        <span id="guarantee" class="anchor-point" style="top: 68%;"></span>
-        <span id="faq" class="anchor-point" style="top: 88%;"></span>
-
-        <img src="https://lh3.googleusercontent.com/d/1FagClCsNPGstHBqCngz1w3LgrFvWvXFI=s0" 
-             alt="動元活力 GM-67 產品詳情圖" 
+        <span id="philosophy" class="anchor-point" style="top: 0%;"></span>
+        <span id="origin" class="anchor-point" style="top: 20%;"></span>
+        <span id="trademark" class="anchor-point" style="top: 40%;"></span>
+        <span id="vision" class="anchor-point" style="top: 60%;"></span>
+        <span id="social" class="anchor-point" style="top: 80%;"></span>
+       
+        <img src="https://lh3.googleusercontent.com/d/1R1W5ajWU-6kI7s-TtqLbIlXzMDE-LoJK=s0" 
+             alt="網址建置中" 
              class="responsive-img">
         
         <div class="content-section">
@@ -391,27 +391,7 @@ hamburger.addEventListener("click", function () {
     menuTitles.classList.toggle("active");
 });
 
-/* 手機版子選單展開 */
-document.querySelectorAll(".menu-item > .menu-title").forEach(link => {
-    link.addEventListener("click", function(e) {
-        if (window.innerWidth <= 992) {
-            const parent = this.parentElement;
-            const submenu = parent.querySelector(".submenu-list");
 
-            if (submenu) {
-                e.preventDefault();
-
-                document.querySelectorAll(".menu-item").forEach(item => {
-                    if (item !== parent) {
-                        item.classList.remove("open");
-                    }
-                });
-
-                parent.classList.toggle("open");
-            }
-        }
-    });
-});
 </script>
 
 </body>
