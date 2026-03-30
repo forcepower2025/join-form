@@ -40,7 +40,14 @@
     }
 
     /* ===== 第一層 Header（purna 形式） ===== */
-#header-top {
+
+    #header-top .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+    
+    #header-top {
     position: sticky;
     top: 0;
     z-index: 3000;
@@ -49,23 +56,14 @@
 
     display: flex;
     align-items: center;
-
-    position: relative; /* ← 重要 */
+    justify-content: center; /* 用這個置中 */
 }
 
 #header-top .left-icon {
     position: absolute;
     left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
 }
 
-#header-top .logo {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
 
     #header-top .logo img {
         max-height: 42px;
