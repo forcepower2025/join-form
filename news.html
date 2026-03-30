@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>最新消息｜動元力國際</title>
+
+<link rel="icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s32">
+
+<meta property="og:title" content="最新消息｜動元力國際">
+<meta property="og:description" content="官方最新公告與活動">
+<meta property="og:image" content="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s600">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+    font-family:"Microsoft JhengHei",sans-serif;
+    background:#f8f9f8;
+}
+
+a{text-decoration:none;}
+
+/* ===== Header ===== */
+#header-top {
+    position: sticky;
+    top: 0;
+    z-index: 3000;
+    height: 72px;
+    background: #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#header-top .left-icon {
+    position: absolute;
+    left: 12px;
+}
+
+#header-top .logo img {
+    max-height: 42px;
+}
+
+.hamburger {
+    font-size: 24px;
+    cursor: pointer;
+    color:#5b5959;
+}
+
+/* ===== 主選單 ===== */
+#menu-titles {
+    position: sticky;
+    top: 72px;
+    z-index: 2900;
+    background: #a59e8a;
+}
+
+.menu-inner {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+.menu-title {
+    color:#fff;
+    font-size:18px;
+    padding:10px 14px;
+}
+
+/* ===== 內容 ===== */
+.news-wrapper{
+    max-width:1100px;
+    margin:50px auto;
+    padding:20px;
+    text-align:center;
+}
+
+.news-title{
+    font-size:30px;
+    margin-bottom:30px;
+    letter-spacing:2px;
+}
+
+.fb-box{
+    background:#fff;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.05);
+    display:flex;
+    justify-content:center;
+}
+
+/* ===== 手機 ===== */
+@media(max-width:992px){
+    .menu-inner{
+        display:none;
+        flex-direction:column;
+    }
+
+    #menu-titles.active .menu-inner{
+        display:flex;
+    }
+
+    .menu-title{
+        display:block;
+        width:100%;
+        padding:14px 18px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Header -->
+<header id="header-top">
+    <div class="left-icon">
+        <div class="hamburger" id="hamburger">☰</div>
+    </div>
+
+    <a class="logo" href="index.html">
+        <img src="https://lh3.googleusercontent.com/d/1pLB5WF3lUy3zz7gLvaTBKaARo6BULVZ-">
+    </a>
+</header>
+
+<!-- 主選單 -->
+<div id="menu-titles">
+    <div class="menu-inner">
+        <a class="menu-title" href="about.html">關於公司</a>
+        <a class="menu-title" href="product.html">產品介紹</a>
+        <a class="menu-title" href="business.html">事業合作</a>
+        <a class="menu-title" href="news.html">最新消息</a>
+        <a class="menu-title" href="contact.html">聯絡我們</a>
+        <a class="menu-title" href="apply.html" target="_blank">加入我們</a>
+        <a class="menu-title" href="login.html" target="_blank">登入會員</a>
+    </div>
+</div>
+
+<!-- 內容 -->
+<div class="news-wrapper">
+    <div class="news-title">最新消息</div>
+
+    <div class="fb-box">
+
+        <!-- FB SDK -->
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+        src="https://connect.facebook.net/zh_TW/sdk.js#xfbml=1&version=v25.0&appId=APP_ID"></script>
+
+        <!-- FB Page -->
+        <div class="fb-page"
+            data-href="https://www.facebook.com/forcepower2026"
+            data-tabs="timeline"
+            data-width="500"
+            data-height=""
+            data-small-header="false"
+            data-adapt-container-width="true"
+            data-hide-cover="false"
+            data-show-facepile="true">
+            <blockquote cite="https://www.facebook.com/forcepower2026" class="fb-xfbml-parse-ignore">
+                <a href="https://www.facebook.com/forcepower2026">動元力國際</a>
+            </blockquote>
+        </div>
+
+    </div>
+</div>
+
+<footer style="text-align:center;padding:40px;">
+© 2026 動元力國際  版權所有
+</footer>
+
+<script>
+const hamburger = document.getElementById("hamburger");
+const menuTitles = document.getElementById("menu-titles");
+
+hamburger.addEventListener("click", function () {
+    menuTitles.classList.toggle("active");
+});
+</script>
+
+</body>
+</html>
