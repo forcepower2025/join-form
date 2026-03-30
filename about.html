@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>動元力國際</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>關於公司｜動元力國際</title>
 
 <style>
 * {
@@ -20,6 +20,7 @@ body {
   font-family: Arial, "Noto Sans TC", sans-serif;
   color: #333;
   background: #fff;
+  line-height: 1.8;
 }
 
 /* ===== Header ===== */
@@ -27,8 +28,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 2000;
-  background: rgba(255,255,255,0.96);
-  border-bottom: 1px solid #eaeaea;
+  background: #006400;
 }
 
 .header-inner {
@@ -43,7 +43,7 @@ body {
 
 .logo a {
   text-decoration: none;
-  color: #222;
+  color: #fff;
   font-size: 20px;
   font-weight: 700;
   white-space: nowrap;
@@ -72,15 +72,16 @@ body {
   border: none;
   cursor: pointer;
   text-decoration: none;
-  color: #333;
+  color: #fff;
   font-size: 15px;
   padding: 8px 0;
   font-family: inherit;
+  transition: color 0.25s ease;
 }
 
 .menu > li > a:hover,
 .menu > li > button:hover {
-  color: #2f7d32;
+  color: #ffd700;
 }
 
 /* ===== Dropdown ===== */
@@ -88,32 +89,43 @@ body {
   position: absolute;
   top: 100%;
   left: 0;
-  min-width: 180px;
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  min-width: 190px;
+  background: #006400;
+  border: none;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
   padding: 10px 0;
   list-style: none;
-  display: none;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease,
+    visibility 0.28s ease;
+  pointer-events: none;
 }
 
 .dropdown li a {
   display: block;
   padding: 10px 16px;
   text-decoration: none;
-  color: #444;
+  color: #fff;
   font-size: 14px;
   white-space: nowrap;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 .dropdown li a:hover {
-  background: #f6f6f6;
-  color: #2f7d32;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffd700;
 }
 
-/* 桌機 hover 顯示 */
 .menu > li.has-dropdown:hover .dropdown {
-  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 /* ===== Mobile Button ===== */
@@ -122,37 +134,63 @@ body {
   background: none;
   border: none;
   font-size: 26px;
+  color: #fff;
   cursor: pointer;
 }
 
-/* ===== Demo Content ===== */
+/* ===== Banner ===== */
 .page-banner {
-  height: 280px;
-  background: #f5f5f5;
+  width: 100%;
+  height: 320px;
+  background: #f4f4f4;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  padding: 20px;
 }
 
 .page-banner h1 {
   font-size: 40px;
+  color: #222;
 }
 
+/* ===== Section ===== */
 .section {
   max-width: 1100px;
   margin: 0 auto;
   padding: 80px 20px;
   border-bottom: 1px solid #f0f0f0;
+  scroll-margin-top: 100px;
 }
 
 .section h2 {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   font-size: 32px;
+  text-align: center;
+}
+
+.section img {
+  width: 100%;
+  max-width: 760px;
+  display: block;
+  margin: 0 auto 24px;
+  border-radius: 10px;
 }
 
 .section p {
+  margin: 0 auto;
+  max-width: 760px;
+  text-align: center;
   color: #666;
-  line-height: 1.8;
+}
+
+/* ===== Footer ===== */
+.footer {
+  padding: 30px 20px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
 }
 
 /* ===== Mobile ===== */
@@ -184,7 +222,7 @@ body {
 
   .menu > li {
     width: 100%;
-    border-top: 1px solid #f2f2f2;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .menu > li > a,
@@ -198,29 +236,52 @@ body {
   }
 
   .menu > li.has-dropdown:hover .dropdown {
-    display: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    pointer-events: none;
   }
 
   .dropdown {
     position: static;
-    display: none;
-    border: none;
+    min-width: auto;
+    display: block;
     box-shadow: none;
     padding: 0 0 8px 0;
     margin-bottom: 10px;
-    background: transparent;
+    background: #006400;
+
+    opacity: 0;
+    visibility: hidden;
+    max-height: 0;
+    overflow: hidden;
+    transform: none;
+    transition:
+      opacity 0.25s ease,
+      max-height 0.3s ease,
+      visibility 0.25s ease;
+    pointer-events: none;
   }
 
   .menu > li.open .dropdown {
-    display: block;
+    opacity: 1;
+    visibility: visible;
+    max-height: 500px;
+    pointer-events: auto;
   }
 
   .dropdown li a {
+    color: #fff;
     padding: 10px 0 10px 16px;
   }
 
+  .dropdown li a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffd700;
+  }
+
   .page-banner {
-    height: 200px;
+    height: 220px;
   }
 
   .page-banner h1 {
@@ -229,6 +290,7 @@ body {
 
   .section {
     padding: 60px 16px;
+    scroll-margin-top: 90px;
   }
 
   .section h2 {
@@ -237,6 +299,7 @@ body {
 }
 </style>
 </head>
+
 <body>
 
 <header class="site-header">
@@ -254,11 +317,11 @@ body {
         <li class="has-dropdown">
           <a href="about.html">關於公司</a>
           <ul class="dropdown">
-            <li><a href="about.html#philosophy">企業理念</a></li>
-            <li><a href="about.html#origin">創業緣起</a></li>
-            <li><a href="about.html#trademark">註冊商標</a></li>
-            <li><a href="about.html#vision">品牌願景</a></li>
-            <li><a href="about.html#social">社會回饋</a></li>
+            <li><a href="#philosophy">企業理念</a></li>
+            <li><a href="#origin">創業緣起</a></li>
+            <li><a href="#trademark">註冊商標</a></li>
+            <li><a href="#vision">品牌願景</a></li>
+            <li><a href="#social">社會回饋</a></li>
           </ul>
         </li>
 
@@ -296,38 +359,45 @@ body {
   </div>
 </header>
 
-<!-- 示範內容 -->
 <section class="page-banner">
   <h1>關於公司</h1>
 </section>
 
 <section id="philosophy" class="section">
   <h2>企業理念</h2>
+  <img src="YOUR_IMAGE_URL_1" alt="企業理念">
   <p>內容建置中，敬請期待。</p>
 </section>
 
 <section id="origin" class="section">
   <h2>創業緣起</h2>
+  <img src="YOUR_IMAGE_URL_2" alt="創業緣起">
   <p>內容建置中，敬請期待。</p>
 </section>
 
 <section id="trademark" class="section">
   <h2>註冊商標</h2>
+  <img src="YOUR_IMAGE_URL_3" alt="註冊商標">
   <p>內容建置中，敬請期待。</p>
 </section>
 
 <section id="vision" class="section">
   <h2>品牌願景</h2>
+  <img src="YOUR_IMAGE_URL_4" alt="品牌願景">
   <p>內容建置中，敬請期待。</p>
 </section>
 
 <section id="social" class="section">
   <h2>社會回饋</h2>
+  <img src="YOUR_IMAGE_URL_5" alt="社會回饋">
   <p>內容建置中，敬請期待。</p>
 </section>
 
+<footer class="footer">
+  © 動元力國際 FORCE POWER
+</footer>
+
 <script>
-/* 手機選單開關 */
 const menuToggle = document.getElementById("menuToggle");
 const mainNav = document.getElementById("mainNav");
 
@@ -335,7 +405,6 @@ menuToggle.addEventListener("click", () => {
   mainNav.classList.toggle("active");
 });
 
-/* 手機版 dropdown 展開 */
 document.querySelectorAll(".has-dropdown > a").forEach(link => {
   link.addEventListener("click", function(e) {
     if (window.innerWidth <= 992) {
