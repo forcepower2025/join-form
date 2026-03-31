@@ -322,18 +322,7 @@
         menuTitles.classList.toggle("active");
     });
 
-    document.querySelectorAll(".menu-item > .menu-title").forEach(title => {
-        title.addEventListener("click", function(e) {
-            if (window.innerWidth <= 992) {
-                const parent = this.parentElement;
-                const submenu = parent.querySelector(".submenu-list");
-                if (submenu) {
-                    e.preventDefault();
-                    parent.classList.toggle("open");
-                }
-            }
-        });
-    });
+
 </script>
 </body>
 </html>
