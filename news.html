@@ -12,7 +12,7 @@
 <link rel="icon" sizes="192x192" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s192">
 
 <meta property="og:title" content="最新公告｜動元力國際">
-<meta property="og:description" content="官方公告與活動消息">
+<meta property="og:description" content="官方公告與最新消息">
 <meta property="og:image" content="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s600">
 <meta property="og:type" content="website">
 
@@ -148,6 +148,268 @@
         visibility: visible;
         transform: translateY(0);
     }
+
+    /* ===== 聯絡頁主區塊 ===== */
+    .contact-wrapper {
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px 20px 20px;
+    }
+
+    .page-title {
+        text-align: center;
+        font-size: 32px;
+        color: #333;
+        margin-bottom: 30px;
+        letter-spacing: 2px;
+    }
+
+    .cards {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: #a59e8a;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 600;
+        padding: 14px 20px;
+        letter-spacing: 1px;
+    }
+
+    .card-body {
+        padding: 24px;
+    }
+
+    .contact-item {
+        margin-bottom: 16px;
+        font-size: 17px;
+        color: #555;
+    }
+
+    .contact-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .contact-item strong {
+        display: inline-block;
+        min-width: 92px;
+        color: #333;
+    }
+
+    .map-box {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .map-box iframe {
+        width: 100%;
+        height: 420px;
+        border: 0;
+        display: block;
+    }
+
+    .social {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .social a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 120px;
+        height: 48px;
+        padding: 0 20px;
+        border-radius: 999px;
+        background: #f2f2f2;
+        color: #333;
+        font-size: 16px;
+        transition: all 0.25s ease;
+    }
+
+    .social a:hover {
+        background: #a59e8a;
+        color: #fff;
+    }
+
+    footer {
+        background-color: #f4f4f4;
+        padding: 40px 20px;
+        text-align: center;
+        margin-top: 50px;
+    }
+
+    /* ===== 手機選單 ===== */
+    @media (max-width: 992px) {
+        #header-top {
+            height: 64px;
+        }
+
+        #menu-titles {
+            top: 64px;
+        }
+
+        .menu-inner {
+            display: none;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            padding: 0;
+        }
+
+        #menu-titles.active .menu-inner {
+            display: flex;
+        }
+
+        .menu-item {
+            width: 100%;
+            border-top: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .menu-title {
+            padding: 14px 18px;
+        }
+
+        .submenu-list {
+            position: static;
+            min-width: auto;
+            box-shadow: none;
+            opacity: 1;
+            visibility: visible;
+            transform: none;
+            display: none;
+        }
+
+        .menu-item.open .submenu-list {
+            display: block;
+        }
+
+        .submenu-list li a {
+            padding: 11px 30px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .contact-wrapper {
+            padding: 24px 12px 12px;
+        }
+
+        .page-title {
+            font-size: 26px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            font-size: 18px;
+            padding: 12px 16px;
+        }
+
+        .card-body {
+            padding: 18px 16px;
+        }
+
+        .contact-item {
+            font-size: 16px;
+        }
+
+        .contact-item strong {
+            min-width: 78px;
+        }
+
+        .map-box iframe {
+            height: 320px;
+        }
+
+        .social {
+            gap: 12px;
+        }
+
+        .social a {
+            min-width: calc(50% - 6px);
+            font-size: 15px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<!-- 第一層：Header -->
+<header id="header-top">
+    <div class="left-icon">
+        <div class="hamburger" id="hamburger">☰</div>
+    </div>
+
+    <a class="logo" href="index.html">
+        <img src="https://lh3.googleusercontent.com/d/1pLB5WF3lUy3zz7gLvaTBKaARo6BULVZ-" alt="動元力國際">
+    </a>
+</header>
+
+<!-- 第二層：主選單列 -->
+<div id="menu-titles">
+    <div class="menu-inner">
+
+        <div class="menu-item">
+            <a class="menu-title" href="about.html">關於公司</a>
+            <ul class="submenu-list">
+                <li><a href="about.html#philosophy">▶企業理念</a></li>
+                <li><a href="about.html#origin">▶創業緣起</a></li>
+                <li><a href="about.html#trademark">▶註冊商標</a></li>
+                <li><a href="about.html#vision">▶品牌願景</a></li>
+                <li><a href="about.html#social">▶社會回饋</a></li>
+            </ul>
+        </div>
+
+        <div class="menu-item">
+            <a class="menu-title" href="product.html">產品介紹</a>
+            <ul class="submenu-list">
+                <li><a href="product.html#features">▶產品特色</a></li>
+                <li><a href="product.html#details">▶詳細說明</a></li>
+                <li><a href="product.html#target">▶適用對象</a></li>
+                <li><a href="product.html#guarantee">▶安心保證</a></li>
+                <li><a href="product.html#faq">▶常見問題</a></li>
+            </ul>
+        </div>
+
+        <div class="menu-item">
+            <a class="menu-title" href="business.html">事業合作</a>
+            <ul class="submenu-list">
+                <li><a href="business.html#model">▶經營模式</a></li>
+                <li><a href="business.html#partner">▶合作對象</a></li>
+                <li><a href="business.html#advantage">▶加入優勢</a></li>
+                <li><a href="business.html#opportunity">▶無限商機</a></li>
+            </ul>
+        </div>
+
+        <div class="menu-item">
+            <a class="menu-title" href="news.html">最新公告</a>
+        </div>
+
+        <div class="menu-item">
+            <a class="menu-title" href="contact.html">聯絡我們</a>
+        </div>
+
+        <div class="menu-item">
+            <a class="menu-title" href="apply.html" target="_blank" rel="noopener">加入我們</a>
+        </div>
+
+        <div class="menu-item">
+            <a class="menu-title" href="login.html" target="_blank" rel="noopener">登入會員</a>
+        </div>
+
+    </div>
+</div>
 
     /* ===== 主區塊 ===== */
     .news-wrapper{
