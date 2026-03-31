@@ -1,115 +1,211 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>動元力國際｜早餐聯盟健康共享平台</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>動元力國際</title>
 
-<!-- ⭐ 這一行就是搜尋顯示的簡介 -->
-<meta name="description" content="動元力國際官方網站｜提供經銷商加盟方案，健康蔬果餐包：打造共享經濟與健康生活的新模式。">
-  
 <style>
-body{
-  margin:0;
-  font-family:sans-serif;
-  background:#fff;
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:"Microsoft JhengHei",sans-serif;overflow-x:hidden;}
+
+/* ===== 開場圖 ===== */
+#splash {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #fff;
 }
 
-/* 圖片容器 */
-.section{
-  width:100%;
+#splash img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
 }
 
-/* 所有圖片自適應 */
-.section img{
-  width:100%;
-  height:auto;
-  display:block;
+.fade-out{
+    animation: fadeOut 1s forwards;
 }
 
-/* 桌機時可限制最大寬度，避免太寬 */
-.wrapper{
-  max-width:1200px;
-  margin:auto;
+@keyframes fadeOut{
+    to{opacity:0;visibility:hidden;}
 }
+
+/* ===== Header ===== */
+#header-top{
+    position:sticky;
+    top:0;
+    z-index:3000;
+    height:72px;
+    background:#e5e5e5;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.left-icon{
+    position:absolute;
+    left:12px;
+}
+
+.logo img{
+    height:42px;
+}
+
+/* ===== 選單 ===== */
+#menu-titles{
+    position:sticky;
+    top:72px;
+    z-index:2900;
+    background:#a59e8a;
+}
+
+.menu-inner{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+}
+
+.menu-title{
+    color:#fff;
+    padding:10px 14px;
+}
+
+/* ===== 輪播 ===== */
+.hero{
+    position:relative;
+    width:100%;
+    height:80vh;
+    overflow:hidden;
+}
+
+.slide{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transition:opacity 1s;
+}
+
+.slide img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.slide.active{
+    opacity:1;
+}
+
+/* 左右按鈕 */
+.arrow{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:30px;
+    color:#fff;
+    background:rgba(0,0,0,0.3);
+    padding:10px;
+    cursor:pointer;
+}
+
+.arrow.left{left:10px;}
+.arrow.right{right:10px;}
+
 </style>
 </head>
 
 <body>
-<div class="wrapper">
 
-<!-- ===== 純圖片(範例) ===== -->
-  <div class="section">
-    <img src="https://drive.google.com/thumbnail?id=檔案ID&sz=w1600" alt="">
+<!-- ===== 開場 ===== -->
+<div id="splash">
+    <picture>
+        <source media="(max-width:768px)" 
+        srcset="https://lh3.googleusercontent.com/d/1DOC0H23-wYiFrpwLo2bAQYMj-LW79fTr">
+        <img src="https://lh3.googleusercontent.com/d/13vmEyVCkGkC3FIMphgCCqUPeq3LX-r2x">
+    </picture>
 </div>
 
-  <!-- ===== 純圖片-活力動元早餐 ===== -->
-  <div class="section">
-    <img src="https://drive.google.com/thumbnail?id=12UflOq_ij9lENH_hY0GpAdTRfDLIWegY&sz=w1600" alt=""><br>
-  </div>
-
-  <!-- ===== 純圖片-健康早餐579 ===== -->
-  <div class="section">
-    <img src="https://drive.google.com/thumbnail?id=16Vomz4ouRrlpcUWghpFCfESJMTvVv0F3&sz=w1600" alt=""><br>
-  </div>
-  
-<!-- ===== 純圖片(創業緣起一) ===== -->
-  <div class="section">
-    <img src="https://drive.google.com/thumbnail?id=1NVPpSJhhgUf5WZm8njJkR5xiRgE2f1Pe&sz=w1600" alt=""><br>
-</div>
-
-<!-- ===== 純圖片(品牌商標) ===== -->
-  <div class="section">
-    <img src="https://drive.google.com/thumbnail?id=1nQh69LrtJJjIw50O9Cc1E2OE4xfwTJyf&sz=w1600" alt=""><br>
-</div>
-
-<!-- ===== 純圖片(企業理念) ===== -->
-  <div class="section">
-    <img src="https://drive.google.com/thumbnail?id=1y81KHYkMbLaLvXKGfmDKjoawn17jR2Ds&sz=w1600" alt=""><br>
-</div>
-
-<!-- ===== 純圖片(產品特色) ===== -->
-  <div class="section">
-    <img src="https://drive.google.com/thumbnail?id=1rBKWENKFkRx13YUKQgtMbUuZo3i2FUrh&sz=w1600" alt=""><br>
-</div>
-
-<!-- ===== 純圖片(連鎖企業) ===== -->
-  <div class="section">
-    <img src="https://drive.google.com/thumbnail?id=1s1W4ImS3lO5GoZPwrUl-iVoBOJXVAX33&sz=w1600" alt=""><br>
-</div>
-
-<!-- ===== 純圖片(範例) ===== -->
-  <div class="section">
-    <img src="https://drive.google.com/thumbnail?id=檔案ID&sz=w1600" alt="">
-</div>
-
-  <!-- ===== 產品圖片區 ===== -->
-  <div class="section">
-      <img src="https://drive.google.com/thumbnail?id=1_7Z362FkftTqY8-p7n9gWDZ5rNK3vLAE&sz=w1600" alt="">
+<!-- Header -->
+<header id="header-top">
+    <div class="left-icon">
+        <div id="hamburger">☰</div>
     </div>
-
-    <!-- ===== 產品說明 ===== -->
-  <div class="section">
-      <img src="https://drive.google.com/thumbnail?id=1ui2RmxJ_0m_0quSPEDQk8LOppfuoQM1Z&sz=w1600" alt="">
-    </div>
-
-  <!-- ===== 退換貨政策 ===== -->
-  <div class="section">
-      <img src="https://drive.google.com/thumbnail?id=1bdidoRkUzaA6j7wnFHhf5bZLaAv6XWZB&sz=w1600" alt="">
-    </div>
-  
-    <!-- ===== 網址建置中 ===== -->
-  <div class="section">
-      <img src="https://drive.google.com/thumbnail?id=1V27lAYHYOWsYx2nn1N_yLlQr5sutCMDO&sz=w1600" alt="">
-     </div>
-
-  <!-- ===== 點擊跳轉外部網站(範例) ===== -->
-  <div class="section">
-    <a href="網址" target="_blank">
-      <img src="https://drive.google.com/thumbnail?id=檔案ID&sz=w1600" alt="">
+    <a class="logo" href="#">
+        <img src="https://lh3.googleusercontent.com/d/1pLB5WF3lUy3zz7gLvaTBKaARo6BULVZ-">
     </a>
-  </div>
+</header>
+
+<!-- 選單 -->
+<div id="menu-titles">
+    <div class="menu-inner">
+        <a class="menu-title" href="about.html">關於公司</a>
+        <a class="menu-title" href="product.html">產品介紹</a>
+        <a class="menu-title" href="business.html">事業合作</a>
+        <a class="menu-title" href="news.html">最新消息</a>
+        <a class="menu-title" href="contact.html">聯絡我們</a>
+        <a class="menu-title" href="apply.html" target="_blank">加入我們</a>
+        <a class="menu-title" href="login.html" target="_blank">登入會員</a>
+    </div>
+</div>
+
+<!-- ===== 輪播 ===== -->
+<div class="hero">
+
+    <div class="slide active">
+        <img src="https://lh3.googleusercontent.com/d/19AGk_oMvKPdF45nN0N_NlRQOCARsNeHs">
+    </div>
+
+    <div class="slide">
+        <img src="https://lh3.googleusercontent.com/d/17-QAD7TE_7rX8FPSbcnzMSYzXWiZg4dZ">
+    </div>
+
+    <div class="slide">
+        <img src="https://lh3.googleusercontent.com/d/1rtHyeCgFksEemspdWXtfwALyfXVc8WHC">
+    </div>
+
+    <div class="slide">
+        <img src="https://lh3.googleusercontent.com/d/1xr89uvt3fWonS9bB-GIKl5Xcvf9JYj5a">
+    </div>
+
+    <div class="slide">
+        <img src="https://lh3.googleusercontent.com/d/1b_UaS9fiQIvctOFwSUvJmJw23ARv431B">
+    </div>
+
+    <div class="arrow left" onclick="prevSlide()">‹</div>
+    <div class="arrow right" onclick="nextSlide()">›</div>
 
 </div>
+
+<script>
+
+/* ===== 開場淡出 ===== */
+setTimeout(()=>{
+    document.getElementById("splash").classList.add("fade-out");
+},2000);
+
+/* ===== 輪播 ===== */
+let index=0;
+const slides=document.querySelectorAll(".slide");
+
+function showSlide(i){
+    slides.forEach(s=>s.classList.remove("active"));
+    slides[i].classList.add("active");
+}
+
+function nextSlide(){
+    index=(index+1)%slides.length;
+    showSlide(index);
+}
+
+function prevSlide(){
+    index=(index-1+slides.length)%slides.length;
+    showSlide(index);
+}
+
+/* 自動播放 */
+setInterval(nextSlide,4000);
+
+</script>
+
 </body>
 </html>
