@@ -5,47 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>動元力國際｜早餐聯盟健康共享平台</title>
 
-<link rel="icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s32" type="image/x-icon">
-<link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s180">
-<link rel="apple-touch-icon" sizes="152x152" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s152">
-<link rel="apple-touch-icon" sizes="180x180" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s180">
-<link rel="icon" sizes="192x192" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s192">
-
-<meta property="og:title" content="動元力國際｜早餐聯盟健康共享平台">
-<meta property="og:description" content="動元力國際官方網站｜提供經銷商加盟方案，健康蔬果餐包：打造共享經濟與健康生活的新模式。">
-<meta property="og:image" content="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s600">
-<meta property="og:type" content="website">
-
 <style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    html {
-        scroll-behavior: smooth;
-    }
-
+    /* 基礎設定 */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
         font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
         background-color: #f8f9f8;
         color: #333;
         line-height: 1.6;
+        overflow-x: hidden;
     }
+    a { text-decoration: none; }
 
-    a {
-        text-decoration: none;
+    /* ===== 開場動畫樣式 ===== */
+    #splash {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: #fff;
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.8s ease, visibility 0.8s ease;
     }
+    #splash img { width: 100%; height: 100%; object-fit: cover; }
+    #splash.fade-out { opacity: 0; visibility: hidden; }
 
     /* ===== 第一層 Header ===== */
-    #header-top .logo {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transform: translateX(2px);
-    }
-    
     #header-top {
         position: sticky;
         top: 0;
@@ -56,442 +44,188 @@
         align-items: center;
         justify-content: center;
     }
-
-    #header-top .left-icon {
-        position: absolute;
-        left: 12px;
-    }
-
-    #header-top .logo img {
-        max-height: 42px;
-        width: auto;
-        display: block;
-    }
-
-    #header-top .hamburger {
-        color: #5b5959;
-        font-size: 24px;
-        cursor: pointer;
-        line-height: 1;
-        user-select: none;
-    }
+    #header-top .left-icon { position: absolute; left: 12px; }
+    #header-top .logo img { max-height: 42px; width: auto; display: block; }
+    #header-top .hamburger { color: #5b5959; font-size: 24px; cursor: pointer; }
 
     /* ===== 第二層 主選單 ===== */
     #menu-titles {
-        letter-spacing: 1px;
         position: sticky;
         top: 72px;
         z-index: 2900;
         background: #a59e8a;
         backdrop-filter: blur(6px);
-        border-top: 1px solid rgba(255,255,255,0.12);
         border-bottom: 1px solid rgba(255,255,255,0.12);
     }
-
     .menu-inner {
         max-width: 1280px;
         margin: 0 auto;
         display: flex;
-        align-items: center;
         justify-content: center;
-        gap: 30px;
-        padding: 0 20px;
+        gap: 20px;
     }
-
-    .menu-item {
-        position: relative;
-    }
-
+    .menu-item { position: relative; }
     .menu-title {
         display: block;
         color: #fff;
-        font-size: 18px;
-        padding: 10px 14px;
-        white-space: nowrap;
-        transition: background 0.25s ease, color 0.25s ease;
+        padding: 12px 15px;
+        font-size: 17px;
     }
-
-    .menu-title:hover {
-        background: rgba(255,255,255,0.08);
-    }
-
     .submenu-list {
         list-style: none;
         position: absolute;
-        top: 100%;
-        left: 0;
-        min-width: 190px;
+        top: 100%; left: 0;
         background: #a59e8a;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        min-width: 160px;
+        opacity: 0; visibility: hidden;
+        transition: 0.3s;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .menu-item:hover .submenu-list { opacity: 1; visibility: visible; }
+    .submenu-list li a { display: block; color: #fff; padding: 10px 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+    /* ===== 輪播圖樣式 ===== */
+    .hero {
+        position: relative;
+        width: 100%;
+        height: 60vh; /* 調整高度 */
+        background: #000;
+        overflow: hidden;
+    }
+    .slide {
+        position: absolute;
+        width: 100%; height: 100%;
         opacity: 0;
-        visibility: hidden;
-        transform: translateY(10px);
-        transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s ease;
-        z-index: 2950;
+        transition: opacity 1s ease-in-out;
     }
+    .slide.active { opacity: 1; }
+    .slide img { width: 100%; height: 100%; object-fit: cover; }
 
-    .submenu-list li a {
-        display: block;
-        color: #fff;
-        padding: 11px 16px;
-        font-size: 18px;
-        white-space: nowrap;
-        transition: background 0.25s ease;
+    .arrow {
+        position: absolute;
+        top: 50%; transform: translateY(-50%);
+        background: rgba(0,0,0,0.3);
+        color: #fff; font-size: 40px;
+        padding: 10px 20px; cursor: pointer; z-index: 10;
+        user-select: none;
     }
+    .arrow.left { left: 20px; }
+    .arrow.right { right: 20px; }
 
-    .submenu-list li a:hover {
-        background: rgba(255,255,255,0.1);
-    }
-
-    .menu-item:hover .submenu-list {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-
-    /* ===== 聯絡頁主區塊 ===== */
-    .contact-wrapper {
-        width: 100%;
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 40px 20px 20px;
-    }
-
-    .page-title {
-        text-align: center;
-        font-size: 32px;
-        color: #333;
-        margin-bottom: 30px;
-        letter-spacing: 2px;
-    }
-
-    .cards {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-
-    .card {
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        overflow: hidden;
-    }
-
-    .card-header {
-        background: #a59e8a;
-        color: #fff;
-        font-size: 20px;
-        font-weight: 600;
-        padding: 14px 20px;
-        letter-spacing: 1px;
-    }
-
-    .card-body {
-        padding: 24px;
-    }
-
-    .contact-item {
-        margin-bottom: 16px;
-        font-size: 17px;
-        color: #555;
-    }
-
-    .contact-item:last-child {
-        margin-bottom: 0;
-    }
-
-    .contact-item strong {
-        display: inline-block;
-        min-width: 92px;
-        color: #333;
-    }
-
-    .map-box {
-        border-radius: 12px;
-        overflow: hidden;
-    }
-
-    .map-box iframe {
-        width: 100%;
-        height: 420px;
-        border: 0;
-        display: block;
-    }
-
-    .social {
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-
-    .social a {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 120px;
-        height: 48px;
-        padding: 0 20px;
-        border-radius: 999px;
-        background: #f2f2f2;
-        color: #333;
-        font-size: 16px;
-        transition: all 0.25s ease;
-    }
-
-    .social a:hover {
-        background: #a59e8a;
-        color: #fff;
-    }
-
-    footer {
-        background-color: #f4f4f4;
-        padding: 40px 20px;
-        text-align: center;
-        margin-top: 50px;
-    }
-
-    /* ===== 手機選單 ===== */
+    /* 手機版 RWD */
     @media (max-width: 992px) {
-        #header-top {
-            height: 64px;
-        }
-
-        #menu-titles {
-            top: 64px;
-        }
-
-        .menu-inner {
-            display: none;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 0;
-            padding: 0;
-        }
-
-        #menu-titles.active .menu-inner {
-            display: flex;
-        }
-
-        .menu-item {
-            width: 100%;
-            border-top: 1px solid rgba(255,255,255,0.12);
-        }
-
-        .menu-title {
-            padding: 14px 18px;
-        }
-
-        .submenu-list {
-            position: static;
-            min-width: auto;
-            box-shadow: none;
-            opacity: 1;
-            visibility: visible;
-            transform: none;
-            display: none;
-        }
-
-        .menu-item.open .submenu-list {
-            display: block;
-        }
-
-        .submenu-list li a {
-            padding: 11px 30px;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .contact-wrapper {
-            padding: 24px 12px 12px;
-        }
-
-        .page-title {
-            font-size: 26px;
-            margin-bottom: 20px;
-        }
-
-        .card-header {
-            font-size: 18px;
-            padding: 12px 16px;
-        }
-
-        .card-body {
-            padding: 18px 16px;
-        }
-
-        .contact-item {
-            font-size: 16px;
-        }
-
-        .contact-item strong {
-            min-width: 78px;
-        }
-
-        .map-box iframe {
-            height: 320px;
-        }
-
-        .social {
-            gap: 12px;
-        }
-
-        .social a {
-            min-width: calc(50% - 6px);
-            font-size: 15px;
-        }
+        .menu-inner { display: none; flex-direction: column; }
+        #menu-titles.active .menu-inner { display: flex; }
+        .submenu-list { position: static; display: none; opacity: 1; visibility: visible; }
+        .menu-item.open .submenu-list { display: block; }
+        .hero { height: 40vh; }
     }
 </style>
 </head>
 <body>
 
-<!-- 第一層：Header -->
+<div id="splash">
+    <picture>
+        <source media="(max-width:768px)" srcset="https://lh3.googleusercontent.com/d/1DOC0H23-wYiFrpwLo2bAQYMj-LW79fTr">
+        <img src="https://lh3.googleusercontent.com/d/13vmEyVCkGkC3FIMphgCCqUPeq3LX-r2x" alt="Welcome">
+    </picture>
+</div>
+
 <header id="header-top">
     <div class="left-icon">
         <div class="hamburger" id="hamburger">☰</div>
     </div>
-
     <a class="logo" href="index.html">
         <img src="https://lh3.googleusercontent.com/d/1pLB5WF3lUy3zz7gLvaTBKaARo6BULVZ-" alt="動元力國際">
     </a>
 </header>
 
-<!-- 第二層：主選單列 -->
 <div id="menu-titles">
     <div class="menu-inner">
-
         <div class="menu-item">
             <a class="menu-title" href="about.html">關於公司</a>
             <ul class="submenu-list">
                 <li><a href="about.html#philosophy">▶企業理念</a></li>
                 <li><a href="about.html#origin">▶創業緣起</a></li>
                 <li><a href="about.html#trademark">▶註冊商標</a></li>
-                <li><a href="about.html#vision">▶品牌願景</a></li>
-                <li><a href="about.html#social">▶社會回饋</a></li>
             </ul>
         </div>
-
         <div class="menu-item">
             <a class="menu-title" href="product.html">產品介紹</a>
             <ul class="submenu-list">
                 <li><a href="product.html#features">▶產品特色</a></li>
                 <li><a href="product.html#details">▶詳細說明</a></li>
-                <li><a href="product.html#target">▶適用對象</a></li>
-                <li><a href="product.html#guarantee">▶安心保證</a></li>
-                <li><a href="product.html#faq">▶常見問題</a></li>
             </ul>
         </div>
-
-        <div class="menu-item">
-            <a class="menu-title" href="business.html">事業合作</a>
-            <ul class="submenu-list">
-                <li><a href="business.html#model">▶經營模式</a></li>
-                <li><a href="business.html#partner">▶合作對象</a></li>
-                <li><a href="business.html#advantage">▶加入優勢</a></li>
-                <li><a href="business.html#opportunity">▶無限商機</a></li>
-            </ul>
-        </div>
-
-        <div class="menu-item">
-            <a class="menu-title" href="news.html">最新公告</a>
-        </div>
-
-        <div class="menu-item">
-            <a class="menu-title" href="contact.html">聯絡我們</a>
-        </div>
-
-        <div class="menu-item">
-            <a class="menu-title" href="apply.html" target="_blank" rel="noopener">加入我們</a>
-        </div>
-
-        <div class="menu-item">
-            <a class="menu-title" href="login.html" target="_blank" rel="noopener">登入會員</a>
-        </div>
-
+        <div class="menu-item"><a class="menu-title" href="news.html">最新公告</a></div>
+        <div class="menu-item"><a class="menu-title" href="contact.html">聯絡我們</a></div>
+        <div class="menu-item"><a class="menu-title" href="login.html">登入會員</a></div>
     </div>
 </div>
 
-<!-- ===== 開場 ===== -->
-<div id="splash">
-    <picture>
-        <source media="(max-width:768px)" 
-        srcset="https://lh3.googleusercontent.com/d/1DOC0H23-wYiFrpwLo2bAQYMj-LW79fTr">
-        <img src="https://lh3.googleusercontent.com/d/13vmEyVCkGkC3FIMphgCCqUPeq3LX-r2x">
-    </picture>
-</div>
-
-<!-- Header -->
-<header id="header-top">
-    <div class="left-icon">
-        <div id="hamburger">☰</div>
-    </div>
-    <a class="logo" href="#">
-        <img src="https://lh3.googleusercontent.com/d/1pLB5WF3lUy3zz7gLvaTBKaARo6BULVZ-">
-    </a>
-</header>
-
-<!-- ===== 輪播 ===== -->
 <div class="hero">
-
-    <div class="slide active">
-        <img src="https://lh3.googleusercontent.com/d/19AGk_oMvKPdF45nN0N_NlRQOCARsNeHs">
-    </div>
-
-    <div class="slide">
-        <img src="https://lh3.googleusercontent.com/d/17-QAD7TE_7rX8FPSbcnzMSYzXWiZg4dZ">
-    </div>
-
-    <div class="slide">
-        <img src="https://lh3.googleusercontent.com/d/1rtHyeCgFksEemspdWXtfwALyfXVc8WHC">
-    </div>
-
-    <div class="slide">
-        <img src="https://lh3.googleusercontent.com/d/1xr89uvt3fWonS9bB-GIKl5Xcvf9JYj5a">
-    </div>
-
-    <div class="slide">
-        <img src="https://lh3.googleusercontent.com/d/1b_UaS9fiQIvctOFwSUvJmJw23ARv431B">
-    </div>
-
+    <div class="slide active"><img src="https://lh3.googleusercontent.com/d/19AGk_oMvKPdF45nN0N_NlRQOCARsNeHs"></div>
+    <div class="slide"><img src="https://lh3.googleusercontent.com/d/17-QAD7TE_7rX8FPSbcnzMSYzXWiZg4dZ"></div>
+    <div class="slide"><img src="https://lh3.googleusercontent.com/d/1rtHyeCgFksEemspdWXtfwALyfXVc8WHC"></div>
+    <div class="slide"><img src="https://lh3.googleusercontent.com/d/1xr89uvt3fWonS9bB-GIKl5Xcvf9JYj5a"></div>
+    <div class="slide"><img src="https://lh3.googleusercontent.com/d/1b_UaS9fiQIvctOFwSUvJmJw23ARv431B"></div>
+    
     <div class="arrow left" onclick="prevSlide()">‹</div>
     <div class="arrow right" onclick="nextSlide()">›</div>
-
 </div>
 
-/* ===== 主區塊 ===== */
-
+<footer style="text-align:center; padding:40px;">
+    © 2026 動元力國際 版權所有
+</footer>
 
 <script>
+    /* 開場淡出：2秒後執行 */
+    setTimeout(() => {
+        document.getElementById("splash").classList.add("fade-out");
+    }, 2000);
 
-/* ===== 開場淡出 ===== */
-setTimeout(()=>{
-    document.getElementById("splash").classList.add("fade-out");
-},2000);
+    /* 輪播功能 */
+    let currentIndex = 0;
+    const slides = document.querySelectorAll(".slide");
 
-/* ===== 輪播 ===== */
-let index=0;
-const slides=document.querySelectorAll(".slide");
+    function showSlide(i) {
+        slides.forEach(s => s.classList.remove("active"));
+        slides[i].classList.add("active");
+    }
 
-function showSlide(i){
-    slides.forEach(s=>s.classList.remove("active"));
-    slides[i].classList.add("active");
-}
+    function nextSlide() {
+        currentIndex = (currentIndex + 1) % slides.length;
+        showSlide(currentIndex);
+    }
 
-function nextSlide(){
-    index=(index+1)%slides.length;
-    showSlide(index);
-}
+    function prevSlide() {
+        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+        showSlide(currentIndex);
+    }
 
-function prevSlide(){
-    index=(index-1+slides.length)%slides.length;
-    showSlide(index);
-}
+    /* 自動播放輪播圖 */
+    setInterval(nextSlide, 4000);
 
-/* 自動播放 */
-setInterval(nextSlide,4000);
+    /* 手機漢堡選單 */
+    const hamburger = document.getElementById("hamburger");
+    const menuTitles = document.getElementById("menu-titles");
+    hamburger.addEventListener("click", () => {
+        menuTitles.classList.toggle("active");
+    });
 
+    /* 手機版子選單點擊 */
+    document.querySelectorAll(".menu-item > .menu-title").forEach(title => {
+        title.addEventListener("click", function(e) {
+            if (window.innerWidth <= 992) {
+                const parent = this.parentElement;
+                if (parent.querySelector(".submenu-list")) {
+                    e.preventDefault();
+                    parent.classList.toggle("open");
+                }
+            }
+        });
+    });
 </script>
-
 
 </body>
 </html>
