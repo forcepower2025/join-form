@@ -293,7 +293,7 @@
         }
 
         .menu-item.open .submenu-list {
-            display: block;
+            display: none !important;
         }
 
         .submenu-list li a {
@@ -475,19 +475,7 @@ hamburger.addEventListener("click", function () {
     menuTitles.classList.toggle("active");
 });
 
-/* 手機版子選單展開 JS */
-document.querySelectorAll(".menu-item > .menu-title").forEach(link => {
-    link.addEventListener("click", function(e) {
-        if (window.innerWidth <= 992) {
-            const parent = this.parentElement;
-            const submenu = parent.querySelector(".submenu-list");
-            if (submenu) {
-                e.preventDefault();
-                parent.classList.toggle("open");
-            }
-        }
-    });
-});
+
 </script>
 
 </body>
