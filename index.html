@@ -87,32 +87,47 @@
         border-top: 1px solid rgba(255,255,255,0.05);
     }
 
-    /* ===== 輪播圖：左右拉伸滿版，高度壓扁 80% ===== */
-    .hero {
-        position: relative;
-        width: 100vw;
-        height: 80vh; /* 螢幕高度 80% */
-        overflow: hidden;
-        background: #000;
-    }
-    .slide {
-        position: absolute; /* 修正為絕對定位以利淡入淡出 */
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        display: none;
-        opacity: 0;
-        transition: opacity 1.2s ease-in-out;
-    }
-    .slide.active {
-        display: block;
-        opacity: 1;
-    }
-    .slide img {
-        width: 100%;
-        height: 100%;
-        object-fit: fill; /* 強制拉伸滿版，壓扁至 80vh */
-        display: block;
-    }
+/* ===== 輪播圖容器 (限高 80vh) ===== */
+.hero {
+    position: relative;
+    width: 100vw;
+    height: 80vh; /* 鎖定高度 */
+    overflow: hidden;
+    background: #000; /* 底色 */
+}
+    
+/* ===== 幻燈片容器 ===== */
+.slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: none; opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+}
+.slide.active { display: block; opacity: 1; }
+
+/* ===== 1. 後面的背景圖片 (負責模糊填滿) ===== */
+.slide img.slide-bg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    /* 關鍵 1：object-fit: cover 讓背景圖片「填滿」整個 80vh 區塊 */
+    object-fit: cover; 
+    /* 關鍵 2：filter: blur() 加上模糊效果 (數值越大越模糊) */
+    filter: blur(20px) brightness(0.8); /* 稍微降低亮度讓前景更突出 */
+    transform: scale(1.1); /* 稍微放大，避免模糊後邊緣出現白邊 */
+    z-index: 1;
+}
+
+/* ===== 2. 前面的主角圖片 (負責完整顯示) ===== */
+.slide img.slide-fg {
+    position: relative;
+    width: 100%; height: 100%;
+    /* 關鍵 3：object-fit: contain 確保整張圖完整顯示，絕對不裁切 */
+    object-fit: contain; 
+    display: block;
+    z-index: 2; /* 放在背景上面 */
+}
 
     .arrow {
         position: absolute; top: 50%; transform: translateY(-50%);
@@ -270,11 +285,27 @@
 </div>
 
 <div class="hero">
-    <div class="slide active"><img src="https://lh3.googleusercontent.com/d/19AGk_oMvKPdF45nN0N_NlRQOCARsNeHs"></div>
-    <div class="slide"><img src="https://lh3.googleusercontent.com/d/17-QAD7TE_7rX8FPSbcnzMSYzXWiZg4dZ"></div>
-    <div class="slide"><img src="https://lh3.googleusercontent.com/d/1rtHyeCgFksEemspdWXtfwALyfXVc8WHC"></div>
-    <div class="slide"><img src="https://lh3.googleusercontent.com/d/1xr89uvt3fWonS9bB-GIKl5Xcvf9JYj5a"></div>
-    <div class="slide"><img src="https://lh3.googleusercontent.com/d/1b_UaS9fiQIvctOFwSUvJmJw23ARv431B"></div>
+    <div class="slide active">
+        <img src="https://lh3.googleusercontent.com/d/19AGk_oMvKPdF45nN0N_NlRQOCARsNeHs" class="slide-bg">
+        <img src="https://lh3.googleusercontent.com/d/19AGk_oMvKPdF45nN0N_NlRQOCARsNeHs" class="slide-fg">
+    </div>
+    <div class="slide">
+        <img src="https://lh3.googleusercontent.com/d/17-QAD7TE_7rX8FPSbcnzMSYzXWiZg4dZ" class="slide-bg">
+        <img src="https://lh3.googleusercontent.com/d/17-QAD7TE_7rX8FPSbcnzMSYzXWiZg4dZ" class="slide-fg">
+    </div>
+    <div class="slide">
+        <img src="https://lh3.googleusercontent.com/d/1rtHyeCgFksEemspdWXtfwALyfXVc8WHC" class="slide-bg">
+        <img src="https://lh3.googleusercontent.com/d/1rtHyeCgFksEemspdWXtfwALyfXVc8WHC" class="slide-fg">
+    </div>
+    <div class="slide">
+        <img src="https://lh3.googleusercontent.com/d/1xr89uvt3fWonS9bB-GIKl5Xcvf9JYj5a" class="slide-bg">
+        <img src="https://lh3.googleusercontent.com/d/1xr89uvt3fWonS9bB-GIKl5Xcvf9JYj5a" class="slide-fg">
+    </div>
+    <div class="slide">
+        <img src="https://lh3.googleusercontent.com/d/1b_UaS9fiQIvctOFwSUvJmJw23ARv431B" class="slide-bg">
+        <img src="https://lh3.googleusercontent.com/d/1b_UaS9fiQIvctOFwSUvJmJw23ARv431B" class="slide-fg">
+    </div>
+
     <div class="arrow left" onclick="prevSlide()">‹</div>
     <div class="arrow right" onclick="nextSlide()">›</div>
 </div>
