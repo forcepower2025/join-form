@@ -25,18 +25,15 @@
         background-color: #f8f9f8;
         color: #333;
         line-height: 1.6;
-        /* 防止開場畫面或滿版圖片造成網頁左右晃動 */
         overflow-x: hidden; 
     }
     a { text-decoration: none; }
 
-    /* ===== 【修正】開場動畫滿版 ===== */
+    /* ===== 開場動畫：適應螢幕不裁切 ===== */
     #splash {
         position: fixed;
-        top: 0; 
-        left: 0; 
-        width: 100vw; /* 視窗寬度 100% */
-        height: 100vh; /* 視窗高度 100% */
+        top: 0; left: 0; 
+        width: 100vw; height: 100vh;
         background: #fff;
         z-index: 9999;
         display: flex;
@@ -44,24 +41,18 @@
         align-items: center;
         transition: opacity 0.8s ease, visibility 0.8s ease;
     }
-    #splash picture, #splash img {
+    #splash img {
         width: 100vw;
-        height: 80vh;
-        /* 修正：使用 cover 確保圖片「填滿」全螢幕，左右不留白 */
-        object-fit: cover; 
+        height: 100vh;
+        object-fit: contain; /* 適應螢幕滿版，不裁切 */
     }
     #splash.fade-out { opacity: 0; visibility: hidden; }
 
     /* ===== Header (固定) ===== */
     #header-top {
-        position: sticky;
-        top: 0;
-        z-index: 3000;
-        height: 72px;
-        background: #e5e5e5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: sticky; top: 0; z-index: 3000;
+        height: 72px; background: #e5e5e5;
+        display: flex; align-items: center; justify-content: center;
     }
     #header-top .left-icon { position: absolute; left: 12px; }
     #header-top .logo img { max-height: 42px; width: auto; display: block; }
@@ -69,104 +60,74 @@
 
     /* ===== 主選單 (固定) ===== */
     #menu-titles {
-        position: sticky;
-        top: 72px;
-        z-index: 2900;
-        background: #a59e8a;
-        backdrop-filter: blur(6px);
+        position: sticky; top: 72px; z-index: 2900;
+        background: #a59e8a; backdrop-filter: blur(6px);
         border-bottom: 1px solid rgba(255,255,255,0.12);
     }
     .menu-inner {
-        max-width: 1280px;
-        margin: 0 auto;
-        display: flex;
-        justify-content: center;
-        gap: 15px;
+        max-width: 1280px; margin: 0 auto;
+        display: flex; justify-content: center; gap: 15px;
     }
     .menu-item { position: relative; }
     .menu-title {
-        display: block;
-        color: #fff;
-        padding: 12px 14px;
-        font-size: 17px;
-        white-space: nowrap;
-        transition: background 0.3s;
+        display: block; color: #fff; padding: 12px 14px; font-size: 17px;
+        white-space: nowrap; transition: background 0.3s;
     }
     .menu-title:hover { background: rgba(255,255,255,0.1); }
 
-    /* 子選單 */
     .submenu-list {
-        list-style: none;
-        position: absolute;
-        top: 100%; left: 0;
-        background: #a59e8a;
-        min-width: 180px;
-        opacity: 0; visibility: hidden;
-        transform: translateY(10px);
+        list-style: none; position: absolute; top: 100%; left: 0;
+        background: #a59e8a; min-width: 180px;
+        opacity: 0; visibility: hidden; transform: translateY(10px);
         transition: 0.3s ease;
     }
     .menu-item:hover .submenu-list { opacity: 1; visibility: visible; transform: translateY(0); }
     .submenu-list li a {
-        display: block;
-        color: #fff;
-        padding: 11px 16px;
-        font-size: 16px;
+        display: block; color: #fff; padding: 11px 16px; font-size: 16px;
         border-top: 1px solid rgba(255,255,255,0.05);
     }
 
-    /* ===== 【修正】輪播圖不切到上下、保留比例 ===== */
+    /* ===== 輪播圖：左右拉伸滿版，高度壓扁 80% ===== */
     .hero {
         position: relative;
-        width: 100%;
-        /* 修正：移除固定高度設定，讓高度隨圖片內容撐開 */
-        height: 80vh; 
+        width: 100vw;
+        height: 80vh; /* 螢幕高度 80% */
         overflow: hidden;
         background: #000;
     }
     .slide {
-        /* 修正：不再使用 absolute 定位疊放圖片 */
-        position: relative; 
-        width: 100%; 
-        /* 修正：除了第一張以外，預設隱藏且不佔空間 */
-        display: none; 
+        position: absolute; /* 修正為絕對定位以利淡入淡出 */
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        display: none;
         opacity: 0;
-        /* 修正：切換動畫使用 opacity */
         transition: opacity 1.2s ease-in-out;
     }
-    .slide.active { 
-        /* 修正：顯示目前圖片 */
-        display: block; 
-        opacity: 1; 
+    .slide.active {
+        display: block;
+        opacity: 1;
     }
-    .slide img { 
-    width: 100%;     /* 寬度撐滿容器 */
-    height: 100%;    /* 高度撐滿容器的 80vh */
-    object-fit: contain; /* 核心：確保整張圖縮放在 80vh 內，絕對不裁切 */
-    display: block;
+    .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: fill; /* 強制拉伸滿版，壓扁至 80vh */
+        display: block;
     }
 
-    /* 輪播箭頭調整 (因高度變動，需重新定位) */
     .arrow {
-        position: absolute;
-        top: 50%; transform: translateY(-50%);
-        background: rgba(0,0,0,0.2);
-        color: #fff; font-size: 35px;
-        width: 50px; height: 50px;
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; z-index: 10;
-        border-radius: 50%;
+        position: absolute; top: 50%; transform: translateY(-50%);
+        background: rgba(0,0,0,0.2); color: #fff; font-size: 35px;
+        width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
+        cursor: pointer; z-index: 10; border-radius: 50%;
     }
     .arrow.left { left: 15px; }
     .arrow.right { right: 15px; }
 
-    /* 手機版 RWD */
     @media (max-width: 992px) {
         .menu-inner { display: none; flex-direction: column; width: 100%; }
         #menu-titles.active .menu-inner { display: flex; }
         .submenu-list { position: static; display: none; opacity: 1; visibility: visible; }
         .menu-item.open .submenu-list { display: block; }
-        /* 手機版箭頭縮小 */
-        .arrow { width: 35px; height: 35px; font-size: 25px; }
     }
 </style>
 </head>
@@ -230,33 +191,28 @@
     <div class="slide"><img src="https://lh3.googleusercontent.com/d/1rtHyeCgFksEemspdWXtfwALyfXVc8WHC"></div>
     <div class="slide"><img src="https://lh3.googleusercontent.com/d/1xr89uvt3fWonS9bB-GIKl5Xcvf9JYj5a"></div>
     <div class="slide"><img src="https://lh3.googleusercontent.com/d/1b_UaS9fiQIvctOFwSUvJmJw23ARv431B"></div>
-    
     <div class="arrow left" onclick="prevSlide()">‹</div>
     <div class="arrow right" onclick="nextSlide()">›</div>
 </div>
 
-<footer style="text-align:center; padding:50px;">
+<footer style="text-align:center; padding:30px; background:#fff;">
     © 2026 動元力國際 版權所有
 </footer>
 
 <script>
-    /* 1. 開場動畫 (2秒) */
     setTimeout(() => {
         const splash = document.getElementById("splash");
         if(splash) splash.classList.add("fade-out");
     }, 2000);
 
-    /* 2. 輪播邏輯 (已針對高度變動調整 JS) */
     let currentIndex = 0;
     const slides = document.querySelectorAll(".slide");
 
     function showSlide(n) {
-        // 先把所有圖片隱藏
         slides.forEach(s => {
             s.style.display = 'none';
             s.classList.remove("active");
         });
-        // 顯示指定的圖片，並觸發透明度動畫
         slides[n].style.display = 'block';
         setTimeout(() => {
             slides[n].classList.add("active");
@@ -273,20 +229,15 @@
         showSlide(currentIndex);
     }
 
-    // 初始化第一張
     showSlide(currentIndex);
-
-    // 自動輪播：每 4 秒換一張
     setInterval(nextSlide, 4000);
 
-    /* 3. 手機漢堡選單開關 */
     const hamburger = document.getElementById("hamburger");
     const menuTitles = document.getElementById("menu-titles");
     hamburger.addEventListener("click", () => {
         menuTitles.classList.toggle("active");
     });
 
-    /* 4. 手機版子選單點擊展開 */
     document.querySelectorAll(".menu-item > .menu-title").forEach(title => {
         title.addEventListener("click", function(e) {
             if (window.innerWidth <= 992) {
@@ -300,6 +251,5 @@
         });
     });
 </script>
-
 </body>
 </html>
