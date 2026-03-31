@@ -3,118 +3,151 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>動元力國際</title>
+<title>動元力國際｜早餐聯盟健康共享平台</title>
+
+<link rel="icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s32" type="image/x-icon">
+<link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s180">
+<link rel="apple-touch-icon" sizes="152x152" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s152">
+<link rel="apple-touch-icon" sizes="180x180" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s180">
+<link rel="icon" sizes="192x192" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s192">
+
+<meta property="og:title" content="動元力國際｜早餐聯盟健康共享平台">
+<meta property="og:description" content="提供經銷商加盟方案，健康蔬果餐包：打造共享經濟與健康生活的新模式。">
+<meta property="og:image" content="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s600">
+<meta property="og:type" content="website">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:"Microsoft JhengHei",sans-serif;overflow-x:hidden;}
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
-/* ===== 開場圖 ===== */
-#splash {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: #fff;
-}
+    html {
+        scroll-behavior: smooth;
+    }
 
-#splash img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-}
+    body {
+        font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
+        background-color: #f8f9f8;
+        color: #333;
+        line-height: 1.6;
+    }
 
-.fade-out{
-    animation: fadeOut 1s forwards;
-}
+    a {
+        text-decoration: none;
+    }
 
-@keyframes fadeOut{
-    to{opacity:0;visibility:hidden;}
-}
+    /* ===== 第一層 Header ===== */
+    #header-top .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: translateX(2px);
+    }
+    
+    #header-top {
+        position: sticky;
+        top: 0;
+        z-index: 3000;
+        height: 72px;
+        background: #e5e5e5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-/* ===== Header ===== */
-#header-top{
-    position:sticky;
-    top:0;
-    z-index:3000;
-    height:72px;
-    background:#e5e5e5;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
+    #header-top .left-icon {
+        position: absolute;
+        left: 12px;
+    }
 
-.left-icon{
-    position:absolute;
-    left:12px;
-}
+    #header-top .logo img {
+        max-height: 42px;
+        width: auto;
+        display: block;
+    }
 
-.logo img{
-    height:42px;
-}
+    #header-top .hamburger {
+        color: #5b5959;
+        font-size: 24px;
+        cursor: pointer;
+        line-height: 1;
+        user-select: none;
+    }
 
-/* ===== 選單 ===== */
-#menu-titles{
-    position:sticky;
-    top:72px;
-    z-index:2900;
-    background:#a59e8a;
-}
+    /* ===== 第二層 主選單 ===== */
+    #menu-titles {
+        letter-spacing: 1px;
+        position: sticky;
+        top: 72px;
+        z-index: 2900;
+        background: #a59e8a;
+        backdrop-filter: blur(6px);
+        border-top: 1px solid rgba(255,255,255,0.12);
+        border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
 
-.menu-inner{
-    display:flex;
-    justify-content:center;
-    gap:30px;
-}
+    .menu-inner {
+        max-width: 1280px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        padding: 0 20px;
+    }
 
-.menu-title{
-    color:#fff;
-    padding:10px 14px;
-}
+    .menu-item {
+        position: relative;
+    }
 
-/* ===== 輪播 ===== */
-.hero{
-    position:relative;
-    width:100%;
-    height:80vh;
-    overflow:hidden;
-}
+    .menu-title {
+        display: block;
+        color: #fff;
+        font-size: 18px;
+        padding: 10px 14px;
+        white-space: nowrap;
+        transition: background 0.25s ease, color 0.25s ease;
+    }
 
-.slide{
-    position:absolute;
-    inset:0;
-    opacity:0;
-    transition:opacity 1s;
-}
+    .menu-title:hover {
+        background: rgba(255,255,255,0.08);
+    }
 
-.slide img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-}
+    .submenu-list {
+        list-style: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 190px;
+        background: #a59e8a;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s ease;
+        z-index: 2950;
+    }
 
-.slide.active{
-    opacity:1;
-}
+    .submenu-list li a {
+        display: block;
+        color: #fff;
+        padding: 11px 16px;
+        font-size: 18px;
+        white-space: nowrap;
+        transition: background 0.25s ease;
+    }
 
-/* 左右按鈕 */
-.arrow{
-    position:absolute;
-    top:50%;
-    transform:translateY(-50%);
-    font-size:30px;
-    color:#fff;
-    background:rgba(0,0,0,0.3);
-    padding:10px;
-    cursor:pointer;
-}
+    .submenu-list li a:hover {
+        background: rgba(255,255,255,0.1);
+    }
 
-.arrow.left{left:10px;}
-.arrow.right{right:10px;}
-
-</style>
-</head>
-
-<body>
+    .menu-item:hover .submenu-list {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
 
 <!-- ===== 開場 ===== -->
 <div id="splash">
@@ -134,19 +167,6 @@ body{font-family:"Microsoft JhengHei",sans-serif;overflow-x:hidden;}
         <img src="https://lh3.googleusercontent.com/d/1pLB5WF3lUy3zz7gLvaTBKaARo6BULVZ-">
     </a>
 </header>
-
-<!-- 選單 -->
-<div id="menu-titles">
-    <div class="menu-inner">
-        <a class="menu-title" href="about.html">關於公司</a>
-        <a class="menu-title" href="product.html">產品介紹</a>
-        <a class="menu-title" href="business.html">事業合作</a>
-        <a class="menu-title" href="news.html">最新消息</a>
-        <a class="menu-title" href="contact.html">聯絡我們</a>
-        <a class="menu-title" href="apply.html" target="_blank">加入我們</a>
-        <a class="menu-title" href="login.html" target="_blank">登入會員</a>
-    </div>
-</div>
 
 <!-- ===== 輪播 ===== -->
 <div class="hero">
@@ -175,6 +195,9 @@ body{font-family:"Microsoft JhengHei",sans-serif;overflow-x:hidden;}
     <div class="arrow right" onclick="nextSlide()">›</div>
 
 </div>
+
+/* ===== 主區塊 ===== */
+
 
 <script>
 
@@ -206,6 +229,7 @@ function prevSlide(){
 setInterval(nextSlide,4000);
 
 </script>
+
 
 </body>
 </html>
