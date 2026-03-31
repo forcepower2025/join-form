@@ -41,11 +41,44 @@
         align-items: center;
         transition: opacity 0.8s ease, visibility 0.8s ease;
     }
-    #splash img {
-        width: 100vw;
-        height: 100vh;
-        object-fit: fill; /* 適應螢幕滿版，不裁切 */
-    }
+
+    /* ===== 開場圖背景 (徹底模糊邊緣) ===== */
+    #splash img.splash-bg {
+    position: absolute;
+    top: -10vh; left: -10vw; /* 往外擴大 */
+    width: 120vw; height: 120vh; /* 比螢幕大 */
+    object-fit: cover;
+    
+    /* 關鍵 1：極限模糊 + 降低亮度 */
+    filter: blur(60px) brightness(0.7) saturate(1.3); /* 提高模糊度 */
+    
+    /* 關鍵 2：羽化遮罩 (讓四周慢慢變透明) */
+    -webkit-mask-image: radial-gradient(circle, black 50%, transparent 85%);
+    mask-image: radial-gradient(circle, black 50%, transparent 85%);
+    
+    z-index: 1;
+}
+    
+
+/* ===== 原本的 #splash img 修改為：中央清晰主圖 ===== */
+#splash img:not(.splash-bg) {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 絕對居中 */
+    
+    width: 85vw;  /* 不要滿版，留出空間看背景的模糊羽化 */
+    height: auto; /* 保持比例，不變形 */
+    max-height: 70vh;
+    
+    object-fit: contain; /* 確保主圖完整顯示 */
+    z-index: 2; /* 必須大於背景的 z-index: 1 */
+    
+    /* 選擇性：給主圖一點點陰影，讓它從模糊背景中跳出來 */
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+}
+
+    
     #splash.fade-out { opacity: 0; visibility: hidden; }
 
     /* ===== Header (固定) ===== */
@@ -107,16 +140,22 @@
 .slide.active { display: block; opacity: 1; }
 
 /* ===== 1. 後面的背景圖片 (負責模糊填滿) ===== */
+/* ===== 輪播圖背景 (徹底模糊邊緣) ===== */
 .slide img.slide-bg {
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    /* 關鍵 1：object-fit: cover 讓背景圖片「填滿」整個 80vh 區塊 */
-    object-fit: cover; 
-    /* 關鍵 2：filter: blur() 加上模糊效果 (數值越大越模糊) */
-    filter: blur(20px) brightness(0.8); /* 稍微降低亮度讓前景更突出 */
-    transform: scale(1.1); /* 稍微放大，避免模糊後邊緣出現白邊 */
+    top: -10%; left: -10%; /* 往外擴大，確保邊緣被遮住 */
+    width: 120%; height: 120%; /* 比容器大，給模糊和羽化空間 */
+    object-fit: cover;
+    
+    /* 關鍵 1：極限模糊 + 降低亮度 */
+    filter: blur(50px) brightness(0.6) saturate(1.2); /* 提高模糊度，稍微降低亮度，提高飽和度讓色彩更濃郁 */
+    
+    /* 關鍵 2：羽化遮罩 (讓四周慢慢變透明) */
+    -webkit-mask-image: radial-gradient(circle, black 40%, transparent 80%);
+    mask-image: radial-gradient(circle, black 40%, transparent 80%);
+    
     z-index: 1;
+    opacity: 0.9; /* 稍微透明，讓色彩更柔和 */
 }
 
 /* ===== 2. 前面的主角圖片 (負責完整顯示) ===== */
@@ -310,7 +349,7 @@
     <div class="arrow right" onclick="nextSlide()">›</div>
 </div>
 
-<footer style="text-align:center; padding:20px; background:#fff;">
+<footer style="text-align:center; padding:15px; background:#fff;">
     © 2026 動元力國際 版權所有
 </footer>
 
