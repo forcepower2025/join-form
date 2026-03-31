@@ -5,71 +5,152 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>最新公告｜動元力國際</title>
 
-<link rel="icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s32">
+<link rel="icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s32" type="image/x-icon">
+<link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s180">
+<link rel="apple-touch-icon" sizes="152x152" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s152">
+<link rel="apple-touch-icon" sizes="180x180" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s180">
+<link rel="icon" sizes="192x192" href="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s192">
 
 <meta property="og:title" content="最新公告｜動元力國際">
-<meta property="og:description" content="官方最新公告與活動">
+<meta property="og:description" content="官方公告與活動消息">
 <meta property="og:image" content="https://lh3.googleusercontent.com/d/1xvNsSNKezzuXixviQLTJokSUtcIxxDZF=s600">
+<meta property="og:type" content="website">
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
-body{
-    font-family:"Microsoft JhengHei",sans-serif;
-    background:#f8f9f8;
-}
+    html {
+        scroll-behavior: smooth;
+    }
 
-a{text-decoration:none;}
+    body {
+        font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
+        background-color: #f8f9f8;
+        color: #333;
+        line-height: 1.6;
+    }
 
-/* ===== Header ===== */
-#header-top {
-    position: sticky;
-    top: 0;
-    z-index: 3000;
-    height: 72px;
-    background: #e5e5e5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    a {
+        text-decoration: none;
+    }
 
-#header-top .left-icon {
-    position: absolute;
-    left: 12px;
-}
+    /* ===== 第一層 Header ===== */
+    #header-top .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: translateX(2px);
+    }
+    
+    #header-top {
+        position: sticky;
+        top: 0;
+        z-index: 3000;
+        height: 72px;
+        background: #e5e5e5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-#header-top .logo img {
-    max-height: 42px;
-}
+    #header-top .left-icon {
+        position: absolute;
+        left: 12px;
+    }
 
-.hamburger {
-    font-size: 24px;
-    cursor: pointer;
-    color:#5b5959;
-}
+    #header-top .logo img {
+        max-height: 42px;
+        width: auto;
+        display: block;
+    }
 
-/* ===== 主選單 ===== */
-#menu-titles {
-    position: sticky;
-    top: 72px;
-    z-index: 2900;
-    background: #a59e8a;
-}
+    #header-top .hamburger {
+        color: #5b5959;
+        font-size: 24px;
+        cursor: pointer;
+        line-height: 1;
+        user-select: none;
+    }
 
-.menu-inner {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-}
+    /* ===== 第二層 主選單 ===== */
+    #menu-titles {
+        letter-spacing: 1px;
+        position: sticky;
+        top: 72px;
+        z-index: 2900;
+        background: #a59e8a;
+        backdrop-filter: blur(6px);
+        border-top: 1px solid rgba(255,255,255,0.12);
+        border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
 
-.menu-title {
-    color:#fff;
-    font-size:18px;
-    padding:10px 14px;
-}
+    .menu-inner {
+        max-width: 1280px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        padding: 0 20px;
+    }
 
-/* ===== 內容 ===== */
-.news-wrapper{
+    .menu-item {
+        position: relative;
+    }
+
+    .menu-title {
+        display: block;
+        color: #fff;
+        font-size: 18px;
+        padding: 10px 14px;
+        white-space: nowrap;
+        transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    .menu-title:hover {
+        background: rgba(255,255,255,0.08);
+    }
+
+    .submenu-list {
+        list-style: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        min-width: 190px;
+        background: #a59e8a;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s ease;
+        z-index: 2950;
+    }
+
+    .submenu-list li a {
+        display: block;
+        color: #fff;
+        padding: 11px 16px;
+        font-size: 18px;
+        white-space: nowrap;
+        transition: background 0.25s ease;
+    }
+
+    .submenu-list li a:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    .menu-item:hover .submenu-list {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    /* ===== 主區塊 ===== */
+    .news-wrapper{
     max-width:1100px;
     margin:50px auto;
     padding:20px;
