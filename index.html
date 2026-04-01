@@ -224,6 +224,38 @@
             padding: 24px 12px 12px;
         }
 
+    /* 預設：手機圖隱藏 */
+.phone-only { display: none !important; }
+
+/* RWD 斷點：當螢幕小於 768px */
+@media (max-width: 768px) {
+    .pc-only { display: none !important; }    /* 隱藏電腦圖 */
+    .phone-only { display: block !important; } /* 顯示手機圖 */
+    
+
+    /* 確保手機圖左右拉滿版 */
+    .slide img.phone-only {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* 左右拉滿且保持比例 */
+    }
+
+    /* 手機版背景模糊設定 */
+    .slide img.slide-bg.phone-only {
+        position: absolute;
+        top: -12%; left: -12%;
+        width: 124%; height: 124%;
+        filter: blur(48px) brightness(0.68) saturate(1.15);
+        z-index: 1;
+    }
+    
+    /* 手機版前景圖層級 */
+    .slide img.slide-fg.phone-only {
+        position: relative;
+        z-index: 2;
+    }
+}
+
         .page-title {
             font-size: 26px;
             margin-bottom: 20px;
@@ -316,25 +348,43 @@
 
 <div class="hero">
     <div class="slide active">
-        <img src="https://lh3.googleusercontent.com/d/1hbDLJMdP2Vp_R3aSFobSh4C7Li-O4u75" class="slide-bg">
-        <img src="https://lh3.googleusercontent.com/d/1hbDLJMdP2Vp_R3aSFobSh4C7Li-O4u75" class="slide-fg">
+        <img src="https://lh3.googleusercontent.com/d/1hbDLJMdP2Vp_R3aSFobSh4C7Li-O4u75" class="slide-bg pc-only">
+        <img src="https://lh3.googleusercontent.com/d/1hbDLJMdP2Vp_R3aSFobSh4C7Li-O4u75" class="slide-fg pc-only">
+        <img src="https://drive.google.com/uc?id=1g5J7jdE357SrLW7dxCIwOSH08sxOvrEu" class="slide-bg phone-only">
+        <img src="https://drive.google.com/uc?id=1g5J7jdE357SrLW7dxCIwOSH08sxOvrEu" class="slide-fg phone-only">
     </div>
+
     <div class="slide">
-        <img src="https://lh3.googleusercontent.com/d/18VHqOWjIx9SqIanPH30GalLiNKscV9OH" class="slide-bg">
-        <img src="https://lh3.googleusercontent.com/d/18VHqOWjIx9SqIanPH30GalLiNKscV9OH" class="slide-fg">
+        <img src="https://lh3.googleusercontent.com/d/18VHqOWjIx9SqIanPH30GalLiNKscV9OH" class="slide-bg pc-only">
+        <img src="https://lh3.googleusercontent.com/d/18VHqOWjIx9SqIanPH30GalLiNKscV9OH" class="slide-fg pc-only">
+        <img src="https://drive.google.com/uc?id=1Y_80XPuBXcd-weko6XfPl-oLK2KYcdPt" class="slide-bg phone-only">
+        <img src="https://drive.google.com/uc?id=1Y_80XPuBXcd-weko6XfPl-oLK2KYcdPt" class="slide-fg phone-only">
     </div>
+
     <div class="slide">
-        <img src="https://lh3.googleusercontent.com/d/1fx3fkLMhs7awW0DuIrmgzIQ5IZvY0LGQ" class="slide-bg">
-        <img src="https://lh3.googleusercontent.com/d/1fx3fkLMhs7awW0DuIrmgzIQ5IZvY0LGQ" class="slide-fg">
+        <img src="https://lh3.googleusercontent.com/d/1fx3fkLMhs7awW0DuIrmgzIQ5IZvY0LGQ" class="slide-bg pc-only">
+        <img src="https://lh3.googleusercontent.com/d/1fx3fkLMhs7awW0DuIrmgzIQ5IZvY0LGQ" class="slide-fg pc-only">
+        <img src="https://drive.google.com/uc?id=1RqkAxKY6rpgi_DIOc29yhvcXs4s8tjFG" class="slide-bg phone-only">
+        <img src="https://drive.google.com/uc?id=1RqkAxKY6rpgi_DIOc29yhvcXs4s8tjFG" class="slide-fg phone-only">
     </div>
+
     <div class="slide">
-        <img src="https://lh3.googleusercontent.com/d/1bTgVDTTZRSTDFb_uEe01Zozp0WPFHsYH" class="slide-bg">
-        <img src="https://lh3.googleusercontent.com/d/1bTgVDTTZRSTDFb_uEe01Zozp0WPFHsYH" class="slide-fg">
+        <img src="https://lh3.googleusercontent.com/d/1bTgVDTTZRSTDFb_uEe01Zozp0WPFHsYH" class="slide-bg pc-only">
+        <img src="https://lh3.googleusercontent.com/d/1bTgVDTTZRSTDFb_uEe01Zozp0WPFHsYH" class="slide-fg pc-only">
+        <img src="https://drive.google.com/uc?id=1nXOCFQ2HRwdfgSOK-suwBAmo1OkM5w9W" class="slide-bg phone-only">
+        <img src="https://drive.google.com/uc?id=1nXOCFQ2HRwdfgSOK-suwBAmo1OkM5w9W" class="slide-fg phone-only">
     </div>
+
     <div class="slide">
-        <img src="https://lh3.googleusercontent.com/d/1Mwup9BR3YzqJarESqTHpuz6XLMfVY7TK" class="slide-bg">
-        <img src="https://lh3.googleusercontent.com/d/1Mwup9BR3YzqJarESqTHpuz6XLMfVY7TK" class="slide-fg">
+        <img src="https://lh3.googleusercontent.com/d/1Mwup9BR3YzqJarESqTHpuz6XLMfVY7TK" class="slide-bg pc-only">
+        <img src="https://lh3.googleusercontent.com/d/1Mwup9BR3YzqJarESqTHpuz6XLMfVY7TK" class="slide-fg pc-only">
+        <img src="https://drive.google.com/uc?id=1QaOBz40JnmK5n1DUqed2Xj1F-zdtXrzm" class="slide-bg phone-only">
+        <img src="https://drive.google.com/uc?id=1QaOBz40JnmK5n1DUqed2Xj1F-zdtXrzm" class="slide-fg phone-only">
     </div>
+
+    <div class="arrow left" onclick="prevSlide()">‹</div>
+    <div class="arrow right" onclick="nextSlide()">›</div>
+</div>
 
     <div class="arrow left" onclick="prevSlide()">‹</div>
     <div class="arrow right" onclick="nextSlide()">›</div>
