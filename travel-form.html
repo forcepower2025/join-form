@@ -173,11 +173,23 @@ for (let y = 1940; y <= new Date().getFullYear(); y++) {
 }
 
 for (let m = 1; m <= 12; m++) {
-  monthSelect.innerHTML += `<option value="${m}">${m}月</option>`;
+  const mm = String(m).padStart(2, '0');
+
+  monthSelect.innerHTML += `
+    <option value="${mm}">
+      ${mm}月
+    </option>
+  `;
 }
 
 for (let d = 1; d <= 31; d++) {
-  daySelect.innerHTML += `<option value="${d}">${d}日</option>`;
+  const dd = String(d).padStart(2, '0');
+
+  daySelect.innerHTML += `
+    <option value="${dd}">
+      ${dd}日
+    </option>
+  `;
 }
   </script>
 </body>
