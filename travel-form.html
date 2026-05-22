@@ -102,9 +102,11 @@
 <label>出生年月日</label>
 
 <div class="birth-wrap">
-  <select id="birthYear" required></select>
-  <select id="birthMonth" required></select>
-  <select id="birthDay" required></select>
+  <input type="number" id="birthYear" placeholder="年" required>
+
+  <input type="number" id="birthMonth" placeholder="月" required>
+
+  <input type="number" id="birthDay" placeholder="日" required>
 </div>
 
         <label>介紹人</label>
@@ -138,10 +140,10 @@
         name: document.getElementById('name').value.trim(),
         phone: document.getElementById('phone').value.trim(),
         idNumber: document.getElementById('idNumber').value.trim(),
-        birthDate:
-  document.getElementById('birthYear').value + '-' +
-  document.getElementById('birthMonth').value + '-' +
-  document.getElementById('birthDay').value,
+ birthDate:
+  document.getElementById('birthYear').value + '/' +
+  String(document.getElementById('birthMonth').value).padStart(2, '0') + '/' +
+  String(document.getElementById('birthDay').value).padStart(2, '0'),
         referrer: document.getElementById('referrer').value.trim(),
         leader: document.getElementById('leader').value.trim()
       };
@@ -164,33 +166,8 @@
         msg.textContent = '送出失敗，請稍後再試';
       }
     });
-    const yearSelect = document.getElementById('birthYear');
-const monthSelect = document.getElementById('birthMonth');
-const daySelect = document.getElementById('birthDay');
 
-for (let y = 1940; y <= new Date().getFullYear(); y++) {
-  yearSelect.innerHTML += `<option value="${y}">${y}年</option>`;
-}
-
-for (let m = 1; m <= 12; m++) {
-  const mm = String(m).padStart(2, '0');
-
-  monthSelect.innerHTML += `
-    <option value="${mm}">
-      ${mm}月
-    </option>
-  `;
-}
-
-for (let d = 1; d <= 31; d++) {
-  const dd = String(d).padStart(2, '0');
-
-  daySelect.innerHTML += `
-    <option value="${dd}">
-      ${dd}日
-    </option>
-  `;
-}
+    
   </script>
 </body>
 </html>
