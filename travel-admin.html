@@ -199,19 +199,15 @@
       font-size: 18px;
       cursor: pointer;
     }
-
   </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
 <body>
 
 <div class="login-bar">
-
   <input
     type="password"
     id="adminPassword"
@@ -221,7 +217,6 @@
   <button onclick="checkPassword()">
     進入後台
   </button>
-
 </div>
 
 <div
@@ -230,96 +225,83 @@
   style="display:none;"
 >
 
-    <h1>
-      2026-5-30<br>
-      動元力國際<br>
-      旅遊報名管理
-    </h1>
+  <h1>
+    2026-5-30<br>
+    動元力國際<br>
+    旅遊報名管理
+  </h1>
 
-    <div class="summary-box">
-      <div>目前報名：<span id="totalCount">0</span> 人</div>
-      <div>已繳費：<span id="paidCount">0</span> 人</div>
-      <div>未繳費：<span id="unpaidCount">0</span> 人</div>
+  <div class="summary-box">
+    <div>目前報名：<span id="totalCount">0</span> 人</div>
+    <div>已繳費：<span id="paidCount">0</span> 人</div>
+    <div>未繳費：<span id="unpaidCount">0</span> 人</div>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="filterName" placeholder="篩選姓名">
+    <input type="text" id="filterReferrer" placeholder="篩選介紹人">
+    <input type="text" id="filterLeader" placeholder="篩選團隊長">
+
+    <div class="check-filter">
+      <label class="check-item">
+        <input type="checkbox" id="filterPaid">
+        <span>已繳費</span>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox" id="filterUnpaid">
+        <span>未繳費</span>
+      </label>
     </div>
 
-    <div class="filters">
+    <div class="delete-area">
+      <span>刪除資料：</span>
 
-      <input type="text" id="filterName" placeholder="篩選姓名">
+      <input
+        type="text"
+        id="deleteName"
+        placeholder="輸入姓名"
+      >
 
-      <input type="text" id="filterReferrer" placeholder="篩選介紹人">
-
-      <input type="text" id="filterLeader" placeholder="篩選團隊長">
-
-      <div class="check-filter">
-
-        <label class="check-item">
-          <input type="checkbox" id="filterPaid">
-          <span>已繳費</span>
-        </label>
-
-        <label class="check-item">
-          <input type="checkbox" id="filterUnpaid">
-          <span>未繳費</span>
-        </label>
-
-      </div>
-
-      <div class="delete-area">
-
-        <span>刪除資料：</span>
-
-        <input
-          type="text"
-          id="deleteName"
-          placeholder="輸入姓名"
-        >
-
-        <button
-          class="delete-submit-btn"
-          onclick="deleteByName()">
-          送出刪除
-        </button>
-
-      </div>
-
-      <button class="reload-btn" onclick="downloadPDF()">
-  下載表格
-</button>
-
-      <button class="reload-btn" onclick="loadData()">
-        重新整理
+      <button
+        class="delete-submit-btn"
+        onclick="deleteByName()">
+        送出刪除
       </button>
-
     </div>
 
-    <div class="msg" id="msg"></div>
+    <button class="reload-btn" onclick="downloadPDF()">
+      下載表格
+    </button>
 
-    <div class="table-wrap">
+    <button class="reload-btn" onclick="loadData()">
+      重新整理
+    </button>
+  </div>
 
-      <table>
+  <div class="msg" id="msg"></div>
 
-        <thead>
-          <tr>
-            <th>姓名</th>
-            <th>手機號碼</th>
-            <th>身份證字號</th>
-            <th>出生年月日</th>
-            <th>介紹人</th>
-            <th>團隊長</th>
-            <th>是否已繳費</th>
-          </tr>
-        </thead>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>姓名</th>
+          <th>手機號碼</th>
+          <th>身份證字號</th>
+          <th>出生年月日</th>
+          <th>介紹人</th>
+          <th>團隊長</th>
+          <th>是否已繳費</th>
+        </tr>
+      </thead>
 
-        <tbody id="tbody"></tbody>
-
-      </table>
-
-    </div>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
 
 </div>
 
 <script>
-
 const ADMIN_PASSWORD = '60398346';
 
 const API_URL =
@@ -328,26 +310,20 @@ const API_URL =
 let allData = [];
 
 function checkPassword() {
-
   const password =
     document.getElementById('adminPassword').value;
 
   if (password === ADMIN_PASSWORD) {
-
     document.getElementById('adminContent')
       .style.display = 'block';
 
     loadData();
-
   } else {
-
     alert('密碼錯誤');
-
   }
 }
 
 async function api(payload) {
-
   const res = await fetch(API_URL, {
     method: 'POST',
     body: JSON.stringify(payload)
@@ -357,41 +333,29 @@ async function api(payload) {
 }
 
 async function loadData() {
-
   const msg = document.getElementById('msg');
 
   msg.textContent = '資料載入中...';
 
   try {
-
     const result = await api({
       action: 'list'
     });
 
     if (result.success) {
-
       allData = result.data || [];
-
       render();
-
       msg.textContent = '';
-
     } else {
-
       msg.textContent =
         result.message || '資料載入失敗';
-
     }
-
   } catch (err) {
-
     msg.textContent = '資料載入失敗';
-
   }
 }
 
 function render() {
-
   const tbody =
     document.getElementById('tbody');
 
@@ -440,7 +404,6 @@ function render() {
     .textContent = unpaidCount;
 
   const filtered = allData.filter(item => {
-
     return (
       (!name || item.name.includes(name)) &&
       (!referrer || item.referrer.includes(referrer)) &&
@@ -451,11 +414,9 @@ function render() {
         (filterUnpaid && item.paymentStatus === '未繳費')
       )
     );
-
   });
 
   filtered.forEach(item => {
-
     const tr = document.createElement('tr');
 
     tr.innerHTML = `
@@ -465,9 +426,7 @@ function render() {
       ${editableTd(item, 'birthDate', item.birthDate)}
       ${editableTd(item, 'referrer', item.referrer)}
       ${editableTd(item, 'leader', item.leader)}
-
       <td>
-
         <button
           class="pay-btn ${item.paymentStatus === '已繳費' ? 'paid' : 'unpaid'}"
           onclick="togglePayment(
@@ -475,21 +434,16 @@ function render() {
             '${escapeQuote(item.name)}',
             '${item.paymentStatus}'
           )">
-
           ${item.paymentStatus || '未繳費'}
-
         </button>
-
       </td>
     `;
 
     tbody.appendChild(tr);
-
   });
 }
 
 function editableTd(item, field, value) {
-
   return `
     <td
       class="editable"
@@ -498,9 +452,7 @@ function editableTd(item, field, value) {
         '${field}',
         '${escapeQuote(value)}'
       )">
-
       ${value || ''}
-
     </td>
   `;
 }
@@ -510,14 +462,12 @@ async function editField(
   field,
   oldValue
 ) {
-
   const newValue =
     prompt('請輸入新的內容：', oldValue);
 
   if (newValue === null) return;
 
   try {
-
     const result = await api({
       action: 'updateField',
       rowNumber,
@@ -526,19 +476,12 @@ async function editField(
     });
 
     if (result.success) {
-
       await loadData();
-
     } else {
-
       alert(result.message || '更新失敗');
-
     }
-
   } catch (err) {
-
     alert('更新失敗');
-
   }
 }
 
@@ -547,7 +490,6 @@ async function togglePayment(
   name,
   currentStatus
 ) {
-
   const newStatus =
     currentStatus === '已繳費'
       ? '未繳費'
@@ -560,7 +502,6 @@ async function togglePayment(
   if (!ok) return;
 
   try {
-
     const result = await api({
       action: 'updatePayment',
       rowNumber,
@@ -568,33 +509,23 @@ async function togglePayment(
     });
 
     if (result.success) {
-
       await loadData();
-
     } else {
-
       alert(result.message || '更新失敗');
-
     }
-
   } catch (err) {
-
     alert('更新失敗');
-
   }
 }
 
 async function deleteByName() {
-
   const name =
     document.getElementById('deleteName')
     .value
     .trim();
 
   if (!name) {
-
     alert('請輸入姓名');
-
     return;
   }
 
@@ -605,14 +536,12 @@ async function deleteByName() {
   if (!ok) return;
 
   try {
-
     const result = await api({
       action: 'deleteByName',
       name
     });
 
     if (result.success) {
-
       alert(
         `已刪除 ${result.deletedCount} 筆資料`
       );
@@ -621,22 +550,15 @@ async function deleteByName() {
         .value = '';
 
       await loadData();
-
     } else {
-
       alert(result.message || '刪除失敗');
-
     }
-
   } catch (err) {
-
     alert('刪除失敗');
-
   }
 }
 
 function escapeQuote(str) {
-
   return String(str || '')
     .replace(/'/g, "\\'");
 }
@@ -657,7 +579,6 @@ document.getElementById('filterUnpaid')
   .addEventListener('change', render);
 
 async function downloadPDF() {
-
   const table =
     document.querySelector('table');
 
@@ -694,44 +615,6 @@ async function downloadPDF() {
 
   pdf.save('旅遊報名表.pdf');
 }
-
-const table =
-  document.querySelector('table');
-
-const canvas =
-  await html2canvas(table, {
-    scrollX: 0,
-    scrollY: 0,
-    windowWidth: table.scrollWidth,
-    windowHeight: table.scrollHeight
-  });
-
-  const imgData =
-    canvas.toDataURL('image/png');
-
-  const { jsPDF } = window.jspdf;
-
-  const pdf =
-    new jsPDF('l', 'mm', 'a4');
-
-  const pdfWidth =
-    pdf.internal.pageSize.getWidth();
-
-  const pdfHeight =
-    canvas.height * pdfWidth / canvas.width;
-
-  pdf.addImage(
-    imgData,
-    'PNG',
-    0,
-    0,
-    pdfWidth,
-    pdfHeight
-  );
-
-  pdf.save('旅遊報名表.pdf');
-}
-
 </script>
 
 </body>
