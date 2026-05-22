@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2026-5-30-旅遊報名表</title>
-  <title>感恩歡慶南瓜燈籠節</title>
-  <title>紫薇花園喜相逢</title>
+  <title>旅遊報名表</title>
   <style>
     body {
       margin: 0;
@@ -67,6 +65,18 @@
       text-align: center;
       font-weight: bold;
     }
+    .birth-wrap {
+  display: flex;
+  gap: 10px;
+}
+
+.birth-wrap select {
+  flex: 1;
+  padding: 14px;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
   </style>
 </head>
 
@@ -74,7 +84,8 @@
   <div class="container">
     <div class="card">
      
-      <h1>2026-5-30-旅遊報名表</h1>
+      <h1>2026-5-30</h1>
+      <h1>旅遊報名表</h1>
       <h1>感恩歡慶南瓜燈籠節</h1>
       <h1>紫薇花園喜相逢</h1>
  
@@ -88,8 +99,13 @@
         <label>身份證字號</label>
         <input type="text" id="idNumber" required>
 
-        <label>出生年月日</label>
-        <input type="date" id="birthDate" required>
+<label>出生年月日</label>
+
+<div class="birth-wrap">
+  <select id="birthYear" required></select>
+  <select id="birthMonth" required></select>
+  <select id="birthDay" required></select>
+</div>
 
         <label>介紹人</label>
         <input type="text" id="referrer" required>
@@ -122,7 +138,10 @@
         name: document.getElementById('name').value.trim(),
         phone: document.getElementById('phone').value.trim(),
         idNumber: document.getElementById('idNumber').value.trim(),
-        birthDate: document.getElementById('birthDate').value,
+        birthDate:
+  document.getElementById('birthYear').value + '-' +
+  document.getElementById('birthMonth').value + '-' +
+  document.getElementById('birthDay').value,
         referrer: document.getElementById('referrer').value.trim(),
         leader: document.getElementById('leader').value.trim()
       };
@@ -145,6 +164,21 @@
         msg.textContent = '送出失敗，請稍後再試';
       }
     });
+    const yearSelect = document.getElementById('birthYear');
+const monthSelect = document.getElementById('birthMonth');
+const daySelect = document.getElementById('birthDay');
+
+for (let y = 1940; y <= new Date().getFullYear(); y++) {
+  yearSelect.innerHTML += `<option value="${y}">${y}年</option>`;
+}
+
+for (let m = 1; m <= 12; m++) {
+  monthSelect.innerHTML += `<option value="${m}">${m}月</option>`;
+}
+
+for (let d = 1; d <= 31; d++) {
+  daySelect.innerHTML += `<option value="${d}">${d}日</option>`;
+}
   </script>
 </body>
 </html>
