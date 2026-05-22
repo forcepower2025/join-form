@@ -111,11 +111,15 @@
       <input type="text" id="filterReferrer" placeholder="篩選介紹人">
       <input type="text" id="filterLeader" placeholder="篩選團隊長">
 
-      <select id="filterPayment">
-        <option value="">全部繳費狀態</option>
-        <option value="已繳費">已繳費</option>
-        <option value="未繳費">未繳費</option>
-      </select>
+<label>
+  <input type="checkbox" id="filterPaid">
+  已繳費
+</label>
+
+<label>
+  <input type="checkbox" id="filterUnpaid">
+  未繳費
+</label>
 
       <button onclick="loadData()">重新整理</button>
     </div>
@@ -179,13 +183,18 @@
       const name = document.getElementById('filterName').value.trim();
       const referrer = document.getElementById('filterReferrer').value.trim();
       const leader = document.getElementById('filterLeader').value.trim();
-      const payment = document.getElementById('filterPayment').value;
+const filterPaid = document.getElementById('filterPaid').checked;
+const filterUnpaid = document.getElementById('filterUnpaid').checked;
 
       const filtered = allData.filter(item => {
         return (!name || item.name.includes(name)) &&
                (!referrer || item.referrer.includes(referrer)) &&
                (!leader || item.leader.includes(leader)) &&
-               (!payment || item.paymentStatus === payment);
+(
+  (!filterPaid && !filterUnpaid) ||
+  (filterPaid && item.paymentStatus === '已繳費') ||
+  (filterUnpaid && item.paymentStatus === '未繳費')
+);
       });
 
       filtered.forEach(item => {
@@ -272,7 +281,8 @@
     document.getElementById('filterName').addEventListener('input', render);
     document.getElementById('filterReferrer').addEventListener('input', render);
     document.getElementById('filterLeader').addEventListener('input', render);
-    document.getElementById('filterPayment').addEventListener('change', render);
+    document.getElementById('filterPaid').addEventListener('change', render);
+    document.getElementById('filterUnpaid').addEventListener('change', render);
 
     loadData();
   </script>
