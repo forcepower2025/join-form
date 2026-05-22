@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>旅遊報名管理</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Microsoft JhengHei", Arial, sans-serif;
+      background: #f5f7fb;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input, select {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    th {
+      background: #333;
+      color: #fff;
+    }
+
+    td.editable {
+      cursor: pointer;
+      background: #fffdf0;
+    }
+
+    .pay-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .paid {
+      background: #1f6feb;
+    }
+
+    .unpaid {
+      background: #d93025;
+    }
+
+    .msg {
+      margin: 12px 0;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 14px;
+        min-width: 900px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>旅遊報名管理</h1>
+
+    <div class="filters">
+      <input type="text" id="filterName" placeholder="篩選姓名">
+      <input type="text" id="filterReferrer" placeholder="篩選介紹人">
+      <input type="text" id="filterLeader" placeholder="篩選團隊長">
+
+      <select id="filterPayment">
+        <option value="">全部繳費狀態</option>
+        <option value="已繳費">已繳費</option>
+        <option value="未繳費">未繳費</option>
+      </select>
+
+      <button onclick="loadData()">重新整理</button>
+    </div>
+
+    <div class="msg" id="msg"></div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>姓名</th>
+            <th>手機號碼</th>
+            <th>身份證字號</th>
+            <th>出生年月日</th>
+            <th>介紹人</th>
+            <th>團隊長</th>
+            <th>是否已繳費</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxFbheZOQVYMRE3LgZEujHHyY4ZaiyY_JYM9aeFM05V83aVxi_k5GA9iTuD6pUsAVsfUA/exec';
+
+    let allData = [];
+
+    async function api(payload) {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      return await res.json();
+    }
+
+    async function loadData() {
+      const msg = document.getElementById('msg');
+      msg.textContent = '資料載入中...';
+
+      try {
+        const result = await api({ action: 'list' });
+
+        if (result.success) {
+          allData = result.data || [];
+          render();
+          msg.textContent = '';
+        } else {
+          msg.textContent = result.message || '資料載入失敗';
+        }
+      } catch (err) {
+        msg.textContent = '資料載入失敗';
+      }
+    }
+
+    function render() {
+      const tbody = document.getElementById('tbody');
+      tbody.innerHTML = '';
+
+      const name = document.getElementById('filterName').value.trim();
+      const referrer = document.getElementById('filterReferrer').value.trim();
+      const leader = document.getElementById('filterLeader').value.trim();
+      const payment = document.getElementById('filterPayment').value;
+
+      const filtered = allData.filter(item => {
+        return (!name || item.name.includes(name)) &&
+               (!referrer || item.referrer.includes(referrer)) &&
+               (!leader || item.leader.includes(leader)) &&
+               (!payment || item.paymentStatus === payment);
+      });
+
+      filtered.forEach(item => {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          ${editableTd(item, 'name', item.name)}
+          ${editableTd(item, 'phone', item.phone)}
+          ${editableTd(item, 'idNumber', item.idNumber)}
+          ${editableTd(item, 'birthDate', item.birthDate)}
+          ${editableTd(item, 'referrer', item.referrer)}
+          ${editableTd(item, 'leader', item.leader)}
+          <td>
+            <button class="pay-btn ${item.paymentStatus === '已繳費' ? 'paid' : 'unpaid'}"
+              onclick="togglePayment(${item.rowNumber}, '${escapeQuote(item.name)}', '${item.paymentStatus}')">
+              ${item.paymentStatus || '未繳費'}
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function editableTd(item, field, value) {
+      return `
+        <td class="editable" onclick="editField(${item.rowNumber}, '${field}', '${escapeQuote(value)}')">
+          ${value || ''}
+        </td>
+      `;
+    }
+
+    async function editField(rowNumber, field, oldValue) {
+      const newValue = prompt('請輸入新的內容：', oldValue);
+
+      if (newValue === null) return;
+
+      try {
+        const result = await api({
+          action: 'updateField',
+          rowNumber,
+          field,
+          value: newValue
+        });
+
+        if (result.success) {
+          await loadData();
+        } else {
+          alert(result.message || '更新失敗');
+        }
+      } catch (err) {
+        alert('更新失敗');
+      }
+    }
+
+    async function togglePayment(rowNumber, name, currentStatus) {
+      const newStatus = currentStatus === '已繳費' ? '未繳費' : '已繳費';
+
+      const ok = confirm(`是否確認把${name}改成${newStatus}?`);
+
+      if (!ok) return;
+
+      try {
+        const result = await api({
+          action: 'updatePayment',
+          rowNumber,
+          status: newStatus
+        });
+
+        if (result.success) {
+          await loadData();
+        } else {
+          alert(result.message || '更新失敗');
+        }
+      } catch (err) {
+        alert('更新失敗');
+      }
+    }
+
+    function escapeQuote(str) {
+      return String(str || '').replace(/'/g, "\\'");
+    }
+
+    document.getElementById('filterName').addEventListener('input', render);
+    document.getElementById('filterReferrer').addEventListener('input', render);
+    document.getElementById('filterLeader').addEventListener('input', render);
+    document.getElementById('filterPayment').addEventListener('change', render);
+
+    loadData();
+  </script>
+</body>
+</html>
