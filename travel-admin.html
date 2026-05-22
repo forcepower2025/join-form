@@ -121,12 +121,29 @@
   height: 34px;
   cursor: pointer;
 }
+    .summary-box {
+  text-align: center;
+  margin: 12px 0 20px;
+  line-height: 1.8;
+  font-size: 18px;
+  color: #555;
+}
+
+.summary-box span {
+  font-weight: bold;
+  color: #000;
+}
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h1>2026-5-30-<br>旅遊報名管理</h1>
+    <h1>2026-5-30<br>旅遊報名管理</h1>
+    <div class="summary-box">
+  <div>目前報名：<span id="totalCount">0</span> 人</div>
+  <div>已繳費：<span id="paidCount">0</span> 人</div>
+  <div>未繳費：<span id="unpaidCount">0</span> 人</div>
+</div>
 
     <div class="filters">
       <input type="text" id="filterName" placeholder="篩選姓名">
@@ -210,6 +227,20 @@
 const filterPaid = document.getElementById('filterPaid').checked;
 const filterUnpaid = document.getElementById('filterUnpaid').checked;
 
+      const totalCount = allData.length;
+
+const paidCount = allData.filter(
+  item => item.paymentStatus === '已繳費'
+).length;
+
+const unpaidCount = allData.filter(
+  item => item.paymentStatus !== '已繳費'
+).length;
+
+document.getElementById('totalCount').textContent = totalCount;
+document.getElementById('paidCount').textContent = paidCount;
+document.getElementById('unpaidCount').textContent = unpaidCount;
+      
       const filtered = allData.filter(item => {
         return (!name || item.name.includes(name)) &&
                (!referrer || item.referrer.includes(referrer)) &&
