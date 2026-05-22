@@ -201,6 +201,11 @@
     }
 
   </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
 </head>
 
 <body>
@@ -276,6 +281,10 @@
         </button>
 
       </div>
+
+      <button class="reload-btn" onclick="downloadPDF()">
+  下載表格
+</button>
 
       <button class="reload-btn" onclick="loadData()">
         重新整理
@@ -646,6 +655,40 @@ document.getElementById('filterPaid')
 
 document.getElementById('filterUnpaid')
   .addEventListener('change', render);
+
+async function downloadPDF() {
+
+  const table =
+    document.querySelector('.table-wrap');
+
+  const canvas =
+    await html2canvas(table);
+
+  const imgData =
+    canvas.toDataURL('image/png');
+
+  const { jsPDF } = window.jspdf;
+
+  const pdf =
+    new jsPDF('l', 'mm', 'a4');
+
+  const pdfWidth =
+    pdf.internal.pageSize.getWidth();
+
+  const pdfHeight =
+    canvas.height * pdfWidth / canvas.width;
+
+  pdf.addImage(
+    imgData,
+    'PNG',
+    0,
+    0,
+    pdfWidth,
+    pdfHeight
+  );
+
+  pdf.save('旅遊報名表.pdf');
+}
 
 </script>
 
