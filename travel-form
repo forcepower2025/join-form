@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>旅遊報名表</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Microsoft JhengHei", Arial, sans-serif;
+      background: #f5f7fb;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-top: 16px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-top: 8px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 18px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 16px;
+      font-size: 20px;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      background: #1f6feb;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .msg {
+      margin-top: 18px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>旅遊報名表</h1>
+
+      <form id="form">
+        <label>姓名</label>
+        <input type="text" id="name" required>
+
+        <label>手機號碼</label>
+        <input type="tel" id="phone" required>
+
+        <label>身份證字號</label>
+        <input type="text" id="idNumber" required>
+
+        <label>出生年月日</label>
+        <input type="date" id="birthDate" required>
+
+        <label>介紹人</label>
+        <input type="text" id="referrer" required>
+
+        <label>團隊長</label>
+        <input type="text" id="leader" required>
+
+        <button type="submit">送出報名</button>
+      </form>
+
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxFbheZOQVYMRE3LgZEujHHyY4ZaiyY_JYM9aeFM05V83aVxi_k5GA9iTuD6pUsAVsfUA/exec';
+
+    document.getElementById('idNumber').addEventListener('input', function () {
+      this.value = this.value.toUpperCase();
+    });
+
+    document.getElementById('form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const msg = document.getElementById('msg');
+      msg.textContent = '資料送出中...';
+
+      const payload = {
+        action: 'register',
+        name: document.getElementById('name').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        idNumber: document.getElementById('idNumber').value.trim(),
+        birthDate: document.getElementById('birthDate').value,
+        referrer: document.getElementById('referrer').value.trim(),
+        leader: document.getElementById('leader').value.trim()
+      };
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+
+        if (result.success) {
+          msg.textContent = '報名成功！';
+          document.getElementById('form').reset();
+        } else {
+          msg.textContent = result.message || '送出失敗';
+        }
+      } catch (err) {
+        msg.textContent = '送出失敗，請稍後再試';
+      }
+    });
+  </script>
+</body>
+</html>
