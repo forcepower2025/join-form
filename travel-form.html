@@ -141,8 +141,8 @@
         phone: document.getElementById('phone').value.trim(),
         idNumber: document.getElementById('idNumber').value.trim(),
  birthDate:
-  document.getElementById('birthYear').value + '/' +
-  String(document.getElementById('birthMonth').value).padStart(2, '0') + '/' +
+  document.getElementById('birthYear').value + '-' +
+  String(document.getElementById('birthMonth').value).padStart(2, '0') + '-' +
   String(document.getElementById('birthDay').value).padStart(2, '0'),
         referrer: document.getElementById('referrer').value.trim(),
         leader: document.getElementById('leader').value.trim()
