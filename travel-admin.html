@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2026-5-30-旅遊報名管理</title>
+  <title>2026-5-30<br>旅遊報名管理</title>
 
   <style>
     body {
@@ -23,12 +23,12 @@
       text-align: center;
     }
 
-    .filters {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-      margin-bottom: 20px;
-    }
+.filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
 
     input, select {
       padding: 10px;
@@ -99,6 +99,28 @@
         overflow-x: auto;
       }
     }
+    .check-filter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  margin: 12px 0 16px;
+}
+
+.check-item {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  gap: 12px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.check-item input[type="checkbox"] {
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+}
   </style>
 </head>
 
@@ -111,15 +133,17 @@
       <input type="text" id="filterReferrer" placeholder="篩選介紹人">
       <input type="text" id="filterLeader" placeholder="篩選團隊長">
 
-<label>
-  <input type="checkbox" id="filterPaid">
-  已繳費
-</label>
+<div class="check-filter">
+  <label class="check-item">
+    <input type="checkbox" id="filterPaid">
+    <span>已繳費</span>
+  </label>
 
-<label>
-  <input type="checkbox" id="filterUnpaid">
-  未繳費
-</label>
+  <label class="check-item">
+    <input type="checkbox" id="filterUnpaid">
+    <span>未繳費</span>
+  </label>
+</div>
 
       <button onclick="loadData()">重新整理</button>
     </div>
