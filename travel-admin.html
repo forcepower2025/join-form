@@ -659,10 +659,52 @@ document.getElementById('filterUnpaid')
 async function downloadPDF() {
 
   const table =
-    document.querySelector('.table-wrap');
+    document.querySelector('table');
 
   const canvas =
-    await html2canvas(table);
+    await html2canvas(table, {
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: table.scrollWidth,
+      windowHeight: table.scrollHeight
+    });
+
+  const imgData =
+    canvas.toDataURL('image/png');
+
+  const { jsPDF } = window.jspdf;
+
+  const pdf =
+    new jsPDF('l', 'mm', 'a4');
+
+  const pdfWidth =
+    pdf.internal.pageSize.getWidth();
+
+  const pdfHeight =
+    canvas.height * pdfWidth / canvas.width;
+
+  pdf.addImage(
+    imgData,
+    'PNG',
+    0,
+    0,
+    pdfWidth,
+    pdfHeight
+  );
+
+  pdf.save('旅遊報名表.pdf');
+}
+
+const table =
+  document.querySelector('table');
+
+const canvas =
+  await html2canvas(table, {
+    scrollX: 0,
+    scrollY: 0,
+    windowWidth: table.scrollWidth,
+    windowHeight: table.scrollHeight
+  });
 
   const imgData =
     canvas.toDataURL('image/png');
