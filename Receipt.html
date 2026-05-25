@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>電子提貨單</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=1200">
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -87,14 +87,14 @@
 
     .signature-box {
       border: 1px solid #333;
-      height: 180px;
+      height: 300px;
       background: #fff;
       position: relative;
     }
 
     canvas {
       width: 100%;
-      height: 180px;
+      height: 300px;
       display: block;
       touch-action: none;
     }
@@ -164,33 +164,7 @@
       }
     }
 
-    @media screen and (max-width: 768px) {
-      body {
-        padding: 10px;
-      }
 
-      .page {
-        width: 100%;
-        min-height: auto;
-        padding: 18px;
-      }
-
-      .top {
-        flex-direction: column;
-      }
-
-      .qrcode {
-        margin: 0 auto;
-      }
-
-      table {
-        font-size: 16px;
-      }
-
-      th, td {
-        padding: 10px;
-      }
-    }
   </style>
 </head>
 
