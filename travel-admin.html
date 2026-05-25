@@ -662,7 +662,7 @@ async function downloadPDF() {
       canvas.toDataURL('image/png');
 
     const pageWidth =
-      pdf.internal.pageSize.getWidth() - 20;
+      pdf.internal.pageSize.getWidth() - 5;
 
     const pageHeight =
       (canvas.height * pageWidth / canvas.width) - 20;
