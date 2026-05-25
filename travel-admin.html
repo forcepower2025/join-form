@@ -579,42 +579,48 @@ document.getElementById('filterUnpaid')
   .addEventListener('change', render);
 
 async function downloadPDF() {
-  const table =
-    document.querySelector('table');
+  const table = document.querySelector('table');
 
-  const canvas =
-    await html2canvas(table, {
-      scrollX: 0,
-      scrollY: 0,
-      windowWidth: table.scrollWidth,
-      windowHeight: table.scrollHeight
-    });
+  const canvas = await html2canvas(table, {
+    scrollX: 0,
+    scrollY: 0,
+    windowWidth: table.scrollWidth,
+    windowHeight: table.scrollHeight,
+    scale: 2
+  });
 
-  const imgData =
-    canvas.toDataURL('image/png');
+  const imgData = canvas.toDataURL('image/png');
 
   const { jsPDF } = window.jspdf;
 
-  const pdf =
-    new jsPDF('l', 'mm', 'a4');
+  const pdf = new jsPDF('l', 'mm', 'a4');
 
-  const pdfWidth =
-    pdf.internal.pageSize.getWidth();
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
 
-  const pdfHeight =
-    canvas.height * pdfWidth / canvas.width;
+  const imgWidth = pageWidth;
+  const imgHeight = canvas.height * imgWidth / canvas.width;
 
-  pdf.addImage(
-    imgData,
-    'PNG',
-    0,
-    0,
-    pdfWidth,
-    pdfHeight
-  );
+  let heightLeft = imgHeight;
+  let position = 0;
+
+  pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+
+  heightLeft -= pageHeight;
+
+  while (heightLeft > 0) {
+    position -= pageHeight;
+
+    pdf.addPage();
+
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+
+    heightLeft -= pageHeight;
+  }
 
   pdf.save('旅遊報名表.pdf');
 }
+  
 </script>
 
 </body>
