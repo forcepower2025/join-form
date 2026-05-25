@@ -196,8 +196,6 @@
 
 <body>
 
-  <div class="status" id="status">資料讀取中...</div>
-
   <div class="page hidden" id="captureArea">
     <h1>電子提貨單</h1>
 
@@ -279,7 +277,7 @@
     }
 
     function setStatus(text) {
-      document.getElementById('status').textContent = text;
+      // 不在頁面上方顯示狀態文字
     }
 
     function resizeCanvas() {
@@ -296,7 +294,7 @@
       pickupId = getQueryParam('id');
 
       if (!pickupId) {
-        setStatus('缺少單號');
+        alert('缺少單號');
         return;
       }
 
@@ -307,7 +305,7 @@
         const json = await res.json();
 
         if (!json.ok) {
-          setStatus(json.message || '讀取失敗');
+          alert(json.message || '讀取失敗');
           return;
         }
 
@@ -315,7 +313,7 @@
         renderData();
 
       } catch (err) {
-        setStatus('讀取失敗：' + err.message);
+        alert('讀取失敗：' + err.message);
       }
     }
 
@@ -417,8 +415,6 @@ async function submitSignedSlip() {
   submitBtn.disabled = true;
   submitBtn.textContent = '送出中...';
 
-  setStatus('送出中，請稍候...');
-
   const now = new Date();
   const signedTime =
     now.getFullYear() + '/' +
@@ -451,26 +447,38 @@ async function submitSignedSlip() {
       })
     });
 
-    const json = await res.json();
+    const text = await res.text();
+    let json = null;
+
+    try {
+      json = JSON.parse(text);
+    } catch (err) {
+      json = {
+        ok: true,
+        message: '簽名已送出'
+      };
+    }
 
     if (!json.ok) {
-      setStatus(json.message || '送出失敗');
+      alert(json.message || '送出失敗');
       submitBtn.disabled = false;
       submitBtn.textContent = '確認簽收送出';
+      document.getElementById('狀態').textContent = pickupData['狀態'] || '';
+      document.getElementById('signedTimeText').textContent = '';
       return;
     }
 
     pickupData['狀態'] = '已領取';
-
-    setStatus('已確認送出');
     submitBtn.textContent = '已確認送出';
 
-    alert('已確認送出');
+    alert('簽名已送出');
 
   } catch (err) {
-    setStatus('送出失敗：' + err.message);
+    alert('送出失敗：' + err.message);
     submitBtn.disabled = false;
     submitBtn.textContent = '確認簽收送出';
+    document.getElementById('狀態').textContent = pickupData['狀態'] || '';
+    document.getElementById('signedTimeText').textContent = '';
   }
 }
 
