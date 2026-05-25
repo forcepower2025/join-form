@@ -203,7 +203,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+ 
 </head>
 
 <body>
@@ -579,79 +579,106 @@ document.getElementById('filterPaid')
 document.getElementById('filterUnpaid')
   .addEventListener('change', render);
 
-function downloadPDF() {
+async function downloadPDF() {
 
   const { jsPDF } = window.jspdf;
 
   const pdf =
     new jsPDF('l', 'mm', 'a4');
 
-  const headers = [[
-    '姓名',
-    '手機號碼',
-    '身份證字號',
-    '出生年月日',
-    '介紹人',
-    '團隊長',
-    '是否已繳費'
-  ]];
+  const rowsPerPage = 20;
 
-  const rows = [];
+  const allRows =
+    Array.from(
+      document.querySelectorAll('tbody tr')
+    );
 
-  const trs =
-    document.querySelectorAll('tbody tr');
+  const totalPages =
+    Math.ceil(
+      allRows.length / rowsPerPage
+    );
 
-  trs.forEach(tr => {
+  for (
+    let page = 0;
+    page < totalPages;
+    page++
+  ) {
 
-    const tds =
-      tr.querySelectorAll('td');
+    const start =
+      page * rowsPerPage;
 
-    rows.push([
-      tds[0]?.innerText || '',
-      tds[1]?.innerText || '',
-      tds[2]?.innerText || '',
-      tds[3]?.innerText || '',
-      tds[4]?.innerText || '',
-      tds[5]?.innerText || '',
-      tds[6]?.innerText || ''
-    ]);
+    const end =
+      start + rowsPerPage;
 
-  });
+    const pageRows =
+      allRows.slice(start, end);
 
-  pdf.setFontSize(18);
+    const tempTable =
+      document.createElement('table');
 
-  pdf.text(
-    '旅遊報名表',
-    14,
-    15
-  );
+    tempTable.style.width = '100%';
+    tempTable.style.borderCollapse = 'collapse';
+    tempTable.style.background = '#fff';
 
-  pdf.autoTable({
+    tempTable.innerHTML = `
+      <thead>
+        <tr>
+          <th>姓名</th>
+          <th>手機號碼</th>
+          <th>身份證字號</th>
+          <th>出生年月日</th>
+          <th>介紹人</th>
+          <th>團隊長</th>
+          <th>是否已繳費</th>
+        </tr>
+      </thead>
+    `;
 
-    head: headers,
+    const tbody =
+      document.createElement('tbody');
 
-    body: rows,
+    pageRows.forEach(tr => {
+      tbody.appendChild(
+        tr.cloneNode(true)
+      );
+    });
 
-    startY: 22,
+    tempTable.appendChild(tbody);
 
-    theme: 'grid',
+    tempTable.style.position = 'fixed';
+    tempTable.style.left = '-99999px';
 
-    styles: {
-      fontSize: 10,
-      halign: 'center',
-      valign: 'middle'
-    },
+    document.body.appendChild(tempTable);
 
-    headStyles: {
-      fillColor: [51, 51, 51],
-      textColor: 255
-    },
+    const canvas =
+      await html2canvas(tempTable, {
+        scale: 2
+      });
 
-    pageBreak: 'auto',
+    document.body.removeChild(tempTable);
 
-    rowPageBreak: 'avoid'
+    const imgData =
+      canvas.toDataURL('image/png');
 
-  });
+    const pageWidth =
+      pdf.internal.pageSize.getWidth();
+
+    const pageHeight =
+      canvas.height * pageWidth / canvas.width;
+
+    if (page > 0) {
+      pdf.addPage();
+    }
+
+    pdf.addImage(
+      imgData,
+      'PNG',
+      0,
+      0,
+      pageWidth,
+      pageHeight
+    );
+  }
 
   pdf.save('旅遊報名表.pdf');
 }
