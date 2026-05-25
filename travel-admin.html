@@ -672,21 +672,21 @@ async function downloadPDF() {
     const pageWidth =
       pdf.internal.pageSize.getWidth() - 20;
 
-    const pageHeight =
+    const imgHeight =
       (canvas.height * pageWidth / canvas.width) - 20;
 
     if (page > 0) {
       pdf.addPage();
     }
 
-    pdf.addImage(
-      imgData,
-      'PNG',
-      10,
-      10,
-      pageWidth,
-      pageHeight
-    );
+pdf.addImage(
+  imgData,
+  'PNG',
+  4,
+  10,
+  pageWidth,
+  imgHeight
+);
   }
 
   pdf.save('旅遊報名表.pdf');
