@@ -673,7 +673,7 @@ async function downloadPDF() {
       pdf.internal.pageSize.getWidth() - 20;
 
     const imgHeight =
-      (canvas.height * pageWidth / canvas.width) - 20;
+      (canvas.height * pageWidth / canvas.width) ;
 
     if (page > 0) {
       pdf.addPage();
@@ -682,7 +682,7 @@ async function downloadPDF() {
 pdf.addImage(
   imgData,
   'PNG',
-  4,
+  10,
   10,
   pageWidth,
   imgHeight
