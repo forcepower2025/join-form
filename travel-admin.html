@@ -658,6 +658,15 @@ async function downloadPDF() {
     el.style.padding = '18px';
 
   });
+
+    tempTable.querySelectorAll('button')
+  .forEach(btn => {
+
+    btn.style.fontSize = '32px';
+
+    btn.style.padding = '12px 20px';
+
+  });
     
     const canvas =
       await html2canvas(tempTable, {
