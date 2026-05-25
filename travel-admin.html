@@ -650,7 +650,15 @@ async function downloadPDF() {
     tempTable.style.left = '-99999px';
 
     document.body.appendChild(tempTable);
+    tempTable.querySelectorAll('th, td')
+  .forEach(el => {
 
+    el.style.fontSize = '30px';
+
+    el.style.padding = '18px';
+
+  });
+    
     const canvas =
       await html2canvas(tempTable, {
         scale: 2
