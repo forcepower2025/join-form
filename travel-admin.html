@@ -202,7 +202,8 @@
   </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body>
@@ -578,45 +579,79 @@ document.getElementById('filterPaid')
 document.getElementById('filterUnpaid')
   .addEventListener('change', render);
 
-async function downloadPDF() {
-  const table = document.querySelector('table');
-
-  const canvas = await html2canvas(table, {
-    scrollX: 0,
-    scrollY: 0,
-    windowWidth: table.scrollWidth,
-    windowHeight: table.scrollHeight,
-    scale: 2
-  });
-
-  const imgData = canvas.toDataURL('image/png');
+function downloadPDF() {
 
   const { jsPDF } = window.jspdf;
 
-  const pdf = new jsPDF('l', 'mm', 'a4');
+  const pdf =
+    new jsPDF('l', 'mm', 'a4');
 
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
+  const headers = [[
+    '姓名',
+    '手機號碼',
+    '身份證字號',
+    '出生年月日',
+    '介紹人',
+    '團隊長',
+    '是否已繳費'
+  ]];
 
-  const imgWidth = pageWidth;
-  const imgHeight = canvas.height * imgWidth / canvas.width;
+  const rows = [];
 
-  let heightLeft = imgHeight;
-  let position = 0;
+  const trs =
+    document.querySelectorAll('tbody tr');
 
-  pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+  trs.forEach(tr => {
 
-  heightLeft -= pageHeight;
+    const tds =
+      tr.querySelectorAll('td');
 
-  while (heightLeft > 0) {
-    position -= pageHeight;
+    rows.push([
+      tds[0]?.innerText || '',
+      tds[1]?.innerText || '',
+      tds[2]?.innerText || '',
+      tds[3]?.innerText || '',
+      tds[4]?.innerText || '',
+      tds[5]?.innerText || '',
+      tds[6]?.innerText || ''
+    ]);
 
-    pdf.addPage();
+  });
 
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+  pdf.setFontSize(18);
 
-    heightLeft -= pageHeight;
-  }
+  pdf.text(
+    '旅遊報名表',
+    14,
+    15
+  );
+
+  pdf.autoTable({
+
+    head: headers,
+
+    body: rows,
+
+    startY: 22,
+
+    theme: 'grid',
+
+    styles: {
+      fontSize: 10,
+      halign: 'center',
+      valign: 'middle'
+    },
+
+    headStyles: {
+      fillColor: [51, 51, 51],
+      textColor: 255
+    },
+
+    pageBreak: 'auto',
+
+    rowPageBreak: 'avoid'
+
+  });
 
   pdf.save('旅遊報名表.pdf');
 }
