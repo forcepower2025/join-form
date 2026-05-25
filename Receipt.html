@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>電子提貨單</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f2f2f2;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", Arial, sans-serif;
+      color: #222;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #fff;
+      margin: 0 auto;
+      padding: 18mm;
+      box-sizing: border-box;
+      border: 1px solid #ddd;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin: 0 0 20px;
+      letter-spacing: 4px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .info {
+      flex: 1;
+    }
+
+    .qrcode {
+      width: 150px;
+      height: 150px;
+      border: 1px solid #ddd;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    .qrcode img {
+      width: 100%;
+      height: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 18px;
+      margin-top: 10px;
+    }
+
+    th {
+      width: 28%;
+      background: #f5f5f5;
+      text-align: left;
+      font-weight: bold;
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 12px;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 24px 0 10px;
+    }
+
+    .signature-box {
+      border: 1px solid #333;
+      height: 180px;
+      background: #fff;
+      position: relative;
+    }
+
+    canvas {
+      width: 100%;
+      height: 180px;
+      display: block;
+      touch-action: none;
+    }
+
+    .signed-time {
+      margin-top: 12px;
+      font-size: 16px;
+    }
+
+    .buttons {
+      margin: 20px auto;
+      text-align: center;
+    }
+
+    button {
+      font-size: 18px;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 6px;
+      margin: 6px;
+      cursor: pointer;
+    }
+
+    .btn-print {
+      background: #555;
+      color: #fff;
+    }
+
+    .btn-clear {
+      background: #999;
+      color: #fff;
+    }
+
+    .btn-submit {
+      background: #0b7cff;
+      color: #fff;
+    }
+
+    .status {
+      text-align: center;
+      margin: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        margin: 0;
+        border: none;
+        padding: 18mm;
+      }
+
+      .buttons,
+      .status {
+        display: none;
+      }
+    }
+
+    @media screen and (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .page {
+        width: 100%;
+        min-height: auto;
+        padding: 18px;
+      }
+
+      .top {
+        flex-direction: column;
+      }
+
+      .qrcode {
+        margin: 0 auto;
+      }
+
+      table {
+        font-size: 16px;
+      }
+
+      th, td {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="status" id="status">資料讀取中...</div>
+
+  <div class="page hidden" id="captureArea">
+    <h1>電子提貨單</h1>
+
+    <div class="top">
+      <div class="info">
+        <table>
+          <tr>
+            <th>單號</th>
+            <td id="單號"></td>
+          </tr>
+          <tr>
+            <th>領貨人</th>
+            <td id="領貨人"></td>
+          </tr>
+          <tr>
+            <th>類別</th>
+            <td id="類別"></td>
+          </tr>
+          <tr>
+            <th>內容物</th>
+            <td id="內容物"></td>
+          </tr>
+          <tr>
+            <th>價值</th>
+            <td id="價值"></td>
+          </tr>
+          <tr>
+            <th>建單日期</th>
+            <td id="建單日期"></td>
+          </tr>
+          <tr>
+            <th>事由</th>
+            <td id="事由"></td>
+          </tr>
+          <tr>
+            <th>備註</th>
+            <td id="備註"></td>
+          </tr>
+          <tr>
+            <th>狀態</th>
+            <td id="狀態"></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="qrcode">
+        <img id="qrImg" src="">
+      </div>
+    </div>
+
+    <div class="section-title">簽收人電子簽名</div>
+
+    <div class="signature-box">
+      <canvas id="signatureCanvas"></canvas>
+    </div>
+
+    <div class="signed-time" id="signedTimeText"></div>
+  </div>
+
+  <div class="buttons hidden" id="buttonArea">
+    <button class="btn-print" onclick="window.print()">列印 A4</button>
+    <button class="btn-clear" onclick="clearSignature()">清除簽名</button>
+    <button class="btn-submit" onclick="submitSignedSlip()">確認簽收送出</button>
+  </div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwDqxQe1r5EwAXA8SS56P6l3IIojgnZiCjuZz6oOh1tYFlOq7oouGQ4Rkgj0G_yx7erSg/exec';
+
+    let pickupId = '';
+    let pickupData = {};
+    let isDrawing = false;
+    let hasSignature = false;
+
+    const canvas = document.getElementById('signatureCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function getQueryParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    function setStatus(text) {
+      document.getElementById('status').textContent = text;
+    }
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#000';
+    }
+
+    async function loadData() {
+      pickupId = getQueryParam('id');
+
+      if (!pickupId) {
+        setStatus('缺少單號');
+        return;
+      }
+
+      const url = `${API_URL}?action=get&id=${encodeURIComponent(pickupId)}`;
+
+      try {
+        const res = await fetch(url);
+        const json = await res.json();
+
+        if (!json.ok) {
+          setStatus(json.message || '讀取失敗');
+          return;
+        }
+
+        pickupData = json.data;
+        renderData();
+
+      } catch (err) {
+        setStatus('讀取失敗：' + err.message);
+      }
+    }
+
+    function renderData() {
+      const fields = [
+        '單號',
+        '領貨人',
+        '類別',
+        '內容物',
+        '價值',
+        '建單日期',
+        '事由',
+        '備註',
+        '狀態'
+      ];
+
+      fields.forEach(field => {
+        document.getElementById(field).textContent = pickupData[field] || '';
+      });
+
+      const currentUrl = window.location.href;
+      document.getElementById('qrImg').src =
+        'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' +
+        encodeURIComponent(currentUrl);
+
+      if (pickupData['簽收時間戳記']) {
+        document.getElementById('signedTimeText').textContent =
+          '簽收時間：' + pickupData['簽收時間戳記'];
+      }
+
+      document.getElementById('captureArea').classList.remove('hidden');
+      document.getElementById('buttonArea').classList.remove('hidden');
+
+      setStatus('');
+
+      setTimeout(() => {
+        resizeCanvas();
+      }, 100);
+    }
+
+    function getCanvasPoint(e) {
+      const rect = canvas.getBoundingClientRect();
+
+      if (e.touches && e.touches.length > 0) {
+        return {
+          x: e.touches[0].clientX - rect.left,
+          y: e.touches[0].clientY - rect.top
+        };
+      }
+
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+
+    function startDraw(e) {
+      e.preventDefault();
+      isDrawing = true;
+      hasSignature = true;
+
+      const p = getCanvasPoint(e);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+      e.preventDefault();
+
+      const p = getCanvasPoint(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+    }
+
+    function endDraw(e) {
+      e.preventDefault();
+      isDrawing = false;
+    }
+
+    function clearSignature() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      resizeCanvas();
+      hasSignature = false;
+    }
+
+    async function submitSignedSlip() {
+      if (!hasSignature) {
+        alert('請先完成電子簽名');
+        return;
+      }
+
+      if (pickupData['狀態'] === '已領取') {
+        alert('此提貨單已完成簽收');
+        return;
+      }
+
+      setStatus('送出中，請稍候...');
+
+      const now = new Date();
+      const signedTime =
+        now.getFullYear() + '/' +
+        String(now.getMonth() + 1).padStart(2, '0') + '/' +
+        String(now.getDate()).padStart(2, '0') + ' ' +
+        String(now.getHours()).padStart(2, '0') + ':' +
+        String(now.getMinutes()).padStart(2, '0') + ':' +
+        String(now.getSeconds()).padStart(2, '0');
+
+      document.getElementById('狀態').textContent = '已領取';
+      document.getElementById('signedTimeText').textContent = '簽收時間：' + signedTime;
+
+      try {
+        const target = document.getElementById('captureArea');
+
+        const canvasImage = await html2canvas(target, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff'
+        });
+
+        const imageBase64 = canvasImage.toDataURL('image/png');
+
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'submitSignedSlip',
+            id: pickupId,
+            imageBase64: imageBase64
+          })
+        });
+
+        const json = await res.json();
+
+        if (!json.ok) {
+          setStatus(json.message || '送出失敗');
+          return;
+        }
+
+        setStatus('簽收完成，電子提貨單已回存');
+
+      } catch (err) {
+        setStatus('送出失敗：' + err.message);
+      }
+    }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('mouseleave', endDraw);
+
+    canvas.addEventListener('touchstart', startDraw);
+    canvas.addEventListener('touchmove', draw);
+    canvas.addEventListener('touchend', endDraw);
+
+    window.addEventListener('resize', resizeCanvas);
+
+    loadData();
+  </script>
+
+</body>
+</html>
