@@ -331,7 +331,10 @@
       ];
 
       fields.forEach(field => {
-        document.getElementById(field).textContent = pickupData[field] || '';
+        document.getElementById(field).textContent =
+  field === '建單日期'
+    ? String(pickupData[field] || '').substring(0, 10)
+    : (pickupData[field] || '');
       });
 
       const currentUrl = window.location.href;
