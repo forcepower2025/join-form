@@ -617,7 +617,7 @@ async function downloadPDF() {
       document.createElement('table');
 
     tempTable.style.width = '100%';
-    tempTable.style.fontSize = '20px';
+    tempTable.style.fontSize = '30px';
     tempTable.style.borderCollapse = 'collapse';
     tempTable.style.background = '#fff';
 
@@ -662,7 +662,7 @@ async function downloadPDF() {
       canvas.toDataURL('image/png');
 
     const pageWidth =
-      pdf.internal.pageSize.getWidth() - 5;
+      pdf.internal.pageSize.getWidth() - 20;
 
     const pageHeight =
       (canvas.height * pageWidth / canvas.width) - 20;
