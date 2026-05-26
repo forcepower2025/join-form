@@ -615,6 +615,8 @@ async function downloadPDF() {
 
     const tempTable =
       document.createElement('table');
+      tempTable.style.width = '1400px';
+      tempTable.style.tableLayout = 'fixed';
 
     tempTable.style.width = '100%';
     tempTable.style.fontSize = '30px';
@@ -657,6 +659,8 @@ async function downloadPDF() {
 
     el.style.padding = '18px';
 
+    el.style.whiteSpace = 'nowrap';
+
   });
 
     tempTable.querySelectorAll('button')
@@ -668,10 +672,12 @@ async function downloadPDF() {
 
   });
     
-    const canvas =
-      await html2canvas(tempTable, {
-        scale: 2
-      });
+const canvas =
+  await html2canvas(tempTable, {
+    scale: 3,
+    windowWidth: 1400,
+    width: 1400
+  });
 
     document.body.removeChild(tempTable);
 
