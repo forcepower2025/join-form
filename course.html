@@ -185,32 +185,22 @@ async function api(payload) {
 // 直接將資料夾 ID 固定（就是你放圖片的那個資料夾）
 const DRIVE_FOLDER_HTML_ID = '1MIQUeuQJZJNDaU4vc10r0w-Du9uGAcLf';
 
+// 載入課程 DM 圖片的邏輯
 async function loadCourseImage() {
   if (!SHEET_NAME) {
     console.log("缺少 date 參數，無法載入圖片");
     return;
   }
 
-  try {
-    // 1. 重新向後端 GAS 發送請求，依據日期尋找真正的圖片 ID
-    const result = await api({
-      action: 'getCourseImage',
-      sheetName: SHEET_NAME
-    });
+  const img = document.getElementById('courseImage');
+  
+  // 💡 直接組合出你指定的圖片網址：https://forcepower2026.com/工作表名稱.jpg
+  img.src = `https://forcepower2026.com/${SHEET_NAME}.jpg`;
+  
+  // 顯示圖片區塊
+  img.style.display = 'block';
 
-    console.log("圖片獲取結果:", result); 
-
-    // 2. 當後端成功回傳有真正的圖片網址時才塞入 img 標籤
-    if (result.success && result.imageUrl) {
-      const img = document.getElementById('courseImage');
-      img.src = result.imageUrl;
-      img.style.display = 'block'; // 成功拿到圖片，正常顯示區塊
-    } else {
-      console.log("GAS 未找到對應圖片或 imageUrl 為空");
-    }
-  } catch (err) {
-    console.error("呼叫 GAS 圖片 API 失敗:", err);
-  }
+  console.log("網頁嘗試載入的圖片網址為:", img.src);
 }
 
 async function submitForm() {
