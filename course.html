@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>培訓課程報名表</title>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background: #f5f7fb;
+  font-family: "Microsoft JhengHei", sans-serif;
+}
+
+.wrap {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.course-img {
+  width: 100%;
+  display: none;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 25px;
+}
+
+.form-box {
+  background: #fff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+label {
+  display: block;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.lunch-wrap {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 10px;
+}
+
+.lunch-item {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.lunch-item input {
+  width: 30px;
+  height: 30px;
+}
+
+.submit-btn {
+  width: 100%;
+  margin-top: 30px;
+  padding: 16px;
+  font-size: 22px;
+  border: none;
+  border-radius: 12px;
+  background: #1f6feb;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.msg {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 18px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <img id="courseImage" class="course-img">
+
+  <div class="title">
+    培訓課程報名表
+  </div>
+
+  <div class="form-box">
+
+    <label>姓名</label>
+    <input type="text" id="name" placeholder="請輸入姓名">
+
+    <label>手機號碼</label>
+    <input type="tel" id="phone" placeholder="請輸入手機號碼">
+
+    <label>午餐</label>
+
+    <div class="lunch-wrap">
+
+      <label class="lunch-item">
+        <input type="checkbox" id="meat">
+        <span>葷食</span>
+      </label>
+
+      <label class="lunch-item">
+        <input type="checkbox" id="veg">
+        <span>素食</span>
+      </label>
+
+    </div>
+
+    <button class="submit-btn" onclick="submitForm()">
+      送出報名
+    </button>
+
+    <div class="msg" id="msg"></div>
+
+  </div>
+
+</div>
+
+<script>
+const API_URL =
+'https://script.google.com/macros/s/AKfycbwjITXx86Cl3WOqcB9a4GHl8NKe2JhkNWvCZMvufvzumPEAALTv0XGgPm5wShdR5DN4wA/exec';
+
+const params =
+  new URLSearchParams(window.location.search);
+
+const SHEET_NAME =
+  params.get('date');
+
+if (!SHEET_NAME) {
+  alert('網址缺少 date 參數');
+}
+
+document.getElementById('meat')
+  .addEventListener('change', () => {
+    if (document.getElementById('meat').checked) {
+      document.getElementById('veg').checked = false;
+    }
+  });
+
+document.getElementById('veg')
+  .addEventListener('change', () => {
+    if (document.getElementById('veg').checked) {
+      document.getElementById('meat').checked = false;
+    }
+  });
+
+async function api(payload) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+
+  return await res.json();
+}
+
+async function loadCourseImage() {
+  const result = await api({
+    action: 'getCourseImage',
+    sheetName: SHEET_NAME
+  });
+
+  if (result.success && result.imageUrl) {
+    const img = document.getElementById('courseImage');
+    img.src = result.imageUrl;
+    img.style.display = 'block';
+  }
+}
+
+async function submitForm() {
+  const msg = document.getElementById('msg');
+
+  const name =
+    document.getElementById('name').value.trim();
+
+  const phone =
+    document.getElementById('phone').value.trim();
+
+  let lunch = '';
+
+  if (document.getElementById('meat').checked) {
+    lunch = '葷食';
+  }
+
+  if (document.getElementById('veg').checked) {
+    lunch = '素食';
+  }
+
+  if (!name) {
+    alert('請輸入姓名');
+    return;
+  }
+
+  if (!phone) {
+    alert('請輸入手機號碼');
+    return;
+  }
+
+  if (!lunch) {
+    alert('請選擇午餐');
+    return;
+  }
+
+  msg.textContent = '資料送出中...';
+
+  try {
+    const result = await api({
+      action: 'register',
+      sheetName: SHEET_NAME,
+      name,
+      phone,
+      lunch
+    });
+
+    if (result.success) {
+      msg.textContent = '報名成功！';
+
+      document.getElementById('name').value = '';
+      document.getElementById('phone').value = '';
+      document.getElementById('meat').checked = false;
+      document.getElementById('veg').checked = false;
+    } else {
+      msg.textContent = result.message || '送出失敗';
+    }
+
+  } catch (err) {
+    msg.textContent = '送出失敗';
+  }
+}
+
+loadCourseImage();
+</script>
+
+</body>
+</html>
