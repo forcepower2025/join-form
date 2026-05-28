@@ -157,12 +157,25 @@ th {
   border-radius: 4px;
   text-align: center;
 }
-.edit-select {
-  width: 90%;
-  padding: 6px;
+
+/* 表格內午餐小勾選區塊的樣式 */
+.edit-lunch-wrap {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
   font-size: 14px;
-  border: 1px solid #1f6feb;
-  border-radius: 4px;
+  font-weight: bold;
+}
+.edit-lunch-wrap label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.edit-lunch-wrap input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
 }
 
 .status-btn {
@@ -386,7 +399,7 @@ function render() {
     allData.filter(item => item.paymentStatus === '已繳費').length;
 
   const unpaidCount =
-    allData.filter(item => item.paymentStatus !== '已繳費').length;
+    allData.filter(item => item.paymentStatus !== '補充已繳費' && item.paymentStatus !== '已繳費').length;
 
   const checkinCount =
     allData.filter(item => item.checkinStatus === '已報到').length;
@@ -413,7 +426,7 @@ function render() {
       (!name || item.name.includes(name)) &&
       (
         (!filterPaid && !filterUnpaid) ||
-        (filterPaid && item.paymentStatus === 'Macro已繳費' || item.paymentStatus === '已繳費') ||
+        (filterPaid && item.paymentStatus === '已繳費') ||
         (filterUnpaid && item.paymentStatus === '未繳費')
       ) &&
       (
@@ -459,43 +472,69 @@ function render() {
 // 點擊變更為編輯狀態的函式
 function makeEditable(element, rowNumber, field) {
   // 如果已經在編輯狀態，則跳過
-  if (element.querySelector('input') || element.querySelector('select')) return;
+  if (element.querySelector('input')) return;
 
   const originalValue = element.textContent.trim();
 
   if (field === 'lunch') {
-    // 午餐欄位改用下拉選單
-    const select = document.createElement('select');
-    select.className = 'edit-select';
+    // 💡 午餐欄位：生成雙勾選方塊 (葷食 / 素食)
+    const wrap = document.createElement('div');
+    wrap.className = 'edit-lunch-wrap';
     
-    ['葷食', '素食'].forEach(opt => {
-      const option = document.createElement('option');
-      option.value = opt;
-      option.textContent = opt;
-      if (opt === originalValue) option.selected = true;
-      select.appendChild(option);
-    });
+    wrap.innerHTML = `
+      <label><input type="checkbox" id="editMeat" ${originalValue === '葷食' ? 'checked' : ''}> 葷</label>
+      <label><input type="checkbox" id="editVeg" ${originalValue === '素食' ? 'checked' : ''}> 素</label>
+    `;
 
     element.innerHTML = '';
-    element.appendChild(select);
-    select.focus();
+    element.appendChild(wrap);
 
-    // 監聽選單切換或失去焦點
-    select.addEventListener('change', () => saveFieldUpdate(element, rowNumber, field, select.value, originalValue));
-    select.addEventListener('blur', () => saveFieldUpdate(element, rowNumber, field, select.value, originalValue));
+    const cbMeat = wrap.querySelector('#editMeat');
+    const cbVeg = wrap.querySelector('#editVeg');
+
+    // 互斥邏輯
+    cbMeat.addEventListener('change', () => { if (cbMeat.checked) cbVeg.checked = false; });
+    cbVeg.addEventListener('change', () => { if (cbVeg.checked) cbMeat.checked = false; });
+
+    // 建立一個處理儲存的閉包函式
+    const triggerSave = async () => {
+      let finalValue = '';
+      if (cbMeat.checked) finalValue = '葷食';
+      if (cbVeg.checked) finalValue = '素食';
+      
+      // 移除事件監聽避免重複觸發，然後執行儲存
+      cbMeat.removeEventListener('blur', onBlurCheck);
+      cbVeg.removeEventListener('blur', onBlurCheck);
+      await saveFieldUpdate(element, rowNumber, field, finalValue, originalValue);
+    };
+
+    // 檢查失去焦點時是否點到另一個勾選框，如果不是就送出儲存
+    const onBlurCheck = (e) => {
+      setTimeout(() => {
+        const active = document.activeElement;
+        if (active !== cbMeat && active !== cbVeg) {
+          triggerSave();
+        }
+      }, 50);
+    };
+
+    cbMeat.addEventListener('blur', onBlurCheck);
+    cbVeg.addEventListener('blur', onBlurCheck);
+    
+    // 預設聚焦在其中一個上面
+    cbMeat.focus();
 
   } else {
-    // 姓名和手機使用 Input 輸入框
+    // 姓名和手機使用標準 Input 輸入框
     const input = document.createElement('input');
     input.type = (field === 'phone') ? 'tel' : 'text';
     input.className = 'edit-input';
     input.value = originalValue;
-    
+        
     element.innerHTML = '';
     element.appendChild(input);
     input.focus();
 
-    // 監聽 Enter 鍵與失去焦點
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         saveFieldUpdate(element, rowNumber, field, input.value.trim(), originalValue);
@@ -509,7 +548,6 @@ function makeEditable(element, rowNumber, field) {
 
 // 儲存修改內容並發送 API
 async function saveFieldUpdate(element, rowNumber, field, newValue, originalValue) {
-  // 如果值沒有變，直接還原純文字
   if (newValue === originalValue) {
     element.innerHTML = newValue;
     return;
@@ -527,7 +565,6 @@ async function saveFieldUpdate(element, rowNumber, field, newValue, originalValu
     });
 
     if (result.success) {
-      // 重新加載最新數據
       await loadData();
     } else {
       alert(result.message || '修改失敗');
@@ -561,7 +598,7 @@ async function togglePayment(rowNumber, name, currentStatus) {
 
 async function toggleCheckin(rowNumber, name, currentStatus) {
   const newStatus =
-    currentStatus === '已報到' ? '未報到' : '已報到';
+    currentStatus === '決已報到' || currentStatus === '已報到' ? '未報到' : '已報到';
 
   if (!confirm(`是否確認把 ${name} 改成 ${newStatus}？`)) return;
 
@@ -621,6 +658,5 @@ document.getElementById('filterVeg').addEventListener('change', render);
 // 自動載入
 loadData();
 </script>
-
 </body>
 </html>
