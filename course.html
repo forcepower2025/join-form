@@ -186,16 +186,27 @@ async function api(payload) {
 const DRIVE_FOLDER_HTML_ID = '1MIQUeuQJZJNDaU4vc10r0w-Du9uGAcLf';
 
 async function loadCourseImage() {
-  if (!SHEET_NAME) return;
+  if (!SHEET_NAME) {
+    console.log("缺少 date 參數，無法載入圖片");
+    return;
+  }
+
+  // 1. 這是你的資料夾 ID
+  const folderId = '1MIQUeuQJZJNDaU4vc10r0w-Du9uGAcLf';
+  
+  // 2. 這是你的圖片名稱（即網址上的 date，如 20260604）
+  const fileName = SHEET_NAME; 
 
   const img = document.getElementById('courseImage');
+
+  // 3. 利用 Google Drive 的隱藏 API：直接用「資料夾ID」+「檔案名稱」精確定位圖片網址
+  img.src = `https://docs.google.com/uc?export=view&id=${folderId}&title=${fileName}`;
   
-  // 💡 密技：利用 Google Drive 的隱藏 API，直接透過資料夾 ID 與檔案名稱（日期）定位圖片
-  // 這樣網頁加載速度會提升 10 倍，而且永遠不會觸發 GAS 的 DriveApp 存取遭拒錯誤
-  img.src = `https://docs.google.com/uc?export=view&id=${DRIVE_FOLDER_HTML_ID}&title=${SHEET_NAME}`;
+  // 4. 讓圖片顯示出來
   img.style.display = 'block';
 
-  // 如果上面的隱藏 API 因為 Google 改版失效，最正規的解法是改用方案 B
+  // 5. 除錯檢視：如果依然破圖，可以在瀏覽器 F12 看看這行網址
+  console.log("網頁嘗試載入的圖片網址為:", img.src);
 }
 
 async function submitForm() {
