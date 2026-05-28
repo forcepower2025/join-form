@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>培訓課程管理</title>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  background: #f5f7fb;
+  font-family: "Microsoft JhengHei", sans-serif;
+}
+
+.login-bar {
+  background: #222;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.login-bar input {
+  width: 180px;
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+}
+
+.login-bar button {
+  padding: 8px 16px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background: #1f6feb;
+  color: white;
+  cursor: pointer;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.summary-box {
+  text-align: center;
+  margin: 12px 0 20px;
+  line-height: 1.8;
+  font-size: 18px;
+  color: #555;
+}
+
+.summary-box span {
+  font-weight: bold;
+  color: #000;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.check-filter {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 12px 0 16px;
+}
+
+.check-item {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  gap: 12px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.check-item input {
+  width: 34px;
+  height: 34px;
+}
+
+.delete-area {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 0 20px;
+  flex-wrap: wrap;
+}
+
+.delete-area span {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.delete-area input {
+  width: 120px;
+  font-size: 18px;
+}
+
+.btn {
+  font-size: 18px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.delete-btn {
+  background: #222;
+  color: white;
+}
+
+.reload-btn {
+  font-size: 20px;
+  font-weight: 300;
+  padding: 5px 24px;
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+  font-size: 15px;
+}
+
+th {
+  background: #333;
+  color: white;
+}
+
+.status-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.blue {
+  background: #1f6feb;
+}
+
+.red {
+  background: #d93025;
+}
+
+.msg {
+  text-align: center;
+  margin: 12px 0;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  table {
+    min-width: 760px;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-bar">
+  <input type="password" id="adminPassword" placeholder="請輸入密碼">
+  <button onclick="checkPassword()">進入後台</button>
+</div>
+
+<div class="container" id="adminContent" style="display:none;">
+
+  <h1>
+    培訓課程管理<br>
+    <span id="dateTitle"></span>
+  </h1>
+
+  <div class="summary-box">
+    <div>目前報名：<span id="totalCount">0</span> 人</div>
+    <div>已繳費：<span id="paidCount">0</span> 人</div>
+    <div>未繳費：<span id="unpaidCount">0</span> 人</div>
+    <div>已報到：<span id="checkinCount">0</span> 人</div>
+    <div>未報到：<span id="notCheckinCount">0</span> 人</div>
+  </div>
+
+  <div class="filters">
+    <input type="text" id="filterName" placeholder="篩選姓名">
+
+    <div class="check-filter">
+      <label class="check-item">
+        <input type="checkbox" id="filterPaid">
+        <span>已繳費</span>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox" id="filterUnpaid">
+        <span>未繳費</span>
+      </label>
+    </div>
+
+    <div class="delete-area">
+      <span>刪除資料：</span>
+
+      <input
+        type="text"
+        id="deleteName"
+        placeholder="輸入姓名"
+      >
+
+      <button
+        class="btn delete-btn"
+        onclick="deleteByName()">
+        送出刪除
+      </button>
+    </div>
+
+    <button class="reload-btn" onclick="loadData()">重新整理</button>
+  </div>
+
+  <div class="msg" id="msg"></div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>姓名</th>
+          <th>手機號碼</th>
+          <th>午餐</th>
+          <th>是否繳費</th>
+          <th>是否報到</th>
+        </tr>
+      </thead>
+
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+const ADMIN_PASSWORD = '60398346';
+
+const API_URL =
+'https://script.google.com/macros/s/AKfycbwjITXx86Cl3WOqcB9a4GHl8NKe2JhkNWvCZMvufvzumPEAALTv0XGgPm5wShdR5DN4wA/exec';
+
+const params =
+  new URLSearchParams(window.location.search);
+
+const SHEET_NAME =
+  params.get('date');
+
+let allData = [];
+
+if (!SHEET_NAME) {
+  alert('網址缺少 date 參數');
+}
+
+document.getElementById('dateTitle').textContent = SHEET_NAME;
+
+function checkPassword() {
+  const password =
+    document.getElementById('adminPassword').value;
+
+  if (password === ADMIN_PASSWORD) {
+    document.getElementById('adminContent').style.display = 'block';
+    loadData();
+  } else {
+    alert('密碼錯誤');
+  }
+}
+
+async function api(payload) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+
+  return await res.json();
+}
+
+async function loadData() {
+  const msg = document.getElementById('msg');
+  msg.textContent = '資料載入中...';
+
+  try {
+    const result = await api({
+      action: 'list',
+      sheetName: SHEET_NAME
+    });
+
+    if (result.success) {
+      allData = result.data || [];
+      render();
+      msg.textContent = '';
+    } else {
+      msg.textContent = result.message || '資料載入失敗';
+    }
+
+  } catch (err) {
+    msg.textContent = '資料載入失敗';
+  }
+}
+
+function render() {
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+
+  const name =
+    document.getElementById('filterName').value.trim();
+
+  const filterPaid =
+    document.getElementById('filterPaid').checked;
+
+  const filterUnpaid =
+    document.getElementById('filterUnpaid').checked;
+
+  const totalCount = allData.length;
+
+  const paidCount =
+    allData.filter(item => item.paymentStatus === '已繳費').length;
+
+  const unpaidCount =
+    allData.filter(item => item.paymentStatus !== '已繳費').length;
+
+  const checkinCount =
+    allData.filter(item => item.checkinStatus === '已報到').length;
+
+  const notCheckinCount =
+    allData.filter(item => item.checkinStatus !== '已報到').length;
+
+  document.getElementById('totalCount').textContent = totalCount;
+  document.getElementById('paidCount').textContent = paidCount;
+  document.getElementById('unpaidCount').textContent = unpaidCount;
+  document.getElementById('checkinCount').textContent = checkinCount;
+  document.getElementById('notCheckinCount').textContent = notCheckinCount;
+
+  const filtered = allData.filter(item => {
+    return (
+      (!name || item.name.includes(name)) &&
+      (
+        (!filterPaid && !filterUnpaid) ||
+        (filterPaid && item.paymentStatus === '已繳費') ||
+        (filterUnpaid && item.paymentStatus === '未繳費')
+      )
+    );
+  });
+
+  filtered.forEach(item => {
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <td>${item.name || ''}</td>
+      <td>${item.phone || ''}</td>
+      <td>${item.lunch || ''}</td>
+      <td>
+        <button
+          class="status-btn ${item.paymentStatus === '已繳費' ? 'blue' : 'red'}"
+          onclick="togglePayment(${item.rowNumber}, '${escapeQuote(item.name)}', '${item.paymentStatus}')">
+          ${item.paymentStatus || '未繳費'}
+        </button>
+      </td>
+      <td>
+        <button
+          class="status-btn ${item.checkinStatus === '已報到' ? 'blue' : 'red'}"
+          onclick="toggleCheckin(${item.rowNumber}, '${escapeQuote(item.name)}', '${item.checkinStatus}')">
+          ${item.checkinStatus || '未報到'}
+        </button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+async function togglePayment(rowNumber, name, currentStatus) {
+  const newStatus =
+    currentStatus === '已繳費' ? '未繳費' : '已繳費';
+
+  if (!confirm(`是否確認把 ${name} 改成 ${newStatus}？`)) return;
+
+  const result = await api({
+    action: 'updatePayment',
+    sheetName: SHEET_NAME,
+    rowNumber,
+    status: newStatus
+  });
+
+  if (result.success) {
+    await loadData();
+  } else {
+    alert(result.message || '更新失敗');
+  }
+}
+
+async function toggleCheckin(rowNumber, name, currentStatus) {
+  const newStatus =
+    currentStatus === '已報到' ? '未報到' : '已報到';
+
+  if (!confirm(`是否確認把 ${name} 改成 ${newStatus}？`)) return;
+
+  const result = await api({
+    action: 'updateCheckin',
+    sheetName: SHEET_NAME,
+    rowNumber,
+    status: newStatus
+  });
+
+  if (result.success) {
+    await loadData();
+  } else {
+    alert(result.message || '更新失敗');
+  }
+}
+
+async function deleteByName() {
+  const name =
+    document.getElementById('deleteName').value.trim();
+
+  if (!name) {
+    alert('請輸入姓名');
+    return;
+  }
+
+  if (!confirm(`是否確認刪除 ${name} 的資料？`)) return;
+
+  const result = await api({
+    action: 'deleteByName',
+    sheetName: SHEET_NAME,
+    name
+  });
+
+  if (result.success) {
+    alert(`已刪除 ${result.deletedCount} 筆資料`);
+    document.getElementById('deleteName').value = '';
+    await loadData();
+  } else {
+    alert(result.message || '刪除失敗');
+  }
+}
+
+function escapeQuote(str) {
+  return String(str || '').replace(/'/g, "\\'");
+}
+
+document.getElementById('filterName')
+  .addEventListener('input', render);
+
+document.getElementById('filterPaid')
+  .addEventListener('change', render);
+
+document.getElementById('filterUnpaid')
+  .addEventListener('change', render);
+</script>
+
+</body>
+</html>
