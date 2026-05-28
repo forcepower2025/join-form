@@ -183,20 +183,19 @@ async function api(payload) {
 }
 
 async function loadCourseImage() {
-
   const result = await api({
     action: 'getCourseImage',
     sheetName: SHEET_NAME
   });
 
+  console.log("圖片獲取結果:", result); // 可以在瀏覽器 F12 檢查是否有拿到網址
+
   if (result.success && result.imageUrl) {
-
-    const img =
-      document.getElementById('courseImage');
-
+    const img = document.getElementById('courseImage');
     img.src = result.imageUrl;
-
     img.style.display = 'block';
+  } else {
+    console.log("未找到對應圖片或 imageUrl 為空");
   }
 }
 
