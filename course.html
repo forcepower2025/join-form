@@ -191,22 +191,26 @@ async function loadCourseImage() {
     return;
   }
 
-  // 1. 這是你的資料夾 ID
-  const folderId = '1MIQUeuQJZJNDaU4vc10r0w-Du9uGAcLf';
-  
-  // 2. 這是你的圖片名稱（即網址上的 date，如 20260604）
-  const fileName = SHEET_NAME; 
+  try {
+    // 1. 重新向後端 GAS 發送請求，依據日期尋找真正的圖片 ID
+    const result = await api({
+      action: 'getCourseImage',
+      sheetName: SHEET_NAME
+    });
 
-  const img = document.getElementById('courseImage');
+    console.log("圖片獲取結果:", result); 
 
-  // 3. 利用 Google Drive 的隱藏 API：直接用「資料夾ID」+「檔案名稱」精確定位圖片網址
-  img.src = `https://docs.google.com/uc?export=view&id=${folderId}&title=${fileName}`;
-  
-  // 4. 讓圖片顯示出來
-  img.style.display = 'block';
-
-  // 5. 除錯檢視：如果依然破圖，可以在瀏覽器 F12 看看這行網址
-  console.log("網頁嘗試載入的圖片網址為:", img.src);
+    // 2. 當後端成功回傳有真正的圖片網址時才塞入 img 標籤
+    if (result.success && result.imageUrl) {
+      const img = document.getElementById('courseImage');
+      img.src = result.imageUrl;
+      img.style.display = 'block'; // 成功拿到圖片，正常顯示區塊
+    } else {
+      console.log("GAS 未找到對應圖片或 imageUrl 為空");
+    }
+  } catch (err) {
+    console.error("呼叫 GAS 圖片 API 失敗:", err);
+  }
 }
 
 async function submitForm() {
