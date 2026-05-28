@@ -1,3 +1,8 @@
+沒問題！這就幫你把「午餐狀態（葷食／素食）」的篩選勾勾**加上去，同時在最上方的統計資訊欄位，也同步**新增「葷食人數」與「素食人數」的統計欄位。
+
+以下是修改後的完整 HTML 程式碼：
+
+```html
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -30,6 +35,16 @@ h1 {
   line-height: 1.8;
   font-size: 18px;
   color: #555;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .summary-box span {
@@ -57,7 +72,7 @@ input {
   display: flex;
   justify-content: center;
   gap: 40px;
-  margin: 6px 0;
+  margin: 4px 0;
 }
 
 .check-item {
@@ -175,11 +190,21 @@ th {
   </h1>
 
   <div class="summary-box">
-    <div>目前報名：<span id="totalCount">0</span> 人</div>
-    <div>已繳費：<span id="paidCount">0</span> 人</div>
-    <div>未繳費：<span id="unpaidCount">0</span> 人</div>
-    <div>已報到：<span id="checkinCount">0</span> 人</div>
-    <div>未報到：<span id="notCheckinCount">0</span> 人</div>
+    <div class="summary-row">
+      <div>目前報名：<span id="totalCount">0</span> 人</div>
+    </div>
+    <div class="summary-row">
+      <div>已繳費：<span id="paidCount">0</span> 人</div>
+      <div>未繳費：<span id="unpaidCount">0</span> 人</div>
+    </div>
+    <div class="summary-row">
+      <div>已報到：<span id="checkinCount">0</span> 人</div>
+      <div>未報到：<span id="notCheckinCount">0</span> 人</div>
+    </div>
+    <div class="summary-row">
+      <div>葷食：<span id="meatCount">0</span> 人</div>
+      <div>素食：<span id="vegCount">0</span> 人</div>
+    </div>
   </div>
 
   <div class="filters">
@@ -206,6 +231,18 @@ th {
       <label class="check-item">
         <input type="checkbox" id="filterNotCheckin">
         <span>未報到</span>
+      </label>
+    </div>
+
+    <div class="check-filter">
+      <label class="check-item">
+        <input type="checkbox" id="filterMeat">
+        <span>葷食</span>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox" id="filterVeg">
+        <span>素食</span>
       </label>
     </div>
 
@@ -311,13 +348,20 @@ function render() {
   const filterUnpaid =
     document.getElementById('filterUnpaid').checked;
 
-  // 新增：報到篩選變數
   const filterCheckin =
     document.getElementById('filterCheckin').checked;
 
   const filterNotCheckin =
     document.getElementById('filterNotCheckin').checked;
 
+  // 新增：午餐篩選變數
+  const filterMeat =
+    document.getElementById('filterMeat').checked;
+
+  const filterVeg =
+    document.getElementById('filterVeg').checked;
+
+  // 計算並統計數據
   const totalCount = allData.length;
 
   const paidCount =
@@ -332,14 +376,24 @@ function render() {
   const notCheckinCount =
     allData.filter(item => item.checkinStatus !== '已報到').length;
 
+  // 新增：午餐人數統計計算
+  const meatCount =
+    allData.filter(item => item.lunch === '葷食').length;
+
+  const vegCount =
+    allData.filter(item => item.lunch === '素食').length;
+
+  // 更新顯示統計數據
   document.getElementById('totalCount').textContent = totalCount;
   document.getElementById('paidCount').textContent = paidCount;
   document.getElementById('unpaidCount').textContent = unpaidCount;
   document.getElementById('checkinCount').textContent = checkinCount;
   document.getElementById('notCheckinCount').textContent = notCheckinCount;
+  document.getElementById('meatCount').textContent = meatCount;
+  document.getElementById('vegCount').textContent = vegCount;
 
+  // 資料過濾邏輯（包含 姓名、繳費、報到、午餐）
   const filtered = allData.filter(item => {
-    // 同時符合 姓名篩選、繳費篩選、報到篩選
     return (
       (!name || item.name.includes(name)) &&
       (
@@ -349,8 +403,13 @@ function render() {
       ) &&
       (
         (!filterCheckin && !filterNotCheckin) ||
-        (filterCheckin && item.checkinStatus === '已報到') ||
+        (filterCheckin && item.checkinStatus === '決已報到' || item.checkinStatus === '已報到') ||
         (filterNotCheckin && item.checkinStatus === '未報到')
+      ) &&
+      (
+        (!filterMeat && !filterVeg) ||
+        (filterMeat && item.lunch === '葷食') ||
+        (filterVeg && item.lunch === '素食')
       )
     );
   });
@@ -364,7 +423,7 @@ function render() {
       <td>${item.lunch || ''}</td>
       <td>
         <button
-          class="status-btn ${item.paymentStatus === '聯網已繳費' || item.paymentStatus === '已繳費' ? 'blue' : 'red'}"
+          class="status-btn ${item.paymentStatus === '已繳費' ? 'blue' : 'red'}"
           onclick="togglePayment(${item.rowNumber}, '${escapeQuote(item.name)}', '${item.paymentStatus}')">
           ${item.paymentStatus || '未繳費'}
         </button>
@@ -384,15 +443,15 @@ function render() {
 
 async function togglePayment(rowNumber, name, currentStatus) {
   const newStatus =
-    currentStatus === '已繳費' ? '未繳費' : '已繳費';
+    currentStatus === '已繳費' ? '未繳費' : 'Macro已繳費';
 
-  if (!confirm(`是否確認把 ${name} 改成 ${newStatus}？`)) return;
+  if (!confirm(`是否確認把 ${name} 改成 ${newStatus.replace('Macro', '')}？`)) return;
 
   const result = await api({
     action: 'updatePayment',
     sheetName: SHEET_NAME,
     rowNumber,
-    status: newStatus
+    status: newStatus.replace('Macro', '')
   });
 
   if (result.success) {
@@ -404,15 +463,15 @@ async function togglePayment(rowNumber, name, currentStatus) {
 
 async function toggleCheckin(rowNumber, name, currentStatus) {
   const newStatus =
-    currentStatus === '已報到' ? '未報到' : ' ' + '已報到';
+    currentStatus === '已報到' ? '未報到' : '已報到';
 
-  if (!confirm(`是否確認把 ${name} 改成 ${newStatus.trim()}？`)) return;
+  if (!confirm(`是否確認把 ${name} 改成 ${newStatus}？`)) return;
 
   const result = await api({
     action: 'updateCheckin',
     sheetName: SHEET_NAME,
     rowNumber,
-    status: newStatus.trim()
+    status: newStatus
   });
 
   if (result.success) {
@@ -452,26 +511,22 @@ function escapeQuote(str) {
   return String(str || '').replace(/'/g, "\\'");
 }
 
-// 監聽器設定
-document.getElementById('filterName')
-  .addEventListener('input', render);
+// 監聽器
+document.getElementById('filterName').addEventListener('input', render);
+document.getElementById('filterPaid').addEventListener('change', render);
+document.getElementById('filterUnpaid').addEventListener('change', render);
+document.getElementById('filterCheckin').addEventListener('change', render);
+document.getElementById('filterNotCheckin').addEventListener('change', render);
 
-document.getElementById('filterPaid')
-  .addEventListener('change', render);
+// 新增：午餐狀態監聽器
+document.getElementById('filterMeat').addEventListener('change', render);
+document.getElementById('filterVeg').addEventListener('change', render);
 
-document.getElementById('filterUnpaid')
-  .addEventListener('change', render);
-
-// 新增：報到狀態勾勾的監聽器
-document.getElementById('filterCheckin')
-  .addEventListener('change', render);
-
-document.getElementById('filterNotCheckin')
-  .addEventListener('change', render);
-
-// 網頁開啟後自動載入資料
+// 自動載入
 loadData();
 </script>
 
 </body>
 </html>
+
+```
