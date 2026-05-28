@@ -1,8 +1,3 @@
-沒問題！這就幫你把「午餐狀態（葷食／素食）」的篩選勾勾**加上去，同時在最上方的統計資訊欄位，也同步**新增「葷食人數」與「素食人數」的統計欄位。
-
-以下是修改後的完整 HTML 程式碼：
-
-```html
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -143,6 +138,31 @@ th, td {
 th {
   background: #333;
   color: white;
+}
+
+/* 點擊可編輯欄位的樣式 */
+.editable {
+  cursor: pointer;
+  background: #fffbf0;
+  transition: background 0.2s;
+}
+.editable:hover {
+  background: #ffeeb3;
+}
+.edit-input {
+  width: 90%;
+  padding: 6px;
+  font-size: 14px;
+  border: 1px solid #1f6feb;
+  border-radius: 4px;
+  text-align: center;
+}
+.edit-select {
+  width: 90%;
+  padding: 6px;
+  font-size: 14px;
+  border: 1px solid #1f6feb;
+  border-radius: 4px;
 }
 
 .status-btn {
@@ -354,14 +374,12 @@ function render() {
   const filterNotCheckin =
     document.getElementById('filterNotCheckin').checked;
 
-  // 新增：午餐篩選變數
   const filterMeat =
     document.getElementById('filterMeat').checked;
 
   const filterVeg =
     document.getElementById('filterVeg').checked;
 
-  // 計算並統計數據
   const totalCount = allData.length;
 
   const paidCount =
@@ -376,14 +394,12 @@ function render() {
   const notCheckinCount =
     allData.filter(item => item.checkinStatus !== '已報到').length;
 
-  // 新增：午餐人數統計計算
   const meatCount =
     allData.filter(item => item.lunch === '葷食').length;
 
   const vegCount =
     allData.filter(item => item.lunch === '素食').length;
 
-  // 更新顯示統計數據
   document.getElementById('totalCount').textContent = totalCount;
   document.getElementById('paidCount').textContent = paidCount;
   document.getElementById('unpaidCount').textContent = unpaidCount;
@@ -392,18 +408,17 @@ function render() {
   document.getElementById('meatCount').textContent = meatCount;
   document.getElementById('vegCount').textContent = vegCount;
 
-  // 資料過濾邏輯（包含 姓名、繳費、報到、午餐）
   const filtered = allData.filter(item => {
     return (
       (!name || item.name.includes(name)) &&
       (
         (!filterPaid && !filterUnpaid) ||
-        (filterPaid && item.paymentStatus === '已繳費') ||
+        (filterPaid && item.paymentStatus === 'Macro已繳費' || item.paymentStatus === '已繳費') ||
         (filterUnpaid && item.paymentStatus === '未繳費')
       ) &&
       (
         (!filterCheckin && !filterNotCheckin) ||
-        (filterCheckin && item.checkinStatus === '決已報到' || item.checkinStatus === '已報到') ||
+        (filterCheckin && item.checkinStatus === '已報到') ||
         (filterNotCheckin && item.checkinStatus === '未報到')
       ) &&
       (
@@ -418,9 +433,9 @@ function render() {
     const tr = document.createElement('tr');
 
     tr.innerHTML = `
-      <td>${item.name || ''}</td>
-      <td>${item.phone || ''}</td>
-      <td>${item.lunch || ''}</td>
+      <td class="editable" onclick="makeEditable(this, ${item.rowNumber}, 'name')">${item.name || ''}</td>
+      <td class="editable" onclick="makeEditable(this, ${item.rowNumber}, 'phone')">${item.phone || ''}</td>
+      <td class="editable" onclick="makeEditable(this, ${item.rowNumber}, 'lunch')">${item.lunch || ''}</td>
       <td>
         <button
           class="status-btn ${item.paymentStatus === '已繳費' ? 'blue' : 'red'}"
@@ -441,17 +456,100 @@ function render() {
   });
 }
 
+// 點擊變更為編輯狀態的函式
+function makeEditable(element, rowNumber, field) {
+  // 如果已經在編輯狀態，則跳過
+  if (element.querySelector('input') || element.querySelector('select')) return;
+
+  const originalValue = element.textContent.trim();
+
+  if (field === 'lunch') {
+    // 午餐欄位改用下拉選單
+    const select = document.createElement('select');
+    select.className = 'edit-select';
+    
+    ['葷食', '素食'].forEach(opt => {
+      const option = document.createElement('option');
+      option.value = opt;
+      option.textContent = opt;
+      if (opt === originalValue) option.selected = true;
+      select.appendChild(option);
+    });
+
+    element.innerHTML = '';
+    element.appendChild(select);
+    select.focus();
+
+    // 監聽選單切換或失去焦點
+    select.addEventListener('change', () => saveFieldUpdate(element, rowNumber, field, select.value, originalValue));
+    select.addEventListener('blur', () => saveFieldUpdate(element, rowNumber, field, select.value, originalValue));
+
+  } else {
+    // 姓名和手機使用 Input 輸入框
+    const input = document.createElement('input');
+    input.type = (field === 'phone') ? 'tel' : 'text';
+    input.className = 'edit-input';
+    input.value = originalValue;
+    
+    element.innerHTML = '';
+    element.appendChild(input);
+    input.focus();
+
+    // 監聽 Enter 鍵與失去焦點
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        saveFieldUpdate(element, rowNumber, field, input.value.trim(), originalValue);
+      }
+    });
+    input.addEventListener('blur', () => {
+      saveFieldUpdate(element, rowNumber, field, input.value.trim(), originalValue);
+    });
+  }
+}
+
+// 儲存修改內容並發送 API
+async function saveFieldUpdate(element, rowNumber, field, newValue, originalValue) {
+  // 如果值沒有變，直接還原純文字
+  if (newValue === originalValue) {
+    element.innerHTML = newValue;
+    return;
+  }
+
+  element.innerHTML = '更新中...';
+
+  try {
+    const result = await api({
+      action: 'updateField',
+      sheetName: SHEET_NAME,
+      rowNumber: rowNumber,
+      field: field,
+      value: newValue
+    });
+
+    if (result.success) {
+      // 重新加載最新數據
+      await loadData();
+    } else {
+      alert(result.message || '修改失敗');
+      element.innerHTML = originalValue;
+    }
+  } catch (err) {
+    alert('連線失敗，無法更新');
+    element.innerHTML = originalValue;
+  }
+}
+
 async function togglePayment(rowNumber, name, currentStatus) {
   const newStatus =
-    currentStatus === '已繳費' ? '未繳費' : 'Macro已繳費';
+    currentStatus === '已繳費' ? '未繳費' : '已繳費';
 
-  if (!confirm(`是否確認把 ${name} 改成 ${newStatus.replace('Macro', '')}？`)) return;
+  if (!confirm(`是否確認把 ${name} 改成 ${newStatus}？`)) return;
 
   const result = await api({
     action: 'updatePayment',
     sheetName: SHEET_NAME,
     rowNumber,
-    status: newStatus.replace('Macro', '')
+    status: newStatus
   });
 
   if (result.success) {
@@ -517,8 +615,6 @@ document.getElementById('filterPaid').addEventListener('change', render);
 document.getElementById('filterUnpaid').addEventListener('change', render);
 document.getElementById('filterCheckin').addEventListener('change', render);
 document.getElementById('filterNotCheckin').addEventListener('change', render);
-
-// 新增：午餐狀態監聽器
 document.getElementById('filterMeat').addEventListener('change', render);
 document.getElementById('filterVeg').addEventListener('change', render);
 
@@ -528,5 +624,3 @@ loadData();
 
 </body>
 </html>
-
-```
