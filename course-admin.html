@@ -14,32 +14,6 @@ body {
   font-family: "Microsoft JhengHei", sans-serif;
 }
 
-.login-bar {
-  background: #222;
-  padding: 12px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.login-bar input {
-  width: 180px;
-  padding: 8px 12px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: none;
-}
-
-.login-bar button {
-  padding: 8px 16px;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  background: #1f6feb;
-  color: white;
-  cursor: pointer;
-}
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -83,7 +57,7 @@ input {
   display: flex;
   justify-content: center;
   gap: 40px;
-  margin: 12px 0 16px;
+  margin: 6px 0;
 }
 
 .check-item {
@@ -193,12 +167,7 @@ th {
 
 <body>
 
-<div class="login-bar">
-  <input type="password" id="adminPassword" placeholder="請輸入密碼">
-  <button onclick="checkPassword()">進入後台</button>
-</div>
-
-<div class="container" id="adminContent" style="display:none;">
+<div class="container" id="adminContent">
 
   <h1>
     培訓課程管理<br>
@@ -225,6 +194,18 @@ th {
       <label class="check-item">
         <input type="checkbox" id="filterUnpaid">
         <span>未繳費</span>
+      </label>
+    </div>
+
+    <div class="check-filter">
+      <label class="check-item">
+        <input type="checkbox" id="filterCheckin">
+        <span>已報到</span>
+      </label>
+
+      <label class="check-item">
+        <input type="checkbox" id="filterNotCheckin">
+        <span>未報到</span>
       </label>
     </div>
 
@@ -268,8 +249,6 @@ th {
 </div>
 
 <script>
-const ADMIN_PASSWORD = '60398346';
-
 const API_URL =
 'https://script.google.com/macros/s/AKfycbwjITXx86Cl3WOqcB9a4GHl8NKe2JhkNWvCZMvufvzumPEAALTv0XGgPm5wShdR5DN4wA/exec';
 
@@ -286,18 +265,6 @@ if (!SHEET_NAME) {
 }
 
 document.getElementById('dateTitle').textContent = SHEET_NAME;
-
-function checkPassword() {
-  const password =
-    document.getElementById('adminPassword').value;
-
-  if (password === ADMIN_PASSWORD) {
-    document.getElementById('adminContent').style.display = 'block';
-    loadData();
-  } else {
-    alert('密碼錯誤');
-  }
-}
 
 async function api(payload) {
   const res = await fetch(API_URL, {
@@ -344,6 +311,13 @@ function render() {
   const filterUnpaid =
     document.getElementById('filterUnpaid').checked;
 
+  // 新增：報到篩選變數
+  const filterCheckin =
+    document.getElementById('filterCheckin').checked;
+
+  const filterNotCheckin =
+    document.getElementById('filterNotCheckin').checked;
+
   const totalCount = allData.length;
 
   const paidCount =
@@ -365,12 +339,18 @@ function render() {
   document.getElementById('notCheckinCount').textContent = notCheckinCount;
 
   const filtered = allData.filter(item => {
+    // 同時符合 姓名篩選、繳費篩選、報到篩選
     return (
       (!name || item.name.includes(name)) &&
       (
         (!filterPaid && !filterUnpaid) ||
         (filterPaid && item.paymentStatus === '已繳費') ||
         (filterUnpaid && item.paymentStatus === '未繳費')
+      ) &&
+      (
+        (!filterCheckin && !filterNotCheckin) ||
+        (filterCheckin && item.checkinStatus === '已報到') ||
+        (filterNotCheckin && item.checkinStatus === '未報到')
       )
     );
   });
@@ -384,7 +364,7 @@ function render() {
       <td>${item.lunch || ''}</td>
       <td>
         <button
-          class="status-btn ${item.paymentStatus === '已繳費' ? 'blue' : 'red'}"
+          class="status-btn ${item.paymentStatus === '聯網已繳費' || item.paymentStatus === '已繳費' ? 'blue' : 'red'}"
           onclick="togglePayment(${item.rowNumber}, '${escapeQuote(item.name)}', '${item.paymentStatus}')">
           ${item.paymentStatus || '未繳費'}
         </button>
@@ -424,15 +404,15 @@ async function togglePayment(rowNumber, name, currentStatus) {
 
 async function toggleCheckin(rowNumber, name, currentStatus) {
   const newStatus =
-    currentStatus === '已報到' ? '未報到' : '已報到';
+    currentStatus === '已報到' ? '未報到' : ' ' + '已報到';
 
-  if (!confirm(`是否確認把 ${name} 改成 ${newStatus}？`)) return;
+  if (!confirm(`是否確認把 ${name} 改成 ${newStatus.trim()}？`)) return;
 
   const result = await api({
     action: 'updateCheckin',
     sheetName: SHEET_NAME,
     rowNumber,
-    status: newStatus
+    status: newStatus.trim()
   });
 
   if (result.success) {
@@ -472,6 +452,7 @@ function escapeQuote(str) {
   return String(str || '').replace(/'/g, "\\'");
 }
 
+// 監聽器設定
 document.getElementById('filterName')
   .addEventListener('input', render);
 
@@ -480,6 +461,16 @@ document.getElementById('filterPaid')
 
 document.getElementById('filterUnpaid')
   .addEventListener('change', render);
+
+// 新增：報到狀態勾勾的監聽器
+document.getElementById('filterCheckin')
+  .addEventListener('change', render);
+
+document.getElementById('filterNotCheckin')
+  .addEventListener('change', render);
+
+// 網頁開啟後自動載入資料
+loadData();
 </script>
 
 </body>
