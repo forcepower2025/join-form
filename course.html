@@ -183,17 +183,24 @@ async function api(payload) {
 }
 
 async function loadCourseImage() {
+
   const result = await api({
     action: 'getCourseImage',
     sheetName: SHEET_NAME
   });
 
   if (result.success && result.imageUrl) {
-    const img = document.getElementById('courseImage');
+
+    const img =
+      document.getElementById('courseImage');
+
     img.src = result.imageUrl;
+
     img.style.display = 'block';
   }
 }
+
+loadCourseImage();
 
 async function submitForm() {
   const msg = document.getElementById('msg');
