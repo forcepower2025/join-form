@@ -271,9 +271,9 @@
       </button>
     </div>
 
-    <button class="reload-btn" onclick="downloadPDF()">
-      下載表格
-    </button>
+<button class="reload-btn" onclick="downloadExcel()">
+  下載Excel
+</button>
 
     <button class="reload-btn" onclick="loadData()">
       重新整理
@@ -585,135 +585,53 @@ document.getElementById('filterPaid')
 document.getElementById('filterUnpaid')
   .addEventListener('change', render);
 
-async function downloadPDF() {
+function downloadExcel() {
 
-  const { jsPDF } = window.jspdf;
+  let csv =
+    '\uFEFF姓名,手機號碼,身份證字號,出生年月日,年齡,介紹人,團隊長,午餐,上車地點,是否已繳費\n';
 
-  const pdf =
-    new jsPDF('l', 'mm', 'a4');
+  allData.forEach(item => {
 
-  const rowsPerPage = 10;
+    csv += [
+      item.name || '',
+      item.phone || '',
+      item.idNumber || '',
+      item.birthDate || '',
+      item.age || '',
+      item.referrer || '',
+      item.leader || '',
+      item.lunch || '',
+      item.boarding || '',
+      item.paymentStatus || ''
+    ]
+    .map(v => `"${String(v).replace(/"/g,'""')}"`)
+    .join(',');
 
-  const allRows =
-    Array.from(
-      document.querySelectorAll('tbody tr')
-    );
-
-  const totalPages =
-    Math.ceil(
-      allRows.length / rowsPerPage
-    );
-
-  for (
-    let page = 0;
-    page < totalPages;
-    page++
-  ) {
-
-    const start =
-      page * rowsPerPage;
-
-    const end =
-      start + rowsPerPage;
-
-    const pageRows =
-      allRows.slice(start, end);
-
-    const tempTable =
-      document.createElement('table');
-      tempTable.style.width = '1400px';
-      tempTable.style.tableLayout = 'fixed';
-
-    tempTable.style.width = '100%';
-    tempTable.style.fontSize = '30px';
-    tempTable.style.borderCollapse = 'collapse';
-    tempTable.style.background = '#fff';
-
-    tempTable.innerHTML = `
-      <thead>
-        <tr>
-          <th>姓名</th>
-          <th>手機號碼</th>
-          <th>身份證字號</th>
-<th>出生年月日</th>
-<th>年齡</th>
-<th>介紹人</th>
-<th>團隊長</th>
-<th>午餐</th>
-<th>上車地點</th>
-<th>是否已繳費</th>
-        </tr>
-      </thead>
-    `;
-
-    const tbody =
-      document.createElement('tbody');
-
-    pageRows.forEach(tr => {
-      tbody.appendChild(
-        tr.cloneNode(true)
-      );
-    });
-
-    tempTable.appendChild(tbody);
-
-    tempTable.style.position = 'fixed';
-    tempTable.style.left = '-99999px';
-
-    document.body.appendChild(tempTable);
-    tempTable.querySelectorAll('th, td')
-  .forEach(el => {
-
-    el.style.fontSize = '30px';
-
-    el.style.padding = '10px';
-
-    el.style.whiteSpace = 'nowrap';
+    csv += '\n';
 
   });
 
-    tempTable.querySelectorAll('button')
-  .forEach(btn => {
-
-    btn.style.fontSize = '32px';
-
-    btn.style.padding = '12px 20px';
-
-  });
-    
-const canvas =
-  await html2canvas(tempTable, {
-    scale: 3,
-    windowWidth: 1400,
-    width: 1400
-  });
-
-    document.body.removeChild(tempTable);
-
-    const imgData =
-      canvas.toDataURL('image/png');
-
-    const pageWidth =
-      pdf.internal.pageSize.getWidth() - 20;
-
-    const imgHeight =
-      (canvas.height * pageWidth / canvas.width) ;
-
-    if (page > 0) {
-      pdf.addPage();
+  const blob = new Blob(
+    [csv],
+    {
+      type: 'text/csv;charset=utf-8;'
     }
+  );
 
-pdf.addImage(
-  imgData,
-  'PNG',
-  10,
-  10,
-  pageWidth,
-  imgHeight
-);
-  }
+  const link =
+    document.createElement('a');
 
-  pdf.save('旅遊報名表.pdf');
+  link.href =
+    URL.createObjectURL(blob);
+
+  link.download =
+    '旅遊報名表.csv';
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
 }
   
 </script>
