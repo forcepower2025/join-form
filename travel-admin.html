@@ -594,7 +594,7 @@ function downloadExcel() {
 
     csv += [
       item.name || '',
-      item.phone || '',
+       '="' + (item.phone || '') + '"',
       item.idNumber || '',
       item.birthDate || '',
       item.age || '',
