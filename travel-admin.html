@@ -289,10 +289,13 @@
           <th>姓名</th>
           <th>手機號碼</th>
           <th>身份證字號</th>
-          <th>出生年月日</th>
-          <th>介紹人</th>
-          <th>團隊長</th>
-          <th>是否已繳費</th>
+<th>出生年月日</th>
+<th>年齡</th>
+<th>介紹人</th>
+<th>團隊長</th>
+<th>午餐</th>
+<th>上車地點</th>
+<th>是否已繳費</th>
         </tr>
       </thead>
 
@@ -424,9 +427,12 @@ function render() {
       ${editableTd(item, 'name', item.name)}
       ${editableTd(item, 'phone', item.phone)}
       ${editableTd(item, 'idNumber', item.idNumber)}
-      ${editableTd(item, 'birthDate', item.birthDate)}
-      ${editableTd(item, 'referrer', item.referrer)}
-      ${editableTd(item, 'leader', item.leader)}
+${editableTd(item, 'birthDate', item.birthDate)}
+<td>${item.age || ''}</td>
+${editableTd(item, 'referrer', item.referrer)}
+${editableTd(item, 'leader', item.leader)}
+${editableTd(item, 'lunch', item.lunch)}
+${editableTd(item, 'boarding', item.boarding)}
       <td>
         <button
           class="pay-btn ${item.paymentStatus === '已繳費' ? 'paid' : 'unpaid'}"
@@ -629,10 +635,13 @@ async function downloadPDF() {
           <th>姓名</th>
           <th>手機號碼</th>
           <th>身份證字號</th>
-          <th>出生年月日</th>
-          <th>介紹人</th>
-          <th>團隊長</th>
-          <th>是否已繳費</th>
+<th>出生年月日</th>
+<th>年齡</th>
+<th>介紹人</th>
+<th>團隊長</th>
+<th>午餐</th>
+<th>上車地點</th>
+<th>是否已繳費</th>
         </tr>
       </thead>
     `;
