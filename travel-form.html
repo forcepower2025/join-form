@@ -77,6 +77,28 @@
   border: 1px solid #ccc;
   border-radius: 8px;
 }
+
+    .option-wrap {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 10px;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  gap: 10px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.option-item input {
+  width: 28px;
+  height: 28px;
+}
+    
   </style>
 </head>
 
@@ -115,6 +137,32 @@
         <label>團隊長</label>
         <input type="text" id="leader" required>
 
+        <label>午餐</label>
+<div class="option-wrap">
+  <label class="option-item">
+    <input type="checkbox" id="lunchMeat">
+    <span>葷</span>
+  </label>
+
+  <label class="option-item">
+    <input type="checkbox" id="lunchVeg">
+    <span>素</span>
+  </label>
+</div>
+
+<label>上車地點</label>
+<div class="option-wrap">
+  <label class="option-item">
+    <input type="checkbox" id="boardingTaipei">
+    <span>台北東三門</span>
+  </label>
+
+  <label class="option-item">
+    <input type="checkbox" id="boardingZhongli">
+    <span>中壢新屋交流道肯德機</span>
+  </label>
+</div>
+
         <button type="submit">送出報名</button>
       </form>
 
@@ -129,11 +177,66 @@
       this.value = this.value.toUpperCase();
     });
 
+    document.getElementById('lunchMeat').addEventListener('change', function () {
+  if (this.checked) {
+    document.getElementById('lunchVeg').checked = false;
+  }
+});
+
+document.getElementById('lunchVeg').addEventListener('change', function () {
+  if (this.checked) {
+    document.getElementById('lunchMeat').checked = false;
+  }
+});
+
+document.getElementById('boardingTaipei').addEventListener('change', function () {
+  if (this.checked) {
+    document.getElementById('boardingZhongli').checked = false;
+  }
+});
+
+document.getElementById('boardingZhongli').addEventListener('change', function () {
+  if (this.checked) {
+    document.getElementById('boardingTaipei').checked = false;
+  }
+});
+
     document.getElementById('form').addEventListener('submit', async function (e) {
       e.preventDefault();
 
       const msg = document.getElementById('msg');
       msg.textContent = '資料送出中...';
+
+      let lunch = '';
+let boarding = '';
+
+if (document.getElementById('lunchMeat').checked) {
+  lunch = '葷';
+}
+
+if (document.getElementById('lunchVeg').checked) {
+  lunch = '素';
+}
+
+if (document.getElementById('boardingTaipei').checked) {
+  boarding = '台北東三門';
+}
+
+if (document.getElementById('boardingZhongli').checked) {
+  boarding = '中壢新屋交流道肯德機';
+}
+
+if (!lunch) {
+  alert('請選擇午餐');
+  msg.textContent = '';
+  return;
+}
+
+if (!boarding) {
+  alert('請選擇上車地點');
+  msg.textContent = '';
+  return;
+}
 
       const payload = {
         action: 'register',
@@ -146,6 +249,8 @@
   String(document.getElementById('birthDay').value).padStart(2, '0'),
         referrer: document.getElementById('referrer').value.trim(),
         leader: document.getElementById('leader').value.trim()
+        lunch: lunch,
+        boarding: boarding
       };
 
       try {
