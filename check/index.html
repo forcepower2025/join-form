@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>動元力國際｜每日簽到系統</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="config.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="loading-page" class="container text-center">
+    <div class="spinner"></div>
+    <p style="margin-top: 20px; color: #666;">動元力國際 正在安全驗證 LINE 身分中...</p>
+  </div>
+
+  <div id="main-page" class="container" style="display: none;">
+    <header class="brand-header text-center">
+      <h2>動元力國際</h2>
+      <p class="subtitle">每日簽到系統</p>
+    </header>
+
+    <div class="card profile-card">
+      <div class="profile-flex">
+        <img id="user-avatar" src="" alt="頭像" class="avatar">
+        <div>
+          <h3 id="user-name">載入中...</h3>
+          <p class="member-id">會員編號: <span id="member-id-text">-</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card checkin-card text-center">
+      <h4>今日簽到狀態</h4>
+      <div id="checkin-status" class="status-badge status-not">尚未簽到</div>
+      
+      <div class="reward-info">
+        <p>今日預計可獲得級距：<strong id="expected-level" style="color: #2e7d32;">-</strong></p>
+        <p class="hint">（依據本人及今日團隊簽到狀況動態計算）</p>
+      </div>
+
+      <button id="btn-checkin" class="btn btn-primary" disabled>今日簽到</button>
+    </div>
+
+    <div class="card wallet-card">
+      <h4>我的收益資產</h4>
+      <div class="wallet-grid">
+        <div class="wallet-item">
+          <span class="label">總累積獎勵</span>
+          <span class="amount" id="total-reward">NT$ 0</span>
+        </div>
+        <div class="wallet-item highlight">
+          <span class="label">可提領金額 (80%)</span>
+          <span class="amount" id="withdrawable">NT$ 0</span>
+        </div>
+        <div class="wallet-item">
+          <span class="label">購物基金 (20%)</span>
+          <span class="amount" id="shopping-fund">NT$ 0</span>
+        </div>
+      </div>
+      <p class="hint text-center" style="margin-top: 15px;">※ 累積總額採 8 成轉可提領、2 成轉購物基金計算</p>
+    </div>
+
+    <div class="card referral-card">
+      <h4>推薦與團隊狀態</h4>
+      <div class="referral-grid">
+        <div class="ref-item">
+          <span class="ref-label">總推薦人數</span>
+          <span class="ref-value" id="ref-total-count">0 人</span>
+        </div>
+        <div class="ref-item">
+          <span class="ref-label">今日團隊簽到數</span>
+          <span class="ref-value" id="ref-today-count">0 人</span>
+        </div>
+      </div>
+
+      <div class="ref-link-section">
+        <p>您的專屬推薦連結：</p>
+        <div class="copy-box">
+          <input type="text" id="share-url-input" readonly value="">
+        </div>
+        <div class="btn-group">
+          <button id="btn-copy" class="btn btn-secondary">複製連結</button>
+          <button id="btn-share" class="btn btn-line">分享給 LINE 好友</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
