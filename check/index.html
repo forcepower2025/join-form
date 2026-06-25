@@ -10,10 +10,21 @@
 </head>
 <body>
 
-  <div id="loading-page" class="container text-center">
+  <div id="loading-page" class="loading-container">
     <div class="cute-loader">
       <div class="leaf-spinner"></div>
       <div class="cute-center">🌱</div>
+    </div>
+    <div class="loading-text">資料載入中...</div>
+  </div>
+
+  <div id="register-page" class="container" style="display: none; margin-top: 30px;">
+    <div class="card text-center">
+      <h3 style="color:#1b5e20; margin-bottom:10px;">開通每日簽到系統</h3>
+      <p style="font-size:14px; color:#666; margin-bottom:20px;">歡迎加入動元力！請填寫資料完成您的帳號開通：</p>
+      <input type="text" id="reg-name" placeholder="請輸入您的真實姓名" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; text-align:center; font-size:16px; margin-bottom:12px;">
+      <input type="tel" id="reg-phone" placeholder="請輸入 09 開頭的手機號碼" maxlength="10" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; text-align:center; font-size:16px; margin-bottom:20px;">
+      <button id="btn-submit-reg" class="btn btn-primary">確認開通帳號</button>
     </div>
   </div>
 
@@ -28,7 +39,7 @@
         <img id="user-avatar" src="" alt="頭像" class="avatar">
         <div>
           <h3 id="user-name">載入中...</h3>
-          <p class="member-id">會員編號: <span id="member-id-text">-</span></p>
+          <p class="member-id">帳號(手機): <span id="member-id-text">-</span></p>
         </div>
       </div>
     </div>
@@ -36,12 +47,10 @@
     <div class="card checkin-card text-center">
       <h4>今日簽到狀態</h4>
       <div id="checkin-status" class="status-badge status-not">尚未簽到</div>
-      
       <div class="reward-info">
         <p>今日預計可獲得級距：<strong id="expected-level" style="color: #2e7d32;">-</strong></p>
         <p class="hint">（依據本人及今日團隊簽到狀況動態計算）</p>
       </div>
-
       <button id="btn-checkin" class="btn btn-primary" disabled>今日簽到</button>
     </div>
 
@@ -61,7 +70,10 @@
           <span class="amount" id="shopping-fund">NT$ 0</span>
         </div>
       </div>
-      <p class="hint text-center" style="margin-top: 15px;">※ 累積總額採 8 成轉可提領、2 成轉購物基金計算</p>
+      <p class="hint text-center" style="margin-top: 10px; margin-bottom: 15px;">※ 累積總額採 8 成轉可提領、2 成轉購物基金計算</p>
+      
+      <button id="btn-withdraw-ui" class="btn btn-withdraw" disabled>申請提領</button>
+      <p id="withdraw-hint" class="hint text-center" style="color: #c62828;">※ 滿 NT$ 1,000 即可申請提領</p>
     </div>
 
     <div class="card referral-card">
@@ -76,16 +88,47 @@
           <span class="ref-value" id="ref-today-count">0 人</span>
         </div>
       </div>
-
       <div class="ref-link-section">
         <p>您的專屬推薦連結：</p>
-        <div class="copy-box">
-          <input type="text" id="share-url-input" readonly value="">
-        </div>
+        <div class="copy-box"><input type="text" id="share-url-input" readonly value=""></div>
         <div class="btn-group">
           <button id="btn-copy" class="btn btn-secondary">複製連結</button>
-          <button id="btn-share" class="btn btn-line">分享給 LINE 好友</button>
+          <button id="btn-share" class="btn btn-line">分享給好友</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="withdraw-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <h3 id="modal-title">填寫提領帳戶資料</h3>
+      <p id="modal-sub-hint" style="font-size:12px; color:#e65100; text-align:center; margin-bottom:10px; display:none;">※ 系統已自動帶入您上次成功填寫的帳戶，請核對</p>
+      
+      <div class="modal-form">
+        <label>提領金額 (需全額提領)</label>
+        <input type="text" id="w-amount" readonly style="background-color:#eee; font-weight: bold; color: #1b5e20;">
+        
+        <label>身份證字號</label>
+        <input type="text" id="w-idcard" placeholder="請輸入提領人身份證字號">
+        
+        <label>銀行名稱</label>
+        <input type="text" id="w-bankname" placeholder="例如：台灣銀行">
+        
+        <label>銀行代碼 (3碼)</label>
+        <input type="text" id="w-bankcode" placeholder="例如：004" maxlength="3">
+        
+        <label>分行名稱</label>
+        <input type="text" id="w-bankbranch" placeholder="例如：中山分行">
+        
+        <label>銀行帳號</label>
+        <input type="text" id="w-bankacc" placeholder="請輸入完整匯款帳號">
+        
+        <label>戶名 (需與真實姓名相符)</label>
+        <input type="text" id="w-bankuser" placeholder="請輸入帳戶開戶姓名">
+      </div>
+      <div class="modal-btns">
+        <button id="btn-withdraw-cancel" class="btn btn-secondary">取消</button>
+        <button id="btn-withdraw-submit" class="btn btn-primary">確認送出申請</button>
       </div>
     </div>
   </div>
