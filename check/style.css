@@ -1,0 +1,253 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  background-color: #f4f6f8;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 15px;
+}
+
+.container {
+  width: 100%;
+  max-width: 480px;
+  background: transparent;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Loading 畫面 */
+#loading-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #2e7d32;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Header */
+.brand-header {
+  margin: 20px 0;
+}
+
+.brand-header h2 {
+  color: #1b5e20;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.brand-header .subtitle {
+  color: #666;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* 卡片設計 */
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.card h4 {
+  color: #333;
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* 會員頭像卡 */
+.profile-flex {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.avatar {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: #ddd;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.member-id {
+  font-size: 13px;
+  color: #888;
+  margin-top: 3px;
+}
+
+/* 狀態標籤 */
+.status-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 14px;
+  margin: 10px 0;
+}
+
+.status-not {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.status-done {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.reward-info {
+  margin: 10px 0 15px;
+  font-size: 14px;
+}
+
+.hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+/* 錢包網格 */
+.wallet-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.wallet-item {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wallet-item.highlight {
+  background: #f1f8e9;
+  border-left: 4px solid #4caf50;
+}
+
+.wallet-item .label {
+  font-size: 14px;
+  color: #555;
+}
+
+.wallet-item .amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+/* 推薦網格 */
+.referral-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.ref-item {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+
+.ref-label {
+  font-size: 12px;
+  color: #777;
+  display: block;
+}
+
+.ref-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-top: 5px;
+}
+
+/* 複製區塊 */
+.copy-box {
+  margin: 8px 0 12px;
+}
+
+.copy-box input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+}
+
+/* 按鈕系統 */
+.btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: #2e7d32;
+  color: white;
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+}
+
+.btn-primary:disabled {
+  background-color: #b0bec5;
+  color: #eceff1;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.btn-secondary {
+  background-color: #eceff1;
+  color: #37474f;
+}
+
+.btn-line {
+  background-color: #06C755;
+  color: white;
+}
