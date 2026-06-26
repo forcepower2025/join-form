@@ -270,3 +270,41 @@ body {
   background-color: #06C755;
   color: white;
 }
+
+/* 👑 修正提領表單：強制轉換為浮空彈窗 */
+#withdraw-modal-section, 
+.withdraw-modal {
+  position: fixed;         /* 鎖定在螢幕畫面上方 */
+  top: 0;
+  left: 0;
+  width: 100vw;            /* 滿版寬度 */
+  height: 100vh;           /* 滿版高度 */
+  background-color: rgba(0, 0, 0, 0.6); /* 變成黑底半透明的遮罩層 */
+  z-index: 9999;           /* 確保浮在所有卡片的最上層 */
+  display: flex;
+  justify-content: center; /* 左右置中 */
+  align-items: center;     /* 上下置中 */
+}
+
+/* 👑 彈窗內部的白底輸入框卡片 */
+#withdraw-modal-section .modal-content,
+.withdraw-modal-card {
+  background: #ffffff;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  max-height: 90vh;        /* 超過螢幕高度時允許捲動 */
+  overflow-y: auto;
+}
+
+/* 👑 表單裡面的輸入框微調，防止被撐開 */
+#withdraw-modal-section input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0 16px 0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box; /* 防止寬度大爆炸 */
+}
