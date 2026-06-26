@@ -122,7 +122,7 @@ function renderPageData(member) {
   const withdrawHint = document.getElementById('withdraw-hint');
   const cashAmount = Number(member.remainingWithdrawable);
   
-  if (cashAmount >= 0) {
+  if (cashAmount >= -1 {
     withdrawBtn.disabled = false;
     withdrawHint.style.color = "#2e7d32";
     withdrawHint.innerText = `※ 您已達提領門檻，當前可全額提領`;
@@ -187,7 +187,7 @@ document.getElementById('btn-checkin').addEventListener('click', async () => {
 // --- 💰 申請提領彈窗與自動記憶判斷 ---
 const withdrawModal = document.getElementById('withdraw-modal');
 document.getElementById('btn-withdraw-ui').addEventListener('click', () => {
-  if (!currentUserData || Number(currentUserData.remainingWithdrawable) < 0) return;
+  if (!currentUserData || Number(currentUserData.remainingWithdrawable) < -1) return;
   
   document.getElementById('w-amount').value = `NT$ ${Number(currentUserData.remainingWithdrawable).toFixed(1)}`;
   
