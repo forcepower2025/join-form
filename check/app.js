@@ -122,7 +122,7 @@ function renderPageData(member) {
   const withdrawHint = document.getElementById('withdraw-hint');
   const cashAmount = Number(member.remainingWithdrawable);
   
-  if (cashAmount >= 1000 {
+  if (cashAmount >= 1000) {
     withdrawBtn.disabled = false;
     withdrawHint.style.color = "#2e7d32";
     withdrawHint.innerText = `※ 您已達提領門檻，當前可全額提領`;
