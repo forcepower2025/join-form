@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>退款申請書</title>
+  <title>退貨退款申請書</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -229,30 +229,30 @@
         </div>
       </div>
 
-      <div class="section-title">二、訂單與退款資料</div>
+      <div class="section-title">二、退款資料</div>
 
       <div class="grid">
         <div class="field full">
           <label>申請類型 *</label>
           <select id="refundType">
             <option value="">請選擇申請類型</option>
-            <option value="只退款">只退款</option>
+            <option value="純退款">純退款</option>
             <option value="退貨退款">退貨退款</option>
           </select>
         </div>
 
-        <div class="field">
-          <label>訂單編號 *</label>
-          <input type="text" id="orderNo" placeholder="請輸入訂單編號">
+        <div class="field" id="refundProductField">
+          <label>退款商品 *</label>
+          <input type="text" id="refundProduct" placeholder="請輸入退款商品">
+        </div>
+
+        <div class="field" id="refundProductQtyField">
+          <label>退款商品的數量 *</label>
+          <input type="number" id="refundProductQty" placeholder="請輸入退款商品的數量">
         </div>
 
         <div class="field">
-          <label>購買產品 *</label>
-          <input type="text" id="productName" placeholder="請輸入購買產品">
-        </div>
-
-        <div class="field">
-          <label>購買日期 *</label>
+          <label>購買日期</label>
           <input type="date" id="purchaseDate">
         </div>
 
@@ -336,6 +336,32 @@
     let hasSignature = false;
 
     document.getElementById('applyDate').valueAsDate = new Date();
+    document.getElementById('refundType').addEventListener('change', handleRefundTypeChange);
+
+    function handleRefundTypeChange() {
+      const refundType = getValue('refundType');
+
+      const refundProductField = document.getElementById('refundProductField');
+      const refundProductQtyField = document.getElementById('refundProductQtyField');
+
+      const refundProduct = document.getElementById('refundProduct');
+      const refundProductQty = document.getElementById('refundProductQty');
+
+      if (refundType === '純退款') {
+        refundProductField.style.display = 'none';
+        refundProductQtyField.style.display = 'none';
+
+        refundProduct.value = '';
+        refundProductQty.value = '0';
+      } else {
+        refundProductField.style.display = 'flex';
+        refundProductQtyField.style.display = 'flex';
+
+        if (refundProductQty.value === '0') {
+          refundProductQty.value = '';
+        }
+      }
+    }
 
     function resizeCanvas() {
       const rect = canvas.getBoundingClientRect();
@@ -350,7 +376,11 @@
       ctx.strokeStyle = '#000000';
     }
 
-    window.addEventListener('load', resizeCanvas);
+    window.addEventListener('load', function() {
+      resizeCanvas();
+      handleRefundTypeChange();
+    });
+
     window.addEventListener('resize', resizeCanvas);
 
     function getPosition(e) {
@@ -420,9 +450,6 @@
         ['refundType', '申請類型'],
         ['name', '申請人姓名'],
         ['phone', '手機號碼'],
-        ['orderNo', '訂單編號'],
-        ['productName', '購買產品'],
-        ['purchaseDate', '購買日期'],
         ['refundAmount', '退款金額'],
         ['reason', '退款原因'],
         ['bankName', '銀行名稱'],
@@ -431,6 +458,11 @@
         ['bankAccount', '銀行帳號'],
         ['bankAccountName', '銀行戶名']
       ];
+
+      if (getValue('refundType') === '退貨退款') {
+        requiredFields.push(['refundProduct', '退款商品']);
+        requiredFields.push(['refundProductQty', '退款商品的數量']);
+      }
 
       for (const item of requiredFields) {
         const id = item[0];
@@ -470,14 +502,16 @@
 
         const imageBase64 = canvasImage.toDataURL('image/png');
 
+        const refundType = getValue('refundType');
+
         const data = {
           applyDate: getValue('applyDate'),
-          refundType: getValue('refundType'),
+          refundType: refundType,
           name: getValue('name'),
           phone: getValue('phone'),
           idNumber: getValue('idNumber'),
-          orderNo: getValue('orderNo'),
-          productName: getValue('productName'),
+          refundProduct: refundType === '純退款' ? '' : getValue('refundProduct'),
+          refundProductQty: refundType === '純退款' ? '0' : getValue('refundProductQty'),
           purchaseDate: getValue('purchaseDate'),
           refundAmount: getValue('refundAmount'),
           reason: getValue('reason'),
