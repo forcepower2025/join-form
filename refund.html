@@ -490,7 +490,7 @@
 
       submitBtn.disabled = true;
       status.style.color = '#333333';
-      status.textContent = '送出中，正在產生退款申請書圖片...';
+      status.textContent = '系統正在送出資料中，請耐心等候...';
 
       try {
         const captureArea = document.getElementById('captureArea');
@@ -535,8 +535,8 @@
           throw new Error(result.message || '送出失敗');
         }
 
-        status.style.color = '#1f6b46';
-        status.textContent = '退款申請已送出，申請書圖片已存入 Google Drive。';
+        status.style.color = '#FF0000';
+        status.textContent = '退貨退款申請已送出';
 
       } catch (error) {
         status.style.color = '#b00020';
