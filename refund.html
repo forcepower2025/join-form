@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>退款申請書</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f2f2f2;
+      font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+      color: #222;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #ffffff;
+      padding: 36px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      text-align: center;
+      margin: 0 0 8px;
+      font-size: 32px;
+      letter-spacing: 4px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 15px;
+    }
+
+    .section-title {
+      margin: 28px 0 16px;
+      padding-left: 10px;
+      border-left: 5px solid #1f6b46;
+      color: #1f6b46;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 20px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-family: inherit;
+      background: #ffffff;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .notice {
+      background: #f8f6ef;
+      border: 1px solid #ddd2aa;
+      padding: 16px;
+      border-radius: 8px;
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .signature-box {
+      position: relative;
+      height: 220px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    #signatureCanvas {
+      width: 100%;
+      height: 220px;
+      display: block;
+      touch-action: none;
+      background: #ffffff;
+    }
+
+    .signature-hint {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      color: #aaa;
+      pointer-events: none;
+      font-size: 14px;
+    }
+
+    .footer-note {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.8;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 14px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .clear-btn {
+      background: #ddd;
+      color: #333;
+    }
+
+    .submit-btn {
+      flex: 1;
+      background: #1f6b46;
+      color: #ffffff;
+    }
+
+    .submit-btn:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+
+    #status {
+      margin-top: 16px;
+      text-align: center;
+      font-weight: bold;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 12px;
+      }
+
+      .card {
+        padding: 24px 18px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      .button-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <div id="captureArea" class="card">
+      <h1>退款申請書</h1>
+      <div class="subtitle">Refund Application Form</div>
+
+      <div class="section-title">一、申請人資料</div>
+
+      <div class="grid">
+        <div class="field">
+          <label>申請日期</label>
+          <input type="date" id="applyDate" readonly>
+        </div>
+
+        <div class="field">
+          <label>申請人姓名 *</label>
+          <input type="text" id="name" placeholder="請輸入申請人姓名">
+        </div>
+
+        <div class="field">
+          <label>手機號碼 *</label>
+          <input type="tel" id="phone" placeholder="請輸入手機號碼">
+        </div>
+
+        <div class="field">
+          <label>身分證字號</label>
+          <input type="text" id="idNumber" placeholder="請輸入身分證字號">
+        </div>
+      </div>
+
+      <div class="section-title">二、訂單與退款資料</div>
+
+      <div class="grid">
+        <div class="field full">
+          <label>申請類型 *</label>
+          <select id="refundType">
+            <option value="">請選擇申請類型</option>
+            <option value="只退款">只退款</option>
+            <option value="退貨退款">退貨退款</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>訂單編號 *</label>
+          <input type="text" id="orderNo" placeholder="請輸入訂單編號">
+        </div>
+
+        <div class="field">
+          <label>購買產品 *</label>
+          <input type="text" id="productName" placeholder="請輸入購買產品">
+        </div>
+
+        <div class="field">
+          <label>購買日期 *</label>
+          <input type="date" id="purchaseDate">
+        </div>
+
+        <div class="field">
+          <label>退款金額 *</label>
+          <input type="number" id="refundAmount" placeholder="請輸入退款金額">
+        </div>
+
+        <div class="field full">
+          <label>退款原因 *</label>
+          <textarea id="reason" placeholder="請輸入退款原因"></textarea>
+        </div>
+      </div>
+
+      <div class="section-title">三、退款帳戶資料</div>
+
+      <div class="grid">
+        <div class="field">
+          <label>銀行名稱 *</label>
+          <input type="text" id="bankName" placeholder="例如：第一銀行">
+        </div>
+
+        <div class="field">
+          <label>分行名稱 *</label>
+          <input type="text" id="branchName" placeholder="例如：桃園分行">
+        </div>
+
+        <div class="field">
+          <label>銀行分行代碼 *</label>
+          <input type="text" id="bankCode" placeholder="請輸入銀行分行代碼">
+        </div>
+
+        <div class="field">
+          <label>銀行帳號 *</label>
+          <input type="text" id="bankAccount" placeholder="請輸入銀行帳號">
+        </div>
+
+        <div class="field full">
+          <label>銀行戶名 *</label>
+          <input type="text" id="bankAccountName" placeholder="請輸入銀行戶名">
+        </div>
+      </div>
+
+      <div class="section-title">四、退款聲明</div>
+
+      <div class="notice">
+        本人確認上述退款申請資料皆為本人親自填寫，並確認退款帳戶資料正確無誤。
+        若因資料填寫錯誤造成退款延遲、退匯或其他損失，本人願自行負責。
+        本退款申請經公司審核後，將依公司退款流程辦理。
+      </div>
+
+      <div class="section-title">五、申請人電子簽名</div>
+
+      <div class="signature-box">
+        <div id="signatureHint" class="signature-hint">請在此簽名</div>
+        <canvas id="signatureCanvas"></canvas>
+      </div>
+
+      <div class="footer-note">
+        申請人簽名即表示已確認本退款申請書內容，並同意公司依退款流程進行審核及辦理。
+      </div>
+    </div>
+
+    <div class="button-row">
+      <button class="clear-btn" type="button" onclick="clearSignature()">清除簽名</button>
+      <button class="submit-btn" id="submitBtn" type="button" onclick="submitForm()">送出退款申請</button>
+    </div>
+
+    <div id="status"></div>
+  </div>
+
+  <script>
+    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycby2GEZEGyEaYIWWGwzxFYo56Bz5KcToR8AK5n5tPZqpcrhunI22EVNT3CrXV5qztANY/exec';
+
+    const canvas = document.getElementById('signatureCanvas');
+    const ctx = canvas.getContext('2d');
+    const hint = document.getElementById('signatureHint');
+    const submitBtn = document.getElementById('submitBtn');
+
+    let isDrawing = false;
+    let hasSignature = false;
+
+    document.getElementById('applyDate').valueAsDate = new Date();
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+
+      canvas.width = rect.width * 2;
+      canvas.height = rect.height * 2;
+
+      ctx.setTransform(2, 0, 0, 2, 0, 0);
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#000000';
+    }
+
+    window.addEventListener('load', resizeCanvas);
+    window.addEventListener('resize', resizeCanvas);
+
+    function getPosition(e) {
+      const rect = canvas.getBoundingClientRect();
+
+      if (e.touches && e.touches.length > 0) {
+        return {
+          x: e.touches[0].clientX - rect.left,
+          y: e.touches[0].clientY - rect.top
+        };
+      }
+
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+
+    function startDraw(e) {
+      e.preventDefault();
+
+      isDrawing = true;
+      hasSignature = true;
+      hint.style.display = 'none';
+
+      const pos = getPosition(e);
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+
+      e.preventDefault();
+
+      const pos = getPosition(e);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    }
+
+    function endDraw(e) {
+      if (e) e.preventDefault();
+      isDrawing = false;
+    }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('mouseleave', endDraw);
+
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', draw, { passive: false });
+    canvas.addEventListener('touchend', endDraw, { passive: false });
+
+    function clearSignature() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hasSignature = false;
+      hint.style.display = 'block';
+    }
+
+    function getValue(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function validateForm() {
+      const requiredFields = [
+        ['refundType', '申請類型'],
+        ['name', '申請人姓名'],
+        ['phone', '手機號碼'],
+        ['orderNo', '訂單編號'],
+        ['productName', '購買產品'],
+        ['purchaseDate', '購買日期'],
+        ['refundAmount', '退款金額'],
+        ['reason', '退款原因'],
+        ['bankName', '銀行名稱'],
+        ['branchName', '分行名稱'],
+        ['bankCode', '銀行分行代碼'],
+        ['bankAccount', '銀行帳號'],
+        ['bankAccountName', '銀行戶名']
+      ];
+
+      for (const item of requiredFields) {
+        const id = item[0];
+        const label = item[1];
+
+        if (!getValue(id)) {
+          alert('請填寫：' + label);
+          return false;
+        }
+      }
+
+      if (!hasSignature) {
+        alert('請先完成電子簽名');
+        return false;
+      }
+
+      return true;
+    }
+
+    async function submitForm() {
+      if (!validateForm()) return;
+
+      const status = document.getElementById('status');
+
+      submitBtn.disabled = true;
+      status.style.color = '#333333';
+      status.textContent = '送出中，正在產生退款申請書圖片...';
+
+      try {
+        const captureArea = document.getElementById('captureArea');
+
+        const canvasImage = await html2canvas(captureArea, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: '#ffffff'
+        });
+
+        const imageBase64 = canvasImage.toDataURL('image/png');
+
+        const data = {
+          applyDate: getValue('applyDate'),
+          refundType: getValue('refundType'),
+          name: getValue('name'),
+          phone: getValue('phone'),
+          idNumber: getValue('idNumber'),
+          orderNo: getValue('orderNo'),
+          productName: getValue('productName'),
+          purchaseDate: getValue('purchaseDate'),
+          refundAmount: getValue('refundAmount'),
+          reason: getValue('reason'),
+          bankName: getValue('bankName'),
+          branchName: getValue('branchName'),
+          bankCode: getValue('bankCode'),
+          bankAccount: getValue('bankAccount'),
+          bankAccountName: getValue('bankAccountName'),
+          imageBase64: imageBase64
+        };
+
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message || '送出失敗');
+        }
+
+        status.style.color = '#1f6b46';
+        status.textContent = '退款申請已送出，申請書圖片已存入 Google Drive。';
+
+      } catch (error) {
+        status.style.color = '#b00020';
+        status.textContent = '送出失敗：' + error.message;
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
