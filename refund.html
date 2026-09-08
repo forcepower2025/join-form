@@ -76,6 +76,20 @@
       font-weight: bold;
     }
 
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .checkbox-label input {
+      width: auto;
+      margin: 0;
+      transform: scale(1.2);
+    }
+
     input,
     textarea,
     select {
@@ -271,6 +285,15 @@
       <div class="section-title">三、退款帳戶資料</div>
 
       <div class="grid">
+        <div class="field full">
+          <label class="checkbox-label">
+            <input type="checkbox" id="creditCardRefund">
+            信用卡刷退
+          </label>
+        </div>
+      </div>
+
+      <div class="grid" id="bankAccountFields">
         <div class="field">
           <label>銀行名稱 *</label>
           <input type="text" id="bankName" placeholder="例如：第一銀行">
@@ -300,7 +323,7 @@
       <div class="section-title">四、退款聲明</div>
 
       <div class="notice">
-        本人確認上述退款申請資料皆為本人親自填寫，並確認退款帳戶資料正確無誤。
+        本人確認上述退款申請資料皆為本人親自填寫，並確認退款方式或退款帳戶資料正確無誤。
         若因資料填寫錯誤造成退款延遲、退匯或其他損失，本人願自行負責。
         本退款申請經公司審核後，將依公司退款流程辦理，匯款日期上半月：10日、下半月：20日。
       </div>
@@ -338,6 +361,7 @@
 
     document.getElementById('applyDate').valueAsDate = new Date();
     document.getElementById('refundType').addEventListener('change', handleRefundTypeChange);
+    document.getElementById('creditCardRefund').addEventListener('change', handleCreditCardRefundChange);
 
     function handleRefundTypeChange() {
       const refundType = getValue('refundType');
@@ -364,6 +388,29 @@
       }
     }
 
+    function handleCreditCardRefundChange() {
+      const creditCardRefund = document.getElementById('creditCardRefund').checked;
+      const bankAccountFields = document.getElementById('bankAccountFields');
+
+      const bankName = document.getElementById('bankName');
+      const branchName = document.getElementById('branchName');
+      const bankCode = document.getElementById('bankCode');
+      const bankAccount = document.getElementById('bankAccount');
+      const bankAccountName = document.getElementById('bankAccountName');
+
+      if (creditCardRefund) {
+        bankAccountFields.style.display = 'none';
+
+        bankName.value = '';
+        branchName.value = '';
+        bankCode.value = '';
+        bankAccount.value = '';
+        bankAccountName.value = '';
+      } else {
+        bankAccountFields.style.display = 'grid';
+      }
+    }
+
     function resizeCanvas() {
       const rect = canvas.getBoundingClientRect();
 
@@ -380,6 +427,7 @@
     window.addEventListener('load', function() {
       resizeCanvas();
       handleRefundTypeChange();
+      handleCreditCardRefundChange();
     });
 
     window.addEventListener('resize', resizeCanvas);
@@ -452,13 +500,16 @@
         ['name', '申請人姓名'],
         ['phone', '手機號碼'],
         ['refundAmount', '退款金額'],
-        ['reason', '退款原因'],
-        ['bankName', '銀行名稱'],
-        ['branchName', '分行名稱'],
-        ['bankCode', '銀行分行代碼'],
-        ['bankAccount', '銀行帳號'],
-        ['bankAccountName', '銀行戶名']
+        ['reason', '退款原因']
       ];
+
+      if (!document.getElementById('creditCardRefund').checked) {
+        requiredFields.push(['bankName', '銀行名稱']);
+        requiredFields.push(['branchName', '分行名稱']);
+        requiredFields.push(['bankCode', '銀行分行代碼']);
+        requiredFields.push(['bankAccount', '銀行帳號']);
+        requiredFields.push(['bankAccountName', '銀行戶名']);
+      }
 
       if (getValue('refundType') === '退貨退款') {
         requiredFields.push(['refundProduct', '退款商品']);
@@ -504,10 +555,13 @@
         const imageBase64 = canvasImage.toDataURL('image/png');
 
         const refundType = getValue('refundType');
+        const creditCardRefund = document.getElementById('creditCardRefund').checked;
+        const refundMethod = creditCardRefund ? '信用卡刷退' : '銀行匯款';
 
         const data = {
           applyDate: getValue('applyDate'),
           refundType: refundType,
+          refundMethod: refundMethod,
           name: getValue('name'),
           phone: getValue('phone'),
           idNumber: getValue('idNumber'),
@@ -516,11 +570,11 @@
           purchaseDate: getValue('purchaseDate'),
           refundAmount: getValue('refundAmount'),
           reason: getValue('reason'),
-          bankName: getValue('bankName'),
-          branchName: getValue('branchName'),
-          bankCode: getValue('bankCode'),
-          bankAccount: getValue('bankAccount'),
-          bankAccountName: getValue('bankAccountName'),
+          bankName: creditCardRefund ? '' : getValue('bankName'),
+          branchName: creditCardRefund ? '' : getValue('branchName'),
+          bankCode: creditCardRefund ? '' : getValue('bankCode'),
+          bankAccount: creditCardRefund ? '' : getValue('bankAccount'),
+          bankAccountName: creditCardRefund ? '' : getValue('bankAccountName'),
           imageBase64: imageBase64
         };
 
