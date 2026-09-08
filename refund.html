@@ -401,13 +401,19 @@
       if (creditCardRefund) {
         bankAccountFields.style.display = 'none';
 
-        bankName.value = '';
-        branchName.value = '';
-        bankCode.value = '';
-        bankAccount.value = '';
-        bankAccountName.value = '';
+        bankName.value = '無';
+        branchName.value = '無';
+        bankCode.value = '無';
+        bankAccount.value = '信用卡刷退';
+        bankAccountName.value = '無';
       } else {
         bankAccountFields.style.display = 'grid';
+
+        if (bankName.value === '無') bankName.value = '';
+        if (branchName.value === '無') branchName.value = '';
+        if (bankCode.value === '無') bankCode.value = '';
+        if (bankAccount.value === '信用卡刷退') bankAccount.value = '';
+        if (bankAccountName.value === '無') bankAccountName.value = '';
       }
     }
 
@@ -556,12 +562,10 @@
 
         const refundType = getValue('refundType');
         const creditCardRefund = document.getElementById('creditCardRefund').checked;
-        const refundMethod = creditCardRefund ? '信用卡刷退' : '銀行匯款';
 
         const data = {
           applyDate: getValue('applyDate'),
           refundType: refundType,
-          refundMethod: refundMethod,
           name: getValue('name'),
           phone: getValue('phone'),
           idNumber: getValue('idNumber'),
@@ -570,11 +574,11 @@
           purchaseDate: getValue('purchaseDate'),
           refundAmount: getValue('refundAmount'),
           reason: getValue('reason'),
-          bankName: creditCardRefund ? '' : getValue('bankName'),
-          branchName: creditCardRefund ? '' : getValue('branchName'),
-          bankCode: creditCardRefund ? '' : getValue('bankCode'),
-          bankAccount: creditCardRefund ? '' : getValue('bankAccount'),
-          bankAccountName: creditCardRefund ? '' : getValue('bankAccountName'),
+          bankName: creditCardRefund ? '無' : getValue('bankName'),
+          branchName: creditCardRefund ? '無' : getValue('branchName'),
+          bankCode: creditCardRefund ? '無' : getValue('bankCode'),
+          bankAccount: creditCardRefund ? '信用卡刷退' : getValue('bankAccount'),
+          bankAccountName: creditCardRefund ? '無' : getValue('bankAccountName'),
           imageBase64: imageBase64
         };
 
