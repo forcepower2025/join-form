@@ -342,38 +342,134 @@
         }
     }
 
-       /* ===== 主區塊 ===== */
-    .news-wrapper{
-    max-width:1100px;
-    margin:50px auto;
-    padding:20px;
-    text-align:center;
-}
+       /* ===== 最新公告主區塊 ===== */
+    .news-wrapper {
+        max-width: 1100px;
+        margin: 50px auto;
+        padding: 20px;
+    }
 
-.news-title{
-    font-size:30px;
-    margin-bottom:30px;
-    letter-spacing:2px;
-}
+    .news-list {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
 
-.fb-box{
-    background:#fff;
-    padding:30px;
-    border-radius:12px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.05);
-    display:flex;
-    justify-content:center;
-}
+    .news-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        padding: 28px;
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 32px;
+        align-items: center;
+    }
 
-.news-card {
-    background: #fff;
-    padding: 60px 20px;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    text-align: center;
-    font-size: 20px;
-    color: #666;
-}
+    .news-image-box {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #f1f1f1;
+        cursor: pointer;
+    }
+
+    .news-image-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+
+    .news-image-box:hover img {
+        transform: scale(1.05);
+    }
+
+    .news-no-image {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 18px;
+        letter-spacing: 2px;
+    }
+
+    .news-content {
+        text-align: left;
+    }
+
+    .news-date {
+        font-size: 16px;
+        color: #a59e8a;
+        margin-bottom: 12px;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .news-text {
+        font-size: 20px;
+        color: #555;
+        line-height: 1.9;
+        white-space: pre-line;
+        letter-spacing: 1px;
+    }
+
+    .empty-news {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        padding: 70px 20px;
+        text-align: center;
+        font-size: 30px;
+        color: #666;
+        letter-spacing: 2px;
+    }
+
+    .image-modal {
+        display: none;
+        position: fixed;
+        z-index: 99999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.82);
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+    }
+
+    .image-modal.active {
+        display: flex;
+    }
+
+    .image-modal img {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+        background: #fff;
+    }
+
+    .modal-close {
+        position: fixed;
+        top: 24px;
+        right: 34px;
+        color: #fff;
+        font-size: 48px;
+        font-weight: 300;
+        cursor: pointer;
+        z-index: 100000;
+        line-height: 1;
+    }
+
+    .modal-close:hover {
+        color: #ddd;
+    }
 
 /* ===== 手機 ===== */
 @media(max-width:992px){
@@ -390,6 +486,40 @@
         display:block;
         width:100%;
         padding:14px 18px;
+    }
+
+    .news-wrapper {
+        margin: 30px auto;
+        padding: 16px;
+    }
+
+    .news-card {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        padding: 20px;
+    }
+
+    .news-image-box {
+        aspect-ratio: 16 / 10;
+    }
+
+    .news-text {
+        font-size: 17px;
+    }
+
+    .empty-news {
+        font-size: 24px;
+        padding: 50px 20px;
+    }
+
+    .image-modal {
+        padding: 20px;
+    }
+
+    .modal-close {
+        top: 16px;
+        right: 22px;
+        font-size: 42px;
     }
 }
 </style>
@@ -447,9 +577,14 @@
 </div>
 
 <div class="news-wrapper">
-    <div class="news-card">
-        <div class="news-title">目前沒有公告</div>
+    <div id="newsList" class="news-list">
+        <div class="empty-news">公告載入中...</div>
     </div>
+</div>
+
+<div id="imageModal" class="image-modal">
+    <span class="modal-close" onclick="closeImageModal()">×</span>
+    <img id="modalImage" src="" alt="公告圖片">
 </div>
 
 <footer>
@@ -457,6 +592,8 @@
 </footer>
 
 <script>
+const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzgH_Dj6v3NgxJlHZD5hyKI9GIYSUt8pFoLFhcGa2aj1cvGV_5YzJ0tiQ8F53amBhLK/exec';
+
 const hamburger = document.getElementById("hamburger");
 const menuTitles = document.getElementById("menu-titles");
 
@@ -464,7 +601,85 @@ hamburger.addEventListener("click", function () {
     menuTitles.classList.toggle("active");
 });
 
+window.addEventListener('load', loadNews);
 
+async function loadNews() {
+    const newsList = document.getElementById('newsList');
+
+    try {
+        const response = await fetch(GAS_API_URL + '?action=getNews');
+        const result = await response.json();
+
+        if (!result.success) {
+            newsList.innerHTML = '<div class="empty-news">目前沒有公告</div>';
+            return;
+        }
+
+        const newsData = result.data || [];
+
+        if (newsData.length === 0) {
+            newsList.innerHTML = '<div class="empty-news">目前沒有公告</div>';
+            return;
+        }
+
+        newsList.innerHTML = newsData.map(function(item) {
+            const imageId = String(item.imageId || '').trim();
+            const imageUrl = imageId
+                ? 'https://lh3.googleusercontent.com/d/' + imageId + '=s1200'
+                : '';
+
+            const imageHtml = imageUrl
+                ? '<div class="news-image-box" onclick="openImageModal(\'' + imageUrl + '\')">' +
+                    '<img src="' + imageUrl + '" alt="公告圖片">' +
+                  '</div>'
+                : '<div class="news-image-box">' +
+                    '<div class="news-no-image">無圖片</div>' +
+                  '</div>';
+
+            return '<div class="news-card">' +
+                imageHtml +
+                '<div class="news-content">' +
+                    '<div class="news-date">' + escapeHtml(item.date) + '</div>' +
+                    '<div class="news-text">' + escapeHtml(item.content) + '</div>' +
+                '</div>' +
+            '</div>';
+        }).join('');
+
+    } catch (error) {
+        newsList.innerHTML = '<div class="empty-news">公告載入失敗</div>';
+    }
+}
+
+function openImageModal(imageUrl) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+
+    modalImage.src = imageUrl;
+    modal.classList.add('active');
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+
+    modal.classList.remove('active');
+    modalImage.src = '';
+}
+
+document.getElementById('imageModal').addEventListener('click', function(e) {
+    if (e.target.id === 'imageModal') {
+        closeImageModal();
+    }
+});
+
+function escapeHtml(text) {
+    return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
 </script>
 
 </body>
