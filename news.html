@@ -17,6 +17,15 @@
 <meta property="og:type" content="website">
 
 <style>
+
+.news-inner-title {
+    font-size: 24px;
+    font-weight: 900;
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+   
     * {
         box-sizing: border-box;
         margin: 0;
@@ -640,7 +649,7 @@ async function loadNews() {
                 imageHtml +
                 '<div class="news-content">' +
                     '<div class="news-date">' + escapeHtml(item.date) + '</div>' +
-                    '<div class="news-text">' + escapeHtml(item.content) + '</div>' +
+                    '<div class="news-text">' + formatNewsContent(item.content) + '</div>' +
                 '</div>' +
             '</div>';
         }).join('');
@@ -671,6 +680,21 @@ document.getElementById('imageModal').addEventListener('click', function(e) {
         closeImageModal();
     }
 });
+
+function formatNewsContent(text) {
+    const safeText = escapeHtml(text || '');
+
+    return safeText
+        .split('\n')
+        .map(function(line) {
+            if (line.startsWith('【標題】')) {
+                return '<div class="news-inner-title">' + line.replace('【標題】', '') + '</div>';
+            }
+
+            return line;
+        })
+        .join('<br>');
+}
 
 function escapeHtml(text) {
     return String(text || '')
