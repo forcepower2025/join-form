@@ -278,15 +278,15 @@ el('courseForm').addEventListener('submit', async e => {
     el('courseForm').style.display = 'none';
 
 
-    el('successInfo').innerHTML = `
-      <div>課程場次：${eventCode}</div>
-      <div>姓名：${r.data.name}</div>
-      <div>手機號碼：${r.data.phone}</div>
-      <div>團隊名稱：${r.data.team}</div>
-      <div>用餐習慣：${r.data.meal}</div>
-      <div>付款方式：${r.data.payment}</div>
-      <div>付款狀態：${r.data.paymentStatus}</div>
-    `;
+el('successInfo').innerHTML = `
+  <div>課程場次：${eventCode}</div>
+  <div>姓名：${el('name').value.trim()}</div>
+  <div>手機號碼：${el('phone').value.trim()}</div>
+  <div>團隊名稱：${el('team').value}</div>
+  <div>用餐習慣：${meal}</div>
+  <div>付款方式：${payment}</div>
+  <div>付款狀態：${r.data?.paymentStatus || r.paymentStatus || '未付款'}</div>
+`;
 
 
     el('successBox').style.display = 'block';
