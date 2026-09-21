@@ -9,7 +9,6 @@
 </head><body><div class="wrap"><h1>課程報名後台</h1>
 
 <div class="toolbar">
-<div class="field"><label>管理密碼</label><input type="password" id="adminPassword" placeholder="請輸入密碼"></div>
 <div class="field"><label>課程場次</label><select id="eventSelect"></select></div>
 <div class="field"><label>搜尋</label><input id="keyword" placeholder="姓名/手機/推薦人/團隊"></div>
 <button class="btn" onclick="loadData()">讀取名單</button>
@@ -59,8 +58,6 @@
 
 const GAS_URL='https://script.google.com/macros/s/AKfycbwjITXx86Cl3WOqcB9a4GHl8NKe2JhkNWvCZMvufvzumPEAALTv0XGgPm5wShdR5DN4wA/exec';
 
-const ADMIN_PASSWORD='123456';
-
 let rows=[];
 
 const el=id=>document.getElementById(id);
@@ -78,10 +75,6 @@ async function api(action,data={}){
   });
 
   return await res.json();
-}
-
-function checkPwd(){
-  return el('adminPassword').value===ADMIN_PASSWORD;
 }
 
 
@@ -147,11 +140,6 @@ async function init(){
 
 
 async function loadData(){
-
-  if(!checkPwd()){
-    el('msg').textContent='管理密碼錯誤';
-    return;
-  }
 
   const ev=el('eventSelect').value;
 
@@ -231,11 +219,6 @@ function render(){
 
 
 async function updatePayment(userId,status){
-
-  if(!checkPwd()){
-    alert('管理密碼錯誤');
-    return;
-  }
 
   const r=await api('updatePayment',{
     event:el('eventSelect').value,
