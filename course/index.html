@@ -332,7 +332,19 @@ el('courseForm').addEventListener('submit', async e => {
       document.querySelector(
         'input[name="payment"]:checked'
       )?.value || '';
+const paymentDetail = el('paymentDetail').value.trim();
 
+let paymentStatus = '';
+
+if(payment === '現金'){
+  paymentStatus = '收款人：' + paymentDetail;
+}
+else if(payment === '轉帳匯款'){
+  paymentStatus = '帳號末5碼：' + paymentDetail;
+}
+else if(payment === '刷卡'){
+  paymentStatus = '卡號末4碼：' + paymentDetail;
+}
 
     const r = await api(
       'register',
@@ -364,8 +376,7 @@ el('courseForm').addEventListener('submit', async e => {
 
         payment,
 
-paymentDetail:
-  el('paymentDetail').value.trim()
+paymentStatus
       }
     );
 
@@ -396,15 +407,7 @@ el('successInfo').innerHTML = `
   <div>團隊名稱：${el('team').value}</div>
   <div>用餐習慣：${meal}</div>
   <div>付款方式：${payment}</div>
-<div>付款方式：${payment}</div>
-<div>${
-  payment === '現金'
-    ? '收款人'
-    : payment === '轉帳匯款'
-      ? '帳號末5碼'
-      : '卡號末4碼'
-}：${el('paymentDetail').value.trim()}</div>
-<div>付款狀態：${r.data?.paymentStatus || r.paymentStatus || '未付款'}</div>
+  <div>${paymentStatus}</div>
 
 `;
 
