@@ -37,16 +37,10 @@ body {
   gap: 12px;
 }
 
-.logo-mark {
+.logo-img {
   width: 42px;
   height: 42px;
-  border: 2px solid #caa64a;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #caa64a;
-  font-weight: bold;
+  object-fit: contain;
 }
 
 .company {
@@ -215,7 +209,7 @@ button {
 
   <div class="header">
     <div class="logo-row">
-      <div class="logo-mark">＋</div>
+       <img class="logo-img" src="../S__79954831.jpg" alt="動元力國際">
       <div class="company">動元力國際股份有限公司</div>
     </div>
     <div class="title">客戶訂單明細</div>
@@ -279,7 +273,6 @@ button {
         <th>付款人</th>
         <th>付款方式</th>
         <th>付款資料</th>
-        <th>授權碼</th>
         <th>付款金額</th>
       </tr>
     </thead>
@@ -446,7 +439,6 @@ async function loadOrder() {
         <td>${item.payer || ''}</td>
         <td>${item.method || ''}</td>
         <td>${item.paymentInfo || ''}</td>
-        <td>${item.authCode || ''}</td>
         <td>${formatMoney(item.amount)}</td>
       `;
       paymentBody.appendChild(tr);
