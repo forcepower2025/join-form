@@ -221,37 +221,41 @@ button {
     <div class="title">客戶訂單明細</div>
   </div>
 
-  <div class="section-title">會員資料</div>
-  <table>
-    <tr>
-      <th>客戶姓名</th>
-      <td><input id="buyerName" type="text"></td>
-      <th>身分證字號</th>
-      <td><input id="idNumber" type="text"></td>
-    </tr>
-    <tr>
-      <th>手機號碼</th>
-      <td><input id="phone" type="tel"></td>
-      <th>發票號碼</th>
-      <td class="readonly" id="invoiceNo"></td>
-    </tr>
-    <tr>
-      <th>配送日期</th>
-      <td class="readonly" id="deliveryDate"></td>
-      <th>收件人姓名</th>
-      <td><input id="receiverName" type="text"></td>
-    </tr>
-    <tr>
-      <th>收件人手機</th>
-      <td><input id="receiverPhone" type="tel"></td>
-      <th>簽收單編號</th>
-      <td class="readonly" id="signNo"></td>
-    </tr>
-    <tr>
-      <th>宅配地址</th>
-      <td colspan="3"><input id="deliveryAddress" type="text"></td>
-    </tr>
-  </table>
+  <div class="section-title">訂購資料</div>
+<table>
+  <tr>
+    <th>訂單編號</th>
+    <td class="readonly" id="signNo"></td>
+    <th>客戶姓名</th>
+    <td><input id="buyerName" type="text"></td>
+  </tr>
+  <tr>
+    <th>身分證字號</th>
+    <td><input id="idNumber" type="text"></td>
+    <th>手機號碼</th>
+    <td><input id="phone" type="tel"></td>
+  </tr>
+</table>
+
+<div class="section-title">收件資料</div>
+<table>
+  <tr>
+    <th>收件人姓名</th>
+    <td><input id="receiverName" type="text"></td>
+    <th>收件人手機</th>
+    <td><input id="receiverPhone" type="tel"></td>
+  </tr>
+  <tr>
+    <th>配送日期</th>
+    <td class="readonly" id="deliveryDate"></td>
+    <th>發票號碼</th>
+    <td class="readonly" id="invoiceNo"></td>
+  </tr>
+  <tr>
+    <th>宅配地址</th>
+    <td colspan="3"><input id="deliveryAddress" type="text"></td>
+  </tr>
+</table>
 
   <div class="section-title">訂購產品</div>
   <table>
