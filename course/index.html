@@ -30,8 +30,40 @@ input,select{width:100%;height:46px;border:1px solid #ccd6cc;border-radius:10px;
 <div class="form-row"><label>推薦人姓名 <span class="required">*</span></label><input id="referrer" required></div>
 <div class="form-row"><label>團隊名稱 <span class="required">*</span></label><select id="team" required><option value="">請選擇團隊</option><option>鼎峰團隊（吳慧貞）</option><option>金鑽團隊（陳國興）</option><option>曹操團隊（曹富程）</option><option>可樂團隊（劉欣蕙）</option><option>幸福團隊（蔡明發）</option><option>太陽團隊（羅德發）</option><option>飛熊團隊（林宜蓁）</option></select></div>
 <div class="form-row"><label>用餐習慣 <span class="required">*</span></label><div class="radio-group"><label class="radio-item"><input type="radio" name="meal" value="葷食" required>葷食</label><label class="radio-item"><input type="radio" name="meal" value="素食">素食</label></div></div>
-<div class="form-row"><label>付款方式 <span class="required">*</span></label><div class="radio-group"><label class="radio-item"><input type="radio" name="payment" value="現金" required>現金</label><label class="radio-item"><input type="radio" name="payment" value="刷卡">刷卡</label><label class="radio-item"><input type="radio" name="payment" value="轉帳匯款">轉帳匯款</label></div><div class="hint">轉帳匯款請備註姓名</div></div>
-<button class="btn" id="submitBtn" type="submit">送出報名</button>
+<div class="form-row">
+  <label>付款方式 <span class="required">*</span></label>
+
+  <div class="radio-group">
+    <label class="radio-item">
+      <input type="radio" name="payment" value="現金" required>
+      現金
+    </label>
+
+    <label class="radio-item">
+      <input type="radio" name="payment" value="刷卡">
+      刷卡
+    </label>
+
+    <label class="radio-item">
+      <input type="radio" name="payment" value="轉帳匯款">
+      轉帳匯款
+    </label>
+  </div>
+</div>
+
+<div class="form-row" id="paymentDetailRow" style="display:none;">
+  <label id="paymentDetailLabel">
+    付款資料 <span class="required">*</span>
+  </label>
+
+  <input
+    id="paymentDetail"
+    type="text"
+    autocomplete="off"
+  >
+
+  <div class="hint" id="paymentDetailHint"></div>
+</div><button class="btn" id="submitBtn" type="submit">送出報名</button>
 <div class="msg" id="msg"></div>
 </form>
 <div class="success-box" id="successBox"><div class="success-title">報名成功</div><div class="info-list" id="successInfo"></div><div class="hint">現場報到時，請用 LINE 掃描主辦單位提供的報到 QR Code。</div></div>
@@ -58,6 +90,82 @@ let lineProfile = {
 };
 
 const el = id => document.getElementById(id);
+
+  // =====================================================
+// 付款方式附加欄位
+// 現金：收款人
+// 刷卡：卡號末4碼
+// 轉帳匯款：帳號末5碼
+// =====================================================
+const paymentRadios = document.querySelectorAll('input[name="payment"]');
+
+paymentRadios.forEach(radio => {
+  radio.addEventListener('change', function(){
+
+    const row = el('paymentDetailRow');
+    const label = el('paymentDetailLabel');
+    const input = el('paymentDetail');
+    const hint = el('paymentDetailHint');
+
+    row.style.display = 'block';
+
+    input.value = '';
+    input.required = true;
+    input.removeAttribute('maxlength');
+    input.removeAttribute('pattern');
+    input.removeAttribute('inputmode');
+
+    if(this.value === '現金'){
+
+      label.innerHTML =
+        '收款人 <span class="required">*</span>';
+
+      input.placeholder =
+        '請輸入收款人姓名';
+
+      hint.textContent =
+        '請填寫實際收取現金的人員姓名';
+
+    }
+
+    else if(this.value === '轉帳匯款'){
+
+      label.innerHTML =
+        '帳號末5碼 <span class="required">*</span>';
+
+      input.placeholder =
+        '請輸入匯款帳號末5碼';
+
+      input.maxLength = 5;
+      input.inputMode = 'numeric';
+      input.pattern = '[0-9]{5}';
+
+      hint.textContent =
+        '請填寫匯款帳號最後5碼';
+
+    }
+
+    else if(this.value === '刷卡'){
+
+      label.innerHTML =
+        '卡號末4碼 <span class="required">*</span>';
+
+      input.placeholder =
+        '請輸入信用卡末4碼';
+
+      input.maxLength = 4;
+      input.inputMode = 'numeric';
+      input.pattern = '[0-9]{4}';
+
+      hint.textContent =
+        '請填寫本次刷卡信用卡最後4碼';
+
+    }
+
+  });
+});
+
+  
 
 function showMsg(text, type) {
   const m = el('msg');
@@ -254,7 +362,10 @@ el('courseForm').addEventListener('submit', async e => {
 
         meal,
 
-        payment
+        payment,
+
+paymentDetail:
+  el('paymentDetail').value.trim()
       }
     );
 
@@ -285,7 +396,16 @@ el('successInfo').innerHTML = `
   <div>團隊名稱：${el('team').value}</div>
   <div>用餐習慣：${meal}</div>
   <div>付款方式：${payment}</div>
-  <div>付款狀態：${r.data?.paymentStatus || r.paymentStatus || '未付款'}</div>
+<div>付款方式：${payment}</div>
+<div>${
+  payment === '現金'
+    ? '收款人'
+    : payment === '轉帳匯款'
+      ? '帳號末5碼'
+      : '卡號末4碼'
+}：${el('paymentDetail').value.trim()}</div>
+<div>付款狀態：${r.data?.paymentStatus || r.paymentStatus || '未付款'}</div>
+
 `;
 
 
