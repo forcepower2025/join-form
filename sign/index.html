@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客戶訂單明細｜動元力國際</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 12px;
+  font-family: "Microsoft JhengHei", Arial, sans-serif;
+  background: #f4f4f4;
+  color: #222;
+}
+
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 14px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.logo-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-mark {
+  width: 42px;
+  height: 42px;
+  border: 2px solid #caa64a;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #caa64a;
+  font-weight: bold;
+}
+
+.company {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.title {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 6px 16px;
+  border: 1px solid #222;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.section-title {
+  background: #d9d9d9;
+  border: 1px solid #888;
+  border-bottom: none;
+  text-align: center;
+  padding: 8px;
+  font-weight: bold;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0;
+}
+
+th, td {
+  border: 1px solid #888;
+  padding: 8px;
+  font-size: 15px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+th {
+  background: #f6f6f6;
+  font-weight: bold;
+  width: 25%;
+}
+
+input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  text-align: center;
+  background: #fffdf2;
+}
+
+.readonly {
+  background: #f8f8f8;
+}
+
+.payment-table th {
+  background: #f6f6f6;
+}
+
+.signature-wrap {
+  border: 1px solid #888;
+  border-top: none;
+  padding: 10px;
+  position: relative;
+}
+
+.signature-title {
+  background: #d9d9d9;
+  border: 1px solid #888;
+  border-bottom: none;
+  text-align: center;
+  padding: 8px;
+  font-weight: bold;
+  margin-top: 0;
+}
+
+canvas {
+  width: 100%;
+  height: 220px;
+  border: 1px solid #ccc;
+  background: white;
+  touch-action: none;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+button {
+  flex: 1;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.clear-btn {
+  background: #777;
+  color: white;
+}
+
+.submit-btn {
+  background: #0b6b3a;
+  color: white;
+}
+
+.msg {
+  text-align: center;
+  margin-top: 14px;
+  font-weight: bold;
+}
+
+.error {
+  color: #c00;
+}
+
+.success {
+  color: #0b6b3a;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px 10px;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 6px;
+  }
+
+  .page {
+    padding: 8px;
+  }
+
+  .company {
+    font-size: 19px;
+  }
+
+  th, td {
+    font-size: 13px;
+    padding: 6px;
+  }
+
+  input {
+    font-size: 13px;
+  }
+
+  canvas {
+    height: 190px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page" id="captureArea" style="display:none;">
+
+  <div class="header">
+    <div class="logo-row">
+      <div class="logo-mark">＋</div>
+      <div class="company">動元力國際股份有限公司</div>
+    </div>
+    <div class="title">客戶訂單明細</div>
+  </div>
+
+  <div class="section-title">會員資料</div>
+  <table>
+    <tr>
+      <th>客戶姓名</th>
+      <td><input id="buyerName" type="text"></td>
+      <th>身分證字號</th>
+      <td><input id="idNumber" type="text"></td>
+    </tr>
+    <tr>
+      <th>手機號碼</th>
+      <td><input id="phone" type="tel"></td>
+      <th>發票號碼</th>
+      <td class="readonly" id="invoiceNo"></td>
+    </tr>
+    <tr>
+      <th>配送日期</th>
+      <td class="readonly" id="deliveryDate"></td>
+      <th>收件人姓名</th>
+      <td><input id="receiverName" type="text"></td>
+    </tr>
+    <tr>
+      <th>收件人手機</th>
+      <td><input id="receiverPhone" type="tel"></td>
+      <th>簽收單編號</th>
+      <td class="readonly" id="signNo"></td>
+    </tr>
+    <tr>
+      <th>宅配地址</th>
+      <td colspan="3"><input id="deliveryAddress" type="text"></td>
+    </tr>
+  </table>
+
+  <div class="section-title">訂購產品</div>
+  <table>
+    <tr>
+      <th>品名</th>
+      <th>數量</th>
+      <th>總計</th>
+    </tr>
+    <tr>
+      <td id="productName">動元活力蔬果餐包</td>
+      <td id="quantity"></td>
+      <td id="totalAmount"></td>
+    </tr>
+  </table>
+
+  <div class="section-title">付款資訊</div>
+  <table class="payment-table">
+    <thead>
+      <tr>
+        <th>付款日期</th>
+        <th>付款人</th>
+        <th>付款方式</th>
+        <th>付款資料</th>
+        <th>授權碼</th>
+        <th>付款金額</th>
+      </tr>
+    </thead>
+    <tbody id="paymentBody"></tbody>
+  </table>
+
+  <div class="signature-title">電子簽收</div>
+  <div class="signature-wrap">
+    <canvas id="signatureCanvas"></canvas>
+  </div>
+
+</div>
+
+<div id="loading" class="loading">資料載入中...</div>
+
+<div class="button-row" id="buttonRow" style="display:none;">
+  <button class="clear-btn" onclick="clearSignature()">清除簽名</button>
+  <button class="submit-btn" id="submitBtn" onclick="submitSign()">送出簽收</button>
+</div>
+
+<div id="msg" class="msg"></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbzkXXmi_PRb9e_pJjc1aBdymSMn7oC5jeoHq2y6CzafzMnJMlM1Otqq-n1MpwzHsuRYXg/exec';
+
+const params = new URLSearchParams(window.location.search);
+const SIGN_ID = params.get('id');
+
+let hasSignature = false;
+let isDrawing = false;
+
+const canvas = document.getElementById('signatureCanvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * 2;
+  canvas.height = rect.height * 2;
+  ctx.setTransform(2, 0, 0, 2, 0, 0);
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#000';
+}
+
+function getPosition(e) {
+  const rect = canvas.getBoundingClientRect();
+
+  if (e.touches && e.touches.length > 0) {
+    return {
+      x: e.touches[0].clientX - rect.left,
+      y: e.touches[0].clientY - rect.top
+    };
+  }
+
+  return {
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top
+  };
+}
+
+function startDraw(e) {
+  e.preventDefault();
+  isDrawing = true;
+  hasSignature = true;
+  const pos = getPosition(e);
+  ctx.beginPath();
+  ctx.moveTo(pos.x, pos.y);
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  e.preventDefault();
+  const pos = getPosition(e);
+  ctx.lineTo(pos.x, pos.y);
+  ctx.stroke();
+}
+
+function endDraw(e) {
+  if (e) e.preventDefault();
+  isDrawing = false;
+}
+
+function clearSignature() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  hasSignature = false;
+}
+
+canvas.addEventListener('mousedown', startDraw);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', endDraw);
+canvas.addEventListener('mouseleave', endDraw);
+
+canvas.addEventListener('touchstart', startDraw, { passive: false });
+canvas.addEventListener('touchmove', draw, { passive: false });
+canvas.addEventListener('touchend', endDraw, { passive: false });
+
+function setText(id, value) {
+  document.getElementById(id).textContent = value || '';
+}
+
+function setInput(id, value) {
+  document.getElementById(id).value = value || '';
+}
+
+function formatMoney(value) {
+  if (!value) return '';
+  const n = Number(String(value).replace(/,/g, ''));
+  if (isNaN(n)) return value;
+  return 'NT$ ' + n.toLocaleString();
+}
+
+async function api(payload) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+
+  return await res.json();
+}
+
+async function loadOrder() {
+  const msg = document.getElementById('msg');
+
+  if (!SIGN_ID) {
+    document.getElementById('loading').textContent = '缺少簽收單編號';
+    return;
+  }
+
+  try {
+    const result = await api({
+      action: 'getOrder',
+      id: SIGN_ID
+    });
+
+    if (!result.success) {
+      document.getElementById('loading').textContent = result.message || '資料載入失敗';
+      return;
+    }
+
+    const order = result.order;
+    const payments = result.payments || [];
+
+    setText('signNo', order.signNo);
+    setInput('buyerName', order.buyerName);
+    setInput('idNumber', order.idNumber);
+    setInput('phone', order.phone);
+    setText('invoiceNo', order.invoiceNo);
+    setText('deliveryDate', order.deliveryDate);
+    setInput('deliveryAddress', order.deliveryAddress);
+    setInput('receiverName', order.receiverName);
+    setInput('receiverPhone', order.receiverPhone);
+    setText('productName', order.productName || '動元活力蔬果餐包');
+    setText('quantity', order.quantity);
+    setText('totalAmount', formatMoney(order.totalAmount));
+
+    const paymentBody = document.getElementById('paymentBody');
+    paymentBody.innerHTML = '';
+
+    payments.forEach(item => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${item.paymentDate || ''}</td>
+        <td>${item.payer || ''}</td>
+        <td>${item.method || ''}</td>
+        <td>${item.paymentInfo || ''}</td>
+        <td>${item.authCode || ''}</td>
+        <td>${formatMoney(item.amount)}</td>
+      `;
+      paymentBody.appendChild(tr);
+    });
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('captureArea').style.display = 'block';
+    document.getElementById('buttonRow').style.display = 'flex';
+
+    setTimeout(resizeCanvas, 100);
+
+  } catch (err) {
+    document.getElementById('loading').textContent = '資料載入失敗';
+  }
+}
+
+function validate() {
+  const required = [
+    ['buyerName', '客戶姓名'],
+    ['idNumber', '身分證字號'],
+    ['phone', '手機號碼'],
+    ['deliveryAddress', '宅配地址'],
+    ['receiverName', '收件人姓名'],
+    ['receiverPhone', '收件人手機']
+  ];
+
+  for (const item of required) {
+    const id = item[0];
+    const label = item[1];
+
+    if (!document.getElementById(id).value.trim()) {
+      alert('請填寫：' + label);
+      return false;
+    }
+  }
+
+  if (!hasSignature) {
+    alert('請完成電子簽名');
+    return false;
+  }
+
+  return true;
+}
+
+async function submitSign() {
+  if (!validate()) return;
+
+  const btn = document.getElementById('submitBtn');
+  const msg = document.getElementById('msg');
+
+  btn.disabled = true;
+  msg.className = 'msg';
+  msg.textContent = '資料送出中...';
+
+  try {
+    const result = await api({
+      action: 'submitSign',
+      id: SIGN_ID,
+      buyerName: document.getElementById('buyerName').value.trim(),
+      idNumber: document.getElementById('idNumber').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      deliveryAddress: document.getElementById('deliveryAddress').value.trim(),
+      receiverName: document.getElementById('receiverName').value.trim(),
+      receiverPhone: document.getElementById('receiverPhone').value.trim()
+    });
+
+    if (result.success) {
+      msg.className = 'msg success';
+      msg.textContent = '簽收資料已送出';
+    } else {
+      msg.className = 'msg error';
+      msg.textContent = result.message || '送出失敗';
+      btn.disabled = false;
+    }
+
+  } catch (err) {
+    msg.className = 'msg error';
+    msg.textContent = '送出失敗，請稍後再試';
+    btn.disabled = false;
+  }
+}
+
+window.addEventListener('load', loadOrder);
+window.addEventListener('resize', resizeCanvas);
+</script>
+
+</body>
+</html>
