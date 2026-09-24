@@ -128,6 +128,23 @@ canvas {
   touch-action: none;
 }
 
+.saved-signature-img {
+  width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  border: 1px solid #ccc;
+  background: #fff;
+  display: none;
+}
+
+.signed-lock-text {
+  margin-top: 10px;
+  text-align: center;
+  color: #0b6b3a;
+  font-weight: bold;
+  display: none;
+}
+
 .button-row {
   display: flex;
   gap: 10px;
@@ -311,10 +328,13 @@ button {
     <tbody id="paymentBody"></tbody>
   </table>
 
-  <div class="signature-title">電子簽收</div>
-  <div class="signature-wrap">
-    <canvas id="signatureCanvas"></canvas>
-  <div class="sign-note">
+<div class="signature-title">電子簽收</div>
+<div class="signature-wrap">
+  <canvas id="signatureCanvas"></canvas>
+  <img id="savedSignatureImage" class="saved-signature-img" alt="電子簽收圖片">
+  <div id="signedLockText" class="signed-lock-text">此訂單已完成簽收，不能重複簽署</div>
+<div class="sign-note">
+  
     <div><span class="red">紅字欄位為必填欄位，可由本人確認後修改內容。</span></div>
     <div>本人確認上述訂購資料、收件資料、付款資訊及簽收內容均正確無誤。</div>
     <div>本簽名須由本人親自簽署，嚴禁冒名、代簽或未經授權代為簽收；如有不實簽署、冒用他人名義或代簽情事，簽署人應自行承擔相關法律責任。</div>
@@ -396,6 +416,33 @@ function endDraw(e) {
 function clearSignature() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   hasSignature = false;
+}
+
+function createSignatureImageData() {
+  const exportCanvas = document.createElement('canvas');
+  const exportCtx = exportCanvas.getContext('2d');
+
+  exportCanvas.width = canvas.width;
+  exportCanvas.height = canvas.height;
+
+  exportCtx.fillStyle = '#ffffff';
+  exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+  exportCtx.drawImage(canvas, 0, 0);
+
+  exportCtx.save();
+  exportCtx.font = 'bold 42px Microsoft JhengHei, Arial';
+  exportCtx.fillStyle = 'rgba(180, 0, 0, 0.24)';
+  exportCtx.textAlign = 'center';
+  exportCtx.textBaseline = 'middle';
+
+  exportCtx.translate(exportCanvas.width / 2, exportCanvas.height / 2);
+  exportCtx.rotate(-20 * Math.PI / 180);
+  exportCtx.fillText('限動元力國際使用', 0, 0);
+
+  exportCtx.restore();
+
+  return exportCanvas.toDataURL('image/png');
 }
 
 canvas.addEventListener('mousedown', startDraw);
@@ -481,11 +528,26 @@ async function loadOrder() {
       paymentBody.appendChild(tr);
     });
 
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('captureArea').style.display = 'block';
-    document.getElementById('buttonRow').style.display = 'flex';
+document.getElementById('loading').style.display = 'none';
+document.getElementById('captureArea').style.display = 'block';
 
-    setTimeout(resizeCanvas, 100);
+if (order.signStatus === '已簽收' && order.signImageUrl) {
+  canvas.style.display = 'none';
+
+  const savedImg = document.getElementById('savedSignatureImage');
+  savedImg.src = order.signImageUrl;
+  savedImg.style.display = 'block';
+
+  document.getElementById('signedLockText').style.display = 'block';
+  document.getElementById('buttonRow').style.display = 'none';
+} else {
+  canvas.style.display = 'block';
+  document.getElementById('savedSignatureImage').style.display = 'none';
+  document.getElementById('signedLockText').style.display = 'none';
+  document.getElementById('buttonRow').style.display = 'flex';
+
+  setTimeout(resizeCanvas, 100);
+}
 
   } catch (err) {
     document.getElementById('loading').textContent = '資料載入失敗';
@@ -531,21 +593,33 @@ async function submitSign() {
   msg.textContent = '資料送出中...';
 
   try {
-    const result = await api({
-      action: 'submitSign',
-      id: SIGN_ID,
-      buyerName: document.getElementById('buyerName').value.trim(),
-      idNumber: document.getElementById('idNumber').value.trim(),
-      phone: document.getElementById('phone').value.trim(),
-      deliveryAddress: document.getElementById('deliveryAddress').value.trim(),
-      receiverName: document.getElementById('receiverName').value.trim(),
-      receiverPhone: document.getElementById('receiverPhone').value.trim()
-    });
+const result = await api({
+  action: 'submitSign',
+  id: SIGN_ID,
+  buyerName: document.getElementById('buyerName').value.trim(),
+  idNumber: document.getElementById('idNumber').value.trim(),
+  phone: document.getElementById('phone').value.trim(),
+  deliveryAddress: document.getElementById('deliveryAddress').value.trim(),
+  receiverName: document.getElementById('receiverName').value.trim(),
+  receiverPhone: document.getElementById('receiverPhone').value.trim(),
+  signImageData: createSignatureImageData()
+});
 
-    if (result.success) {
-      msg.className = 'msg success';
-      msg.textContent = '簽收資料已送出';
-    } else {
+if (result.success) {
+  msg.className = 'msg success';
+  msg.textContent = '簽收資料已送出';
+
+  if (result.signImageUrl) {
+    canvas.style.display = 'none';
+
+    const savedImg = document.getElementById('savedSignatureImage');
+    savedImg.src = result.signImageUrl;
+    savedImg.style.display = 'block';
+
+    document.getElementById('signedLockText').style.display = 'block';
+    document.getElementById('buttonRow').style.display = 'none';
+  }
+} else {
       msg.className = 'msg error';
       msg.textContent = result.message || '送出失敗';
       btn.disabled = false;
