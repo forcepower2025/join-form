@@ -531,12 +531,17 @@ async function loadOrder() {
 document.getElementById('loading').style.display = 'none';
 document.getElementById('captureArea').style.display = 'block';
 
-if (order.signStatus === '已簽收' && order.signImageUrl) {
+if (order.signStatus === '已簽收') {
   canvas.style.display = 'none';
 
   const savedImg = document.getElementById('savedSignatureImage');
-  savedImg.src = order.signImageUrl;
-  savedImg.style.display = 'block';
+
+  if (order.signImageUrl) {
+    savedImg.src = order.signImageUrl;
+    savedImg.style.display = 'block';
+  } else {
+    savedImg.style.display = 'none';
+  }
 
   document.getElementById('signedLockText').style.display = 'block';
   document.getElementById('buttonRow').style.display = 'none';
