@@ -306,72 +306,31 @@
             }
         });
 
-        // GitHub Pages 與 Apps Script 不同網域。
-        // 用原生 HTML 表單 POST 到隱藏 iframe，避免 fetch 讀取 Google 重導向時的 CORS 錯誤。
-        // Apps Script doPost(e) 的 e.parameter 可直接接收到以下 name 欄位。
-        const submissionFrame = document.createElement('iframe');
-        submissionFrame.name = 'googleSheetSubmissionFrame';
-        submissionFrame.id = 'googleSheetSubmissionFrame';
-        submissionFrame.style.display = 'none';
-        submissionFrame.setAttribute('title', '表單送出');
-        document.body.appendChild(submissionFrame);
-
+        // 原生 POST 在新分頁顯示 Apps Script 真正回應，不使用 iframe 或 fetch。
+        // 成功會顯示 {"result":"success"}；錯誤會顯示實際錯誤訊息。
         const orderForm = document.getElementById('orderForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const loadingSpinner = document.getElementById('loadingSpinner');
         const statusMessage = document.getElementById('statusMessage');
-        let waitingForSubmission = false;
-
-        function showStatus(message, type) {
-            statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-800', 'bg-amber-100', 'text-amber-800');
-            if (type === 'error') statusMessage.classList.add('bg-red-100', 'text-red-700');
-            else if (type === 'pending') statusMessage.classList.add('bg-amber-100', 'text-amber-800');
-            else statusMessage.classList.add('bg-green-100', 'text-green-800');
-            statusMessage.textContent = message;
-        }
-
-        function finishSending() {
-            waitingForSubmission = false;
-            submitBtn.disabled = false;
-            btnText.textContent = '確認送出訂單';
-            loadingSpinner.classList.add('hidden');
-        }
-
-        // 這代表瀏覽器收到 iframe 導頁事件，不等於 Google Sheets 已成功寫入。
-        // 由於 Apps Script 的 JSON 回應位於 Google 網域，GitHub 頁面不能跨網域讀取回應內容。
-        submissionFrame.addEventListener('load', function () {
-            if (!waitingForSubmission) return;
-            finishSending();
-            showStatus('表單已提交至 Google Apps Script。此頁無法直接核實 Google Sheets 是否寫入，請以工作表新增紀錄為準。', 'pending');
-        });
+        orderForm.action = GOOGLE_SCRIPT_URL;
+        orderForm.method = 'POST';
+        orderForm.enctype = 'application/x-www-form-urlencoded';
+        orderForm.target = '_blank';
 
         orderForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-            if (!orderForm.reportValidity()) return;
-            if (!GOOGLE_SCRIPT_URL || !GOOGLE_SCRIPT_URL.includes('script.google.com/macros/s/')) {
-                showStatus('Google Apps Script 網址設定不正確，請聯絡管理者。', 'error');
+            if (!orderForm.reportValidity()) {
+                event.preventDefault();
                 return;
             }
-
-            // 原生表單會用 application/x-www-form-urlencoded 傳送資料，與 e.parameter 相容。
-            orderForm.action = GOOGLE_SCRIPT_URL;
-            orderForm.method = 'POST';
-            orderForm.enctype = 'application/x-www-form-urlencoded';
-            orderForm.target = submissionFrame.name;
-
-            waitingForSubmission = true;
-            submitBtn.disabled = true;
-            btnText.textContent = '資料送出中...';
-            loadingSpinner.classList.remove('hidden');
-            showStatus('資料傳送中，請勿關閉此頁。', 'pending');
-
-            // 非刷卡時清空分期欄位，避免將無關的「1期」送進試算表。
+            if (!GOOGLE_SCRIPT_URL || !GOOGLE_SCRIPT_URL.startsWith('https://script.google.com/macros/s/')) {
+                event.preventDefault();
+                statusMessage.className = 'p-4 rounded-lg text-center text-sm font-medium bg-red-100 text-red-700';
+                statusMessage.textContent = 'Google Apps Script 網址設定不正確。';
+                return;
+            }
             if (document.getElementById('paymentMethodSelect').value !== '刷卡') {
                 document.getElementById('installmentSelect').value = '';
             }
-            // 直接使用原生 submit，不經 fetch，以避開 CORS 讀取失敗。
-            HTMLFormElement.prototype.submit.call(orderForm);
+            statusMessage.className = 'p-4 rounded-lg text-center text-sm font-medium bg-amber-100 text-amber-800';
+            statusMessage.textContent = '已開啟新分頁傳送訂單。請看新分頁的 JSON 回應：result=success 才代表寫入成功；若出現 Google 錯誤畫面，請截圖。';
         });
     </script>
 </body>
