@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -238,13 +239,13 @@
             "代理": { quantity: "5盒", amount: "15000元" },
             "小盤": { quantity: "16盒", amount: "48000元" },
             "中盤": { quantity: "32盒", amount: "96000元" },
-            "大盤": { quantity: "64盒", amount: "192000" },
-            "特大": { quantity: "128盒", amount: "384000" }
+            "大盤": { quantity: "64盒", amount: "192000元" },
+            "特大": { quantity: "128盒", amount: "384000元" }
         };
 
         // 初始化預設日期 (今天)
         document.addEventListener("DOMContentLoaded", () => {
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0];
             document.getElementById('orderDate').value = today;
             document.getElementById('paymentDate').value = today;
 
@@ -305,56 +306,72 @@
             }
         });
 
-        // 表單提交事件處理
-        document.getElementById('orderForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // GitHub Pages 與 Apps Script 不同網域。
+        // 用原生 HTML 表單 POST 到隱藏 iframe，避免 fetch 讀取 Google 重導向時的 CORS 錯誤。
+        // Apps Script doPost(e) 的 e.parameter 可直接接收到以下 name 欄位。
+        const submissionFrame = document.createElement('iframe');
+        submissionFrame.name = 'googleSheetSubmissionFrame';
+        submissionFrame.id = 'googleSheetSubmissionFrame';
+        submissionFrame.style.display = 'none';
+        submissionFrame.setAttribute('title', '表單送出');
+        document.body.appendChild(submissionFrame);
 
-            if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
-                alert("請先在程式碼中替換 GOOGLE_SCRIPT_URL 為您的 Google Apps Script 部署網址！");
+        const orderForm = document.getElementById('orderForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const statusMessage = document.getElementById('statusMessage');
+        let waitingForSubmission = false;
+
+        function showStatus(message, type) {
+            statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-800', 'bg-amber-100', 'text-amber-800');
+            if (type === 'error') statusMessage.classList.add('bg-red-100', 'text-red-700');
+            else if (type === 'pending') statusMessage.classList.add('bg-amber-100', 'text-amber-800');
+            else statusMessage.classList.add('bg-green-100', 'text-green-800');
+            statusMessage.textContent = message;
+        }
+
+        function finishSending() {
+            waitingForSubmission = false;
+            submitBtn.disabled = false;
+            btnText.textContent = '確認送出訂單';
+            loadingSpinner.classList.add('hidden');
+        }
+
+        // 這代表瀏覽器收到 iframe 導頁事件，不等於 Google Sheets 已成功寫入。
+        // 由於 Apps Script 的 JSON 回應位於 Google 網域，GitHub 頁面不能跨網域讀取回應內容。
+        submissionFrame.addEventListener('load', function () {
+            if (!waitingForSubmission) return;
+            finishSending();
+            showStatus('表單已提交至 Google Apps Script。此頁無法直接核實 Google Sheets 是否寫入，請以工作表新增紀錄為準。', 'pending');
+        });
+
+        orderForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            if (!orderForm.reportValidity()) return;
+            if (!GOOGLE_SCRIPT_URL || !GOOGLE_SCRIPT_URL.includes('script.google.com/macros/s/')) {
+                showStatus('Google Apps Script 網址設定不正確，請聯絡管理者。', 'error');
                 return;
             }
 
-            const submitBtn = document.getElementById('submitBtn');
-            const btnText = document.getElementById('btnText');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const statusMessage = document.getElementById('statusMessage');
+            // 原生表單會用 application/x-www-form-urlencoded 傳送資料，與 e.parameter 相容。
+            orderForm.action = GOOGLE_SCRIPT_URL;
+            orderForm.method = 'POST';
+            orderForm.enctype = 'application/x-www-form-urlencoded';
+            orderForm.target = submissionFrame.name;
 
-            // 鎖定按鈕顯示加載中
+            waitingForSubmission = true;
             submitBtn.disabled = true;
-            btnText.textContent = "資料送出中...";
+            btnText.textContent = '資料送出中...';
             loadingSpinner.classList.remove('hidden');
-            statusMessage.classList.add('hidden');
+            showStatus('資料傳送中，請勿關閉此頁。', 'pending');
 
-            const formData = new FormData(this);
-            
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                body: formData
-            })
-            .then(recievedResponse => recievedResponse.json())
-            .then(data => {
-                statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700');
-                statusMessage.classList.add('bg-green-100', 'text-green-800');
-                statusMessage.textContent = "✓ 訂單已成功送出並記錄！";
-                document.getElementById('orderForm').reset();
-                
-                // 重置預設日期
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('orderDate').value = today;
-                document.getElementById('paymentDate').value = today;
-                document.getElementById('installmentContainer').classList.add('hidden');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                statusMessage.classList.remove('hidden', 'bg-green-100', 'text-green-800');
-                statusMessage.classList.add('bg-red-100', 'text-red-700');
-                statusMessage.textContent = "✕ 送出失敗，請重試或聯繫管理者。";
-            })
-            .finally(() => {
-                submitBtn.disabled = false;
-                btnText.textContent = "確認送出訂單";
-                loadingSpinner.classList.add('hidden');
-            });
+            // 非刷卡時清空分期欄位，避免將無關的「1期」送進試算表。
+            if (document.getElementById('paymentMethodSelect').value !== '刷卡') {
+                document.getElementById('installmentSelect').value = '';
+            }
+            // 直接使用原生 submit，不經 fetch，以避開 CORS 讀取失敗。
+            HTMLFormElement.prototype.submit.call(orderForm);
         });
     </script>
 </body>
