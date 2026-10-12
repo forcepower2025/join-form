@@ -145,7 +145,7 @@
                     </div>
                     <!-- 刷卡分幾期? (動態顯示) -->
                     <div id="installmentContainer" class="hidden md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-700 mb-1">刷卡分期數 *</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">刷卡分幾期? *</label>
                         <select id="installmentSelect" name="刷卡分幾期?" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800 bg-white">
                             <option value="1期">1期</option>
                             <option value="3期">3期</option>
@@ -154,15 +154,15 @@
                             <option value="24期">24期</option>
                         </select>
                     </div>
-                    <!-- 付款說明 -->
-<div class="form-group">
-  <label for="paymentNote">付款說明 <span style="color: red;">*</span></label>
-  <textarea id="paymentNote" name="paymentNote" rows="5" required>請填寫以下資訊：
+                    <!-- 付款說明 (已完美套用網頁原本樣式) -->
+                    <div class="md:col-span-2">
+                        <label for="paymentNote" class="block text-sm font-medium text-slate-700 mb-1">付款說明 *</label>
+                        <textarea id="paymentNote" name="paymentNote" rows="5" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800 bg-white">請填寫以下資訊：
 1. 付款人姓名：
 2. 帳號/卡號末4碼：
 3. 分幾筆付款：
 4. 現金收款人（若付現）：</textarea>
-</div>
+                    </div>
                 </div>
             </div>
 
@@ -203,7 +203,7 @@
 
     <!-- 邏輯腳本 -->
     <script>
-        // 設定 Google Apps Script Web App URL (請在此替換為您的 Apps Script 部署網址)
+        // 設定 Google Apps Script Web App URL
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxioyjLupPQCR3TWVokhSGuL_P-VEfFElUUOVQ8EF1mpt-_SJEwZaWKfOPLakav7X/exec';
 
         // 全台縣市與鄉鎮市區對照資料表
@@ -223,7 +223,7 @@
             "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
             "臺南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
             "高雄市": ["楠梓區", "左營區", "鼓山區", "三民區", "鹽埕區", "前金區", "新興區", "苓雅區", "前鎮區", "旗津區", "小港區", "鳳山區", "林園區", "大寮區", "大樹區", "大社區", "仁武區", "鳥松區", "岡山區", "橋頭區", "燕巢區", "田寮區", "阿蓮區", "路竹區", "湖內區", "茄萣區", "永安區", "彌陀區", "梓官區", "旗山區", "美濃區", "六龜區", "甲仙區", "杉林區", "內門區", "茂林區", "桃源區", "那瑪夏區"],
-            "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "坎頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
+            "屏東縣": ["屏東市", "潮州鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "坎頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
             "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
             "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
             "臺東縣": ["臺東市", "成功鎮", "關山鎮", "長濱鄉", "池上鄉", "東河鄉", "鹿野鄉", "卑南鄉", "大武鄉", "太麻里鄉", "東河鄉", "綠島鄉", "蘭嶼鄉", "延平鄉", "金峰鄉", "達仁鄉"],
@@ -331,7 +331,7 @@
                 method: 'POST',
                 body: formData
             })
-            recievedResponse => recievedResponse.json()
+            .then(recievedResponse => recievedResponse.json())
             .then(data => {
                 statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700');
                 statusMessage.classList.add('bg-green-100', 'text-green-800');
