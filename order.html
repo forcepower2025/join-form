@@ -155,10 +155,14 @@
                         </select>
                     </div>
                     <!-- 付款說明 -->
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-slate-700 mb-1">付款說明 *</label>
-                        <textarea name="付款說明" rows="4" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800" placeholder="請填寫以下資訊：&#10;1. 付款人姓名：&#10;2. 帳號/卡號末4碼：&#10;3. 分幾筆付款：&#10;4. 現金收款人（若付現）："></textarea>
-                    </div>
+<div class="form-group">
+  <label for="paymentNote">付款說明 <span style="color: red;">*</span></label>
+  <textarea id="paymentNote" name="paymentNote" rows="5" required>請填寫以下資訊：
+1. 付款人姓名：
+2. 帳號/卡號末4碼：
+3. 分幾筆付款：
+4. 現金收款人（若付現）：</textarea>
+</div>
                 </div>
             </div>
 
@@ -234,8 +238,8 @@
             "代理": { quantity: "5盒", amount: "15000元" },
             "小盤": { quantity: "16盒", amount: "48000元" },
             "中盤": { quantity: "32盒", amount: "96000元" },
-            "大盤": { quantity: "64盒", amount: "19萬2" },
-            "特大": { quantity: "128盒", amount: "38萬4" }
+            "大盤": { quantity: "64盒", amount: "192000" },
+            "特大": { quantity: "128盒", amount: "384000" }
         };
 
         // 初始化預設日期 (今天)
