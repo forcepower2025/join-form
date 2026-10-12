@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>訂單資料填寫表單</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 自訂細節樣式 */
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen py-10 px-4 sm:px-6 lg:px-8 font-sans">
+    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+        <!-- 表單標頭 -->
+        <div class="bg-gradient-to-r from-indigo-600 to-blue-600 px-8 py-6 text-white">
+            <h1 class="text-2xl font-bold tracking-tight">線上訂單填報系統</h1>
+            <p class="text-indigo-100 text-sm mt-1">請填寫以下完整訂單資訊，帶 * 為必填欄位</p>
+        </div>
+
+        <form id="orderForm" class="p-8 space-y-6">
+            
+            <!-- 訂單基本資訊 Section -->
+            <div class="border-b border-slate-200 pb-6">
+                <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                    <span class="w-2 h-6 bg-indigo-600 rounded-full mr-2"></span>訂單與訂購人資訊
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- 訂單日期 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">訂單日期 *</label>
+                        <input type="date" id="orderDate" name="訂單日期" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800 bg-white">
+                    </div>
+                    <!-- 訂購人 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">訂購人姓名 *</label>
+                        <input type="text" name="訂購人" placeholder="請輸入訂購人姓名" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800">
+                    </div>
+                    <!-- 手機號碼 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">手機號碼 *</label>
+                        <input type="tel" name="手機號碼" placeholder="0912345678" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800">
+                    </div>
+                    <!-- 身份證字號 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">身份證字號 *</label>
+                        <input type="text" name="身份證字號" placeholder="請輸入身份證字號" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800 uppercase">
+                    </div>
+                    <!-- 生日 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">生日 *</label>
+                        <input type="date" name="生日" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800 bg-white">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 通訊地址 Section -->
+            <div class="border-b border-slate-200 pb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-slate-800 flex items-center">
+                        <span class="w-2 h-6 bg-indigo-600 rounded-full mr-2"></span>通訊地址
+                    </h2>
+                    <span class="text-xs bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-medium">備註：同宅配地址</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <!-- 通訊地址(縣市) -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">縣市 *</label>
+                        <select id="citySelect" name="通訊地址(縣市)" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800 bg-white">
+                            <option value="">請選擇縣市</option>
+                        </select>
+                    </div>
+                    <!-- 通訊地址(鄉鎮市區) -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">鄉鎮市區 *</label>
+                        <select id="districtSelect" name="通訊地址(區)" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800 bg-white">
+                            <option value="">請先選擇縣市</option>
+                        </select>
+                    </div>
+                    <!-- 通訊地址(巷弄號) -->
+                    <div class="md:col-span-3">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">詳細地址 (巷弄號樓) *</label>
+                        <input type="text" name="通訊地址(巷弄號)" placeholder="請輸入街道、巷弄、號、樓層" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 加入資格與金額 Section -->
+            <div class="border-b border-slate-200 pb-6">
+                <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                    <span class="w-2 h-6 bg-indigo-600 rounded-full mr-2"></span>資格與方案
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- 加入資格 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">加入資格 *</label>
+                        <select id="qualificationSelect" name="加入資格" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800 bg-white">
+                            <option value="">請選擇資格</option>
+                            <option value="會員">會員</option>
+                            <option value="代理">代理</option>
+                            <option value="小盤">小盤</option>
+                            <option value="中盤">中盤</option>
+                            <option value="大盤">大盤</option>
+                            <option value="特大">特大</option>
+                        </select>
+                    </div>
+                    <!-- 購買數量 (自動顯示) -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-500 mb-1">購買數量 (自動帶入)</label>
+                        <input type="text" id="quantityInput" name="購買數量" readonly class="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-600 bg-slate-100 font-medium">
+                    </div>
+                    <!-- 付款金額 (自動顯示) -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-500 mb-1">付款金額 (自動帶入)</label>
+                        <input type="text" id="amountInput" name="付款金額" readonly class="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-indigo-700 bg-slate-100 font-bold">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 付款資訊 Section -->
+            <div class="border-b border-slate-200 pb-6">
+                <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                    <span class="w-2 h-6 bg-indigo-600 rounded-full mr-2"></span>付款詳情
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <!-- 付款日期 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">付款日期 *</label>
+                        <input type="date" id="paymentDate" name="付款日期" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800 bg-white">
+                    </div>
+                    <!-- 付款方式 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">付款方式 *</label>
+                        <select id="paymentMethodSelect" name="付款方式" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800 bg-white">
+                            <option value="">請選擇付款方式</option>
+                            <option value="刷卡">刷卡</option>
+                            <option value="轉帳匯款">轉帳匯款</option>
+                            <option value="付現">付現</option>
+                        </select>
+                    </div>
+                    <!-- 刷卡分幾期? (動態顯示) -->
+                    <div id="installmentContainer" class="hidden md:col-span-2">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">刷卡分期數 *</label>
+                        <select id="installmentSelect" name="刷卡分幾期?" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800 bg-white">
+                            <option value="1期">1期</option>
+                            <option value="3期">3期</option>
+                            <option value="6期">6期</option>
+                            <option value="12期">12期</option>
+                            <option value="24期">24期</option>
+                        </select>
+                    </div>
+                    <!-- 付款說明 -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">付款說明 *</label>
+                        <textarea name="付款說明" rows="4" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800" placeholder="請填寫以下資訊：&#10;1. 付款人姓名：&#10;2. 帳號/卡號末4碼：&#10;3. 分幾筆付款：&#10;4. 現金收款人（若付現）："></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 介紹人資訊 Section -->
+            <div>
+                <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                    <span class="w-2 h-6 bg-indigo-600 rounded-full mr-2"></span>介紹人資訊
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- 介紹人 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">介紹人姓名</label>
+                        <input type="text" name="介紹人" placeholder="請輸入介紹人姓名（無則留空）" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800">
+                    </div>
+                    <!-- 介紹人手機號碼 -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">介紹人手機號碼</label>
+                        <input type="tel" name="介紹人手機號碼" placeholder="請輸入介紹人手機號碼" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-800">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 送出按鈕 -->
+            <div class="pt-4">
+                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-xl transition duration-200 flex justify-center items-center">
+                    <span id="btnText">確認送出訂單</span>
+                    <svg id="loadingSpinner" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- 訊息提示欄位 -->
+            <div id="statusMessage" class="hidden p-4 rounded-lg text-center text-sm font-medium"></div>
+        </form>
+    </div>
+
+    <!-- 邏輯腳本 -->
+    <script>
+        // 設定 Google Apps Script Web App URL (請在此替換為您的 Apps Script 部署網址)
+        const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+        // 全台縣市與鄉鎮市區對照資料表
+        const taiwanDistricts = {
+            "基隆市": ["仁愛區", "信義區", "中正區", "中山區", "安樂區", "暖暖區", "七堵區"],
+            "臺北市": ["中正區", "大同區", "中山區", "松山區", "大安區", "萬華區", "信義區", "士林區", "北投區", "內湖區", "南港區", "文山區"],
+            "新北市": ["板橋區", "三重區", "中和區", "永和區", "新莊區", "新店區", "樹林區", "鶯歌區", "三峽區", "淡水區", "汐止區", "瑞芳區", "土城區", "蘆洲區", "五股區", "泰山區", "林口區", "深坑區", "石碇區", "坪林區", "三芝區", "石門區", "八里區", "平溪區", "雙溪區", "貢寮區", "金山區", "萬里區", "烏來區"],
+            "桃園市": ["桃園區", "中壢區", "大溪區", "楊梅區", "蘆竹區", "大園區", "龜山區", "八德區", "龍潭區", "平鎮區", "新屋區", "觀音區", "復興區"],
+            "新竹市": ["東區", "北區", "香山區"],
+            "新竹縣": ["竹北市", "關西鎮", "新埔鎮", "竹東鎮", "湖口鄉", "橫山鄉", "新豐鄉", "芎林鄉", "寶山鄉", "北埔鄉", "峨眉鄉", "尖石鄉", "五峰鄉"],
+            "苗栗縣": ["苗栗市", "頭份市", "竹南鎮", "後龍鎮", "通霄鎮", "苑裡鎮", "卓蘭鎮", "造橋鄉", "西湖鄉", "頭屋鄉", "公館鄉", "銅鑼鄉", "三義鄉", "大湖鄉", "獅潭鄉", "三灣鄉", "南庄鄉", "泰安鄉"],
+            "臺中市": ["中區", "東區", "南區", "西區", "北區", "北屯區", "西屯區", "南屯區", "太平區", "大里區", "霧峰區", "烏日區", "豐原區", "后里區", "石岡區", "東勢區", "和平區", "新社區", "潭子區", "大雅區", "神岡區", "大肚區", "沙鹿區", "龍井區", "梧棲區", "清水區", "大甲區", "外埔區", "大安區"],
+            "彰化縣": ["彰化市", "員林市", "和美鎮", "鹿港鎮", "溪湖鎮", "二林鎮", "田中鎮", "北斗鎮", "花壇鄉", "芬園鄉", "線西鄉", "伸港鄉", "福興鄉", "秀水鄉", "埔心鄉", "埔鹽鄉", "大村鄉", "平溪鄉", "竹塘鄉", "社頭鄉", "二水鄉", "田尾鄉", "埤頭鄉", "芳苑鄉", "大城鄉", "溪州鄉"],
+            "南投縣": ["南投市", "埔里鎮", "草屯鎮", "竹山鎮", "集集鎮", "名間鄉", "鹿谷鄉", "中寮鄉", "魚池鄉", "國姓鄉", "水里鄉", "信義鄉", "仁愛鄉"],
+            "雲林縣": ["斗六市", "斗南鎮", "虎尾鎮", "土庫鎮", "北港鎮", "西螺鎮", "古坑鄉", "大埤鄉", "莿桐鄉", "林內鄉", "二崙鄉", "崙背鄉", "麥寮鄉", "東勢鄉", "褒忠鄉", "臺西鄉", "元長鄉", "四湖鄉", "口湖鄉", "水林鄉"],
+            "嘉義市": ["東區", "西區"],
+            "嘉義縣": ["太保市", "朴子市", "布袋鎮", "大林鎮", "民雄鄉", "溪口鄉", "新港鄉", "六腳鄉", "東石鄉", "義竹鄉", "鹿草鄉", "水上鄉", "中埔鄉", "竹崎鄉", "梅山鄉", "番路鄉", "大埔鄉", "阿里山鄉"],
+            "臺南市": ["中西區", "東區", "南區", "北區", "安平區", "安南區", "永康區", "歸仁區", "新化區", "左鎮區", "玉井區", "楠西區", "南化區", "仁德區", "關廟區", "龍崎區", "官田區", "麻豆區", "佳里區", "西港區", "七股區", "將軍區", "學甲區", "北門區", "新營區", "後壁區", "白河區", "東山區", "六甲區", "下營區", "柳營區", "鹽水區", "善化區", "大內區", "山上區", "新市區", "安定區"],
+            "高雄市": ["楠梓區", "左營區", "鼓山區", "三民區", "鹽埕區", "前金區", "新興區", "苓雅區", "前鎮區", "旗津區", "小港區", "鳳山區", "林園區", "大寮區", "大樹區", "大社區", "仁武區", "鳥松區", "岡山區", "橋頭區", "燕巢區", "田寮區", "阿蓮區", "路竹區", "湖內區", "茄萣區", "永安區", "彌陀區", "梓官區", "旗山區", "美濃區", "六龜區", "甲仙區", "杉林區", "內門區", "茂林區", "桃源區", "那瑪夏區"],
+            "屏東縣": ["屏東市", "潮州鎮", "東港鎮", "恆春鎮", "萬丹鄉", "長治鄉", "麟洛鄉", "九如鄉", "里港鄉", "鹽埔鄉", "高樹鄉", "萬巒鄉", "內埔鄉", "竹田鄉", "新埤鄉", "枋寮鄉", "新園鄉", "坎頂鄉", "林邊鄉", "南州鄉", "佳冬鄉", "琉球鄉", "車城鄉", "滿州鄉", "枋山鄉", "三地門鄉", "霧臺鄉", "瑪家鄉", "泰武鄉", "來義鄉", "春日鄉", "獅子鄉", "牡丹鄉"],
+            "宜蘭縣": ["宜蘭市", "羅東鎮", "蘇澳鎮", "頭城鎮", "礁溪鄉", "壯圍鄉", "員山鄉", "冬山鄉", "五結鄉", "三星鄉", "大同鄉", "南澳鄉"],
+            "花蓮縣": ["花蓮市", "鳳林鎮", "玉里鎮", "新城鄉", "吉安鄉", "壽豐鄉", "光復鄉", "豐濱鄉", "瑞穗鄉", "富里鄉", "秀林鄉", "萬榮鄉", "卓溪鄉"],
+            "臺東縣": ["臺東市", "成功鎮", "關山鎮", "長濱鄉", "池上鄉", "東河鄉", "鹿野鄉", "卑南鄉", "大武鄉", "太麻里鄉", "東河鄉", "綠島鄉", "蘭嶼鄉", "延平鄉", "金峰鄉", "達仁鄉"],
+            "澎湖縣": ["馬公市", "湖西鄉", "白沙鄉", "西嶼鄉", "望安鄉", "七美鄉"],
+            "金門縣": ["金城鎮", "金湖鎮", "金沙鎮", "金寧鄉", "烈嶼鄉", "烏坵鄉"],
+            "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
+        };
+
+        // 方案與數量、金額連動字典
+        const qualificationData = {
+            "會員": { quantity: "1盒", amount: "3000元" },
+            "代理": { quantity: "5盒", amount: "15000元" },
+            "小盤": { quantity: "16盒", amount: "48000元" },
+            "中盤": { quantity: "32盒", amount: "96000元" },
+            "大盤": { quantity: "64盒", amount: "19萬2" },
+            "特大": { quantity: "128盒", amount: "38萬4" }
+        };
+
+        // 初始化預設日期 (今天)
+        document.addEventListener("DOMContentLoaded", () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('orderDate').value = today;
+            document.getElementById('paymentDate').value = today;
+
+            // 初始化縣市下拉選單
+            const citySelect = document.getElementById('citySelect');
+            Object.keys(taiwanDistricts).forEach(city => {
+                const opt = document.createElement('option');
+                opt.value = city;
+                opt.textContent = city;
+                citySelect.appendChild(opt);
+            });
+        });
+
+        // 縣市連動鄉鎮市區
+        document.getElementById('citySelect').addEventListener('change', function() {
+            const districtSelect = document.getElementById('districtSelect');
+            const selectedCity = this.value;
+            
+            districtSelect.innerHTML = '<option value="">請選擇鄉鎮市區</option>';
+            
+            if (selectedCity && taiwanDistricts[selectedCity]) {
+                taiwanDistricts[selectedCity].forEach(district => {
+                    const opt = document.createElement('option');
+                    opt.value = district;
+                    opt.textContent = district;
+                    districtSelect.appendChild(opt);
+                });
+            }
+        });
+
+        // 加入資格連動購買數量與金額
+        document.getElementById('qualificationSelect').addEventListener('change', function() {
+            const val = this.value;
+            const quantityInput = document.getElementById('quantityInput');
+            const amountInput = document.getElementById('amountInput');
+
+            if (qualificationData[val]) {
+                quantityInput.value = qualificationData[val].quantity;
+                amountInput.value = qualificationData[val].amount;
+            } else {
+                quantityInput.value = '';
+                amountInput.value = '';
+            }
+        });
+
+        // 付款方式動態顯示刷卡分期數
+        document.getElementById('paymentMethodSelect').addEventListener('change', function() {
+            const installmentContainer = document.getElementById('installmentContainer');
+            const installmentSelect = document.getElementById('installmentSelect');
+            
+            if (this.value === '刷卡') {
+                installmentContainer.classList.remove('hidden');
+                installmentSelect.required = true;
+            } else {
+                installmentContainer.classList.add('hidden');
+                installmentSelect.required = false;
+                installmentSelect.value = '';
+            }
+        });
+
+        // 表單提交事件處理
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
+                alert("請先在程式碼中替換 GOOGLE_SCRIPT_URL 為您的 Google Apps Script 部署網址！");
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const statusMessage = document.getElementById('statusMessage');
+
+            // 鎖定按鈕顯示加載中
+            submitBtn.disabled = true;
+            btnText.textContent = "資料送出中...";
+            loadingSpinner.classList.remove('hidden');
+            statusMessage.classList.add('hidden');
+
+            const formData = new FormData(this);
+            
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: formData
+            })
+            recievedResponse => recievedResponse.json()
+            .then(data => {
+                statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-700');
+                statusMessage.classList.add('bg-green-100', 'text-green-800');
+                statusMessage.textContent = "✓ 訂單已成功送出並記錄！";
+                document.getElementById('orderForm').reset();
+                
+                // 重置預設日期
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('orderDate').value = today;
+                document.getElementById('paymentDate').value = today;
+                document.getElementById('installmentContainer').classList.add('hidden');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                statusMessage.classList.remove('hidden', 'bg-green-100', 'text-green-800');
+                statusMessage.classList.add('bg-red-100', 'text-red-700');
+                statusMessage.textContent = "✕ 送出失敗，請重試或聯繫管理者。";
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                btnText.textContent = "確認送出訂單";
+                loadingSpinner.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
